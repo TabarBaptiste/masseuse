@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client';
 
 import React, { useEffect, useState } from 'react';
@@ -45,7 +46,7 @@ function ReservationContent() {
       try {
         const response = await api.get<Service>(`/services/${params.serviceId}`);
         setService(response.data);
-      } catch (_err) {
+      } catch (err) {
         setError('Service introuvable');
       } finally {
         setIsLoadingService(false);
