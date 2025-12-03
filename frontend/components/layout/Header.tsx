@@ -27,7 +27,7 @@ export const Header: React.FC = () => {
             </Link>
             {isInitialized && isAuthenticated && (
               <Link href="/profile" className="text-stone-700 hover:text-amber-800 px-3 py-2 text-sm font-medium transition-colors">
-                Mon Profil
+                {user?.firstName}
               </Link>
             )}
             
@@ -38,9 +38,9 @@ export const Header: React.FC = () => {
               </div>
             ) : isAuthenticated ? (
               <div className="flex items-center space-x-4 ml-4 pl-4 border-l border-stone-200">
-                <span className="hidden xl:inline-block text-sm text-stone-600">
+                {/* <span className="hidden xl:inline-block text-sm text-stone-600">
                   {user?.firstName}
-                </span>
+                </span> */}
                 {user?.role === UserRole.PRO && (
                   <Link href="/pro/dashboard" className="text-stone-700 hover:text-amber-800 text-sm font-medium transition-colors">
                     Dashboard PRO
@@ -110,7 +110,7 @@ export const Header: React.FC = () => {
                   className="block px-3 py-2 rounded-lg text-base font-medium text-stone-700 hover:text-amber-800 hover:bg-stone-50 transition-colors"
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  Mon Profil
+                  {user?.firstName}
                 </Link>
               )}
 

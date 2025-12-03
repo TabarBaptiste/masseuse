@@ -14,9 +14,7 @@ import { PrismaModule } from '../prisma/prisma.module';
     ConfigModule,
     JwtModule.register({
       global: true,
-      secret:
-        process.env.JWT_SECRET ||
-        'your-super-secret-jwt-key-change-in-production',
+      secret: process.env.JWT_SECRET,
       signOptions: { expiresIn: '7d' },
     }),
   ],
