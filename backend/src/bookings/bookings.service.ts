@@ -198,13 +198,24 @@ export class BookingsService {
     return availableSlots;
   }
 
-  async findAll(userId?: string, status?: BookingStatus) {
+  async findAll(userId?: string, status?: BookingStatus, date?: string, name?: string) {
     const where: any = {};
     if (userId) {
       where.userId = userId;
     }
     if (status) {
       where.status = status;
+    }
+    if (date) {
+      where.date = new Date(date);
+    }
+    if (name) {
+      where.user = {
+        OR: [
+          { firstName: { contains: name, mode: 'insensitive' } },
+          { lastName: { contains: name, mode: 'insensitive' } },
+        ],
+      };
     }
 
     return this.prisma.booking.findMany({

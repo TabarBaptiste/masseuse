@@ -40,8 +40,10 @@ export class BookingsController {
   findAll(
     @Query('userId') userId?: string,
     @Query('status') status?: BookingStatus,
+    @Query('date') date?: string,
+    @Query('name') name?: string,
   ) {
-    return this.bookingsService.findAll(userId, status);
+    return this.bookingsService.findAll(userId, status, date, name);
   }
 
   @Get('my-bookings')
