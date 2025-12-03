@@ -1,65 +1,184 @@
-import Image from "next/image";
+import Link from 'next/link';
+import { Button } from '@/components/ui/Button';
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <div className="bg-neutral-50">
+      {/* Hero Section */}
+      <section className="relative min-h-[85vh] flex items-center justify-center overflow-hidden">
+        {/* Background with gradient overlay */}
+        <div className="absolute inset-0 bg-linear-to-br from-amber-50 via-stone-100 to-neutral-100">
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAxOGMzLjMxNCAwIDYgMi42ODYgNiA2cy0yLjY4NiA2LTYgNi02LTIuNjg2LTYtNiAyLjY4Ni02IDYtNnoiIGZpbGw9IiNmNWY1ZjAiIG9wYWNpdHk9IjAuMiIvPjwvZz48L3N2Zz4=')] opacity-30"></div>
+        </div>
+        
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
+          <div className="space-y-8">
+            <div className="inline-block">
+              <span className="text-amber-700 text-sm font-medium tracking-[0.3em] uppercase">Bien-être & Sérénité</span>
+            </div>
+            <h1 className="heading-serif text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold text-stone-800 leading-tight">
+              Zen Massage
+            </h1>
+            <p className="text-base sm:text-xl md:text-2xl text-stone-600 max-w-3xl mx-auto font-light leading-relaxed px-4">
+              Offrez-vous un moment de pure relaxation dans notre havre de paix.
+              <br className="hidden md:block" />
+              Des soins sur mesure pour votre bien-être absolu.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center pt-6">
+              <Link href="/services" className="w-full sm:w-auto">
+                <Button 
+                  size="lg" 
+                  className="w-full sm:w-auto bg-amber-800 hover:bg-amber-900 text-white px-6 sm:px-10 py-3 sm:py-4 text-base sm:text-lg rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                >
+                  Découvrir nos soins
+                </Button>
+              </Link>
+              <Link href="/register" className="w-full sm:w-auto">
+                <Button 
+                  size="lg" 
+                  className="w-full sm:w-auto bg-stone-800 hover:bg-stone-900 text-white border-2 border-stone-800 px-6 sm:px-10 py-3 sm:py-4 text-base sm:text-lg rounded-full shadow-md hover:shadow-lg transition-all duration-300"
+                >
+                  Réserver maintenant
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+        
+        {/* Decorative wave */}
+        <div className="absolute bottom-0 left-0 right-0">
+          <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-auto">
+            <path d="M0 64L60 69.3C120 75 240 85 360 80C480 75 600 53 720 48C840 43 960 53 1080 58.7C1200 64 1320 64 1380 64H1440V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0V64Z" fill="#fdfcfb"/>
+          </svg>
+        </div>
+      </section>
+
+      {/* Philosophy Section */}
+      <section className="py-24 bg-white">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <span className="text-amber-700 text-sm font-medium tracking-[0.3em] uppercase">Notre Philosophie</span>
+            <h2 className="heading-serif text-3xl sm:text-4xl md:text-5xl font-bold text-stone-800 mt-4 mb-6">
+              L'Art du Massage Authentique
+            </h2>
+            <p className="text-lg text-stone-600 max-w-3xl mx-auto leading-relaxed">
+              Nous croyons que chaque massage est une expérience unique, 
+              un voyage vers l'harmonie du corps et de l'esprit.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="py-24 bg-linear-to-b from-white to-neutral-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+            <div className="text-center group">
+              <div className="relative inline-block mb-6">
+                <div className="absolute inset-0 bg-amber-200 rounded-full blur-xl opacity-30 group-hover:opacity-50 transition-opacity"></div>
+                <div className="relative bg-linear-to-br from-amber-100 to-amber-50 rounded-2xl w-24 h-24 flex items-center justify-center mx-auto shadow-md group-hover:shadow-xl transition-all duration-300">
+                  <svg className="w-12 h-12 text-amber-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                  </svg>
+                </div>
+              </div>
+              <h3 className="heading-serif text-2xl font-semibold mb-3 text-stone-800">Expertise Certifiée</h3>
+              <p className="text-stone-600 leading-relaxed">
+                Nos thérapeutes diplômés possèdent plus de 10 ans d'expérience dans l'art du massage thérapeutique.
+              </p>
+            </div>
+            
+            <div className="text-center group">
+              <div className="relative inline-block mb-6">
+                <div className="absolute inset-0 bg-amber-200 rounded-full blur-xl opacity-30 group-hover:opacity-50 transition-opacity"></div>
+                <div className="relative bg-linear-to-br from-amber-100 to-amber-50 rounded-2xl w-24 h-24 flex items-center justify-center mx-auto shadow-md group-hover:shadow-xl transition-all duration-300">
+                  <svg className="w-12 h-12 text-amber-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                  </svg>
+                </div>
+              </div>
+              <h3 className="heading-serif text-2xl font-semibold mb-3 text-stone-800">Soins Personnalisés</h3>
+              <p className="text-stone-600 leading-relaxed">
+                Chaque séance est adaptée à vos besoins spécifiques pour une expérience unique et sur mesure.
+              </p>
+            </div>
+            
+            <div className="text-center group">
+              <div className="relative inline-block mb-6">
+                <div className="absolute inset-0 bg-amber-200 rounded-full blur-xl opacity-30 group-hover:opacity-50 transition-opacity"></div>
+                <div className="relative bg-linear-to-br from-amber-100 to-amber-50 rounded-2xl w-24 h-24 flex items-center justify-center mx-auto shadow-md group-hover:shadow-xl transition-all duration-300">
+                  <svg className="w-12 h-12 text-amber-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+              </div>
+              <h3 className="heading-serif text-2xl font-semibold mb-3 text-stone-800">Ambiance Zen</h3>
+              <p className="text-stone-600 leading-relaxed">
+                Un espace apaisant conçu pour vous transporter vers un état de relaxation profonde.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Services Preview */}
+      <section className="py-24 bg-stone-800 text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <span className="text-amber-400 text-sm font-medium tracking-[0.3em] uppercase">Nos Prestations</span>
+            <h2 className="heading-serif text-4xl md:text-5xl font-bold mt-4 mb-6">
+              Des Soins d'Exception
+            </h2>
+            <p className="text-xl text-stone-300 max-w-3xl mx-auto">
+              Découvrez notre gamme de massages authentiques, du suédois traditionnel aux pierres chaudes
+            </p>
+          </div>
+          <div className="text-center mt-12">
+            <Link href="/services">
+              <Button 
+                size="lg" 
+                className="bg-amber-600 hover:bg-amber-700 text-white px-12 py-6 text-lg rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
+              >
+                Voir tous nos soins
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-28 bg-linear-to-br from-amber-50 via-stone-50 to-neutral-100 relative overflow-hidden">
+        <div className="absolute inset-0 opacity-5">
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAxOGMzLjMxNCAwIDYgMi42ODYgNiA2cy0yLjY4NiA2LTYgNi02LTIuNjg2LTYtNiAyLjY4Ni02IDYtNnoiIGZpbGw9IiM4YjczNTUiLz48L2c+PC9zdmc+')] "></div>
+        </div>
+        <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="heading-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-stone-800 mb-6">
+            Offrez-vous un moment
+            <br />
+            <span className="text-amber-800">de pure détente</span>
+          </h2>
+          <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-stone-600 mb-8 sm:mb-12 max-w-2xl mx-auto font-light px-4">
+            Réservez dès maintenant votre séance et laissez nos mains expertes
+            prendre soin de vous
           </p>
+          <div className="flex flex-col gap-4 sm:gap-6 justify-center items-center">
+            <Link href="/services" className="w-full sm:w-auto max-w-sm">
+              <Button 
+                size="lg" 
+                className="w-full bg-amber-800 hover:bg-amber-900 text-white px-8 sm:px-12 py-4 sm:py-5 text-base sm:text-lg rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
+              >
+                Réserver en ligne
+              </Button>
+            </Link>
+            <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3 text-stone-700 px-4">
+              <svg className="w-5 h-5 sm:w-6 sm:h-6 text-amber-700 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+              </svg>
+              <span className="text-sm sm:text-base md:text-lg font-medium text-center">ou appelez-nous au <strong className="block sm:inline">01 23 45 67 89</strong></span>
+            </div>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+      </section>
     </div>
   );
 }
