@@ -18,14 +18,40 @@ Application web full-stack pour la réservation de séances de massage, avec ges
 
 ### Installation
 
-#### 1. Cloner le projet
+#### Option A: Avec Docker (Recommandé)
+
+##### 1. Démarrer PostgreSQL avec Docker
+
+```bash
+docker-compose up -d
+```
+
+Cela démarre une instance PostgreSQL sur le port 5432.
+
+##### 2. Continuer avec la configuration Backend (étape 2 ci-dessous)
+
+Utilisez cette chaîne de connexion dans votre `.env`:
+```env
+DATABASE_URL="postgresql://masseuse:masseuse@localhost:5432/masseuse?schema=public"
+DIRECT_URL="postgresql://masseuse:masseuse@localhost:5432/masseuse?schema=public"
+```
+
+#### Option B: Sans Docker
+
+##### 1. Installer et configurer PostgreSQL manuellement
+
+Installez PostgreSQL et créez une base de données nommée `masseuse`.
+
+#### Configuration commune
+
+##### 1. Cloner le projet
 
 ```bash
 git clone <repository-url>
 cd masseuse
 ```
 
-#### 2. Configuration Backend
+##### 2. Configuration Backend
 
 ```bash
 cd backend
@@ -61,7 +87,7 @@ npm run start:dev
 
 Le backend sera disponible sur `http://localhost:3001`
 
-#### 3. Configuration Frontend
+##### 3. Configuration Frontend
 
 ```bash
 cd ../frontend
