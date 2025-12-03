@@ -9,6 +9,7 @@ interface AuthState {
   token: string | null;
   isLoading: boolean;
   isAuthenticated: boolean;
+  isInitialized: boolean;
   login: (data: LoginData) => Promise<void>;
   register: (data: RegisterData) => Promise<void>;
   logout: () => void;
@@ -20,6 +21,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   token: null,
   isLoading: false,
   isAuthenticated: false,
+  isInitialized: false,
 
   login: async (data: LoginData) => {
     set({ isLoading: true });
@@ -66,11 +68,14 @@ export const useAuthStore = create<AuthState>((set) => ({
     if (token && userStr) {
       try {
         const user = JSON.parse(userStr);
-        set({ user, token, isAuthenticated: true });
+        set({ user, token, isAuthenticated: true, isInitialized: true });
       } catch (_error) {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
+        set({ isInitialized: true });
       }
+    } else {
+      set({ isInitialized: true });
     }
   },
 }));

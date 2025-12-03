@@ -6,7 +6,7 @@ import { useAuthStore } from '@/store/auth';
 import { UserRole } from '@/types';
 
 export const Header: React.FC = () => {
-  const { user, isAuthenticated, logout } = useAuthStore();
+  const { user, isAuthenticated, isInitialized, logout } = useAuthStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
@@ -25,14 +25,18 @@ export const Header: React.FC = () => {
             <Link href="/services" className="text-stone-700 hover:text-amber-800 px-3 py-2 text-sm font-medium transition-colors">
               Nos Soins
             </Link>
-            {isAuthenticated && (
+            {isInitialized && isAuthenticated && (
               <Link href="/profile" className="text-stone-700 hover:text-amber-800 px-3 py-2 text-sm font-medium transition-colors">
                 Mon Profil
               </Link>
             )}
             
             {/* Auth Section Desktop */}
-            {isAuthenticated ? (
+            {!isInitialized ? (
+              <div className="ml-4 pl-4 border-l border-stone-200">
+                <div className="w-24 h-8 bg-stone-200 animate-pulse rounded"></div>
+              </div>
+            ) : isAuthenticated ? (
               <div className="flex items-center space-x-4 ml-4 pl-4 border-l border-stone-200">
                 <span className="hidden xl:inline-block text-sm text-stone-600">
                   {user?.firstName}
@@ -59,7 +63,7 @@ export const Header: React.FC = () => {
                 <Link href="/login" className="text-stone-700 hover:text-amber-800 px-3 py-2 text-sm font-medium transition-colors">
                   Connexion
                 </Link>
-                <Link href="/register" className="bg-amber-800 hover:bg-amber-900 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all shadow-sm hover:shadow-md">
+                <Link href="/login" className="bg-amber-800 hover:bg-amber-900 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all shadow-sm hover:shadow-md">
                   Réserver
                 </Link>
               </div>
@@ -100,7 +104,7 @@ export const Header: React.FC = () => {
                 Nos Soins
               </Link>
               
-              {isAuthenticated && (
+              {isInitialized && isAuthenticated && (
                 <Link
                   href="/profile"
                   className="block px-3 py-2 rounded-lg text-base font-medium text-stone-700 hover:text-amber-800 hover:bg-stone-50 transition-colors"
@@ -110,7 +114,11 @@ export const Header: React.FC = () => {
                 </Link>
               )}
 
-              {isAuthenticated ? (
+              {!isInitialized ? (
+                <div className="px-3 py-2 border-t border-stone-200 mt-2 pt-2">
+                  <div className="h-8 bg-stone-200 animate-pulse rounded"></div>
+                </div>
+              ) : isAuthenticated ? (
                 <>
                   <div className="px-3 py-2 text-sm text-stone-600 border-t border-stone-200 mt-2 pt-2">
                     {user?.firstName} {user?.lastName}

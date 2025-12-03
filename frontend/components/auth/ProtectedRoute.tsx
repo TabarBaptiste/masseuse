@@ -16,19 +16,19 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   allowedRoles,
 }) => {
   const router = useRouter();
-  const { isAuthenticated, user, isLoading } = useAuthStore();
+  const { isAuthenticated, user, isLoading, isInitialized } = useAuthStore();
 
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
+    if (isInitialized && !isLoading && !isAuthenticated) {
       router.push('/login');
-    } else if (!isLoading && isAuthenticated && allowedRoles && user) {
+    } else if (isInitialized && !isLoading && isAuthenticated && allowedRoles && user) {
       if (!allowedRoles.includes(user.role)) {
         router.push('/');
       }
     }
-  }, [isAuthenticated, isLoading, user, allowedRoles, router]);
+  }, [isAuthenticated, isLoading, user, allowedRoles, router, isInitialized]);
 
-  if (isLoading) {
+  if (!isInitialized || isLoading) {
     return <Loading />;
   }
 

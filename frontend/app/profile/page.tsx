@@ -21,6 +21,11 @@ function ProfileContent() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Force scroll to top on page load
+    window.scrollTo(0, 0);
+  }, []);
+
+  useEffect(() => {
     const fetchBookings = async () => {
       try {
         const response = await api.get('/bookings/my-bookings');
@@ -119,7 +124,16 @@ function ProfileContent() {
           <Card>
             <h2 className="text-xl font-semibold mb-4">Mes réservations</h2>
             {loading ? (
-              <p className="text-gray-600">Chargement...</p>
+              <div className="space-y-4">
+                <div className="border rounded-lg p-4 bg-white animate-pulse">
+                  <div className="h-6 bg-gray-200 rounded w-3/4 mb-3"></div>
+                  <div className="space-y-2">
+                    <div className="h-4 bg-gray-200 rounded w-full"></div>
+                    <div className="h-4 bg-gray-200 rounded w-5/6"></div>
+                    <div className="h-4 bg-gray-200 rounded w-4/6"></div>
+                  </div>
+                </div>
+              </div>
             ) : bookings.length === 0 ? (
               <p className="text-gray-600">
                 Vous n'avez pas encore de réservation.
