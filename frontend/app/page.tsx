@@ -7,7 +7,7 @@ export default function Home() {
       {/* Hero Section */}
       <section className="relative min-h-[85vh] flex items-center justify-center overflow-hidden">
         {/* Background with gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-amber-50 via-stone-100 to-neutral-100">
+        <div className="absolute inset-0 bg-linear-to-br from-amber-50 via-stone-100 to-neutral-100">
           <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAxOGMzLjMxNCAwIDYgMi42ODYgNiA2cy0yLjY4NiA2LTYgNi02LTIuNjg2LTYtNiAyLjY4Ni02IDYtNnoiIGZpbGw9IiNmNWY1ZjAiIG9wYWNpdHk9IjAuMiIvPjwvZz48L3N2Zz4=')] opacity-30"></div>
         </div>
         
@@ -70,13 +70,13 @@ export default function Home() {
       </section>
 
       {/* Features Section */}
-      <section className="py-24 bg-gradient-to-b from-white to-neutral-50">
+      <section className="py-24 bg-linear-to-b from-white to-neutral-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
             <div className="text-center group">
               <div className="relative inline-block mb-6">
                 <div className="absolute inset-0 bg-amber-200 rounded-full blur-xl opacity-30 group-hover:opacity-50 transition-opacity"></div>
-                <div className="relative bg-gradient-to-br from-amber-100 to-amber-50 rounded-2xl w-24 h-24 flex items-center justify-center mx-auto shadow-md group-hover:shadow-xl transition-all duration-300">
+                <div className="relative bg-linear-to-br from-amber-100 to-amber-50 rounded-2xl w-24 h-24 flex items-center justify-center mx-auto shadow-md group-hover:shadow-xl transition-all duration-300">
                   <svg className="w-12 h-12 text-amber-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                   </svg>
@@ -91,7 +91,7 @@ export default function Home() {
             <div className="text-center group">
               <div className="relative inline-block mb-6">
                 <div className="absolute inset-0 bg-amber-200 rounded-full blur-xl opacity-30 group-hover:opacity-50 transition-opacity"></div>
-                <div className="relative bg-gradient-to-br from-amber-100 to-amber-50 rounded-2xl w-24 h-24 flex items-center justify-center mx-auto shadow-md group-hover:shadow-xl transition-all duration-300">
+                <div className="relative bg-linear-to-br from-amber-100 to-amber-50 rounded-2xl w-24 h-24 flex items-center justify-center mx-auto shadow-md group-hover:shadow-xl transition-all duration-300">
                   <svg className="w-12 h-12 text-amber-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                   </svg>
@@ -106,7 +106,7 @@ export default function Home() {
             <div className="text-center group">
               <div className="relative inline-block mb-6">
                 <div className="absolute inset-0 bg-amber-200 rounded-full blur-xl opacity-30 group-hover:opacity-50 transition-opacity"></div>
-                <div className="relative bg-gradient-to-br from-amber-100 to-amber-50 rounded-2xl w-24 h-24 flex items-center justify-center mx-auto shadow-md group-hover:shadow-xl transition-all duration-300">
+                <div className="relative bg-linear-to-br from-amber-100 to-amber-50 rounded-2xl w-24 h-24 flex items-center justify-center mx-auto shadow-md group-hover:shadow-xl transition-all duration-300">
                   <svg className="w-12 h-12 text-amber-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
@@ -147,7 +147,7 @@ export default function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-28 bg-gradient-to-br from-amber-50 via-stone-50 to-neutral-100 relative overflow-hidden">
+      <section className="py-28 bg-linear-to-br from-amber-50 via-stone-50 to-neutral-100 relative overflow-hidden">
         <div className="absolute inset-0 opacity-5">
           <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAxOGMzLjMxNCAwIDYgMi42ODYgNiA2cy0yLjY4NiA2LTYgNi02LTIuNjg2LTYtNiAyLjY4Ni02IDYtNnoiIGZpbGw9IiM4YjczNTUiLz48L2c+PC9zdmc+')] "></div>
         </div>
@@ -171,7 +171,7 @@ export default function Home() {
               </Button>
             </Link>
             <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3 text-stone-700 px-4">
-              <svg className="w-5 h-5 sm:w-6 sm:h-6 text-amber-700 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 sm:w-6 sm:h-6 text-amber-700 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
               </svg>
               <span className="text-sm sm:text-base md:text-lg font-medium text-center">ou appelez-nous au <strong className="block sm:inline">01 23 45 67 89</strong></span>
