@@ -42,49 +42,65 @@ async function main() {
       emailVerified: true,
     },
   });
-  console.log('✅ PRO user created:', pro.email);
+  // Clear existing services
+  await prisma.service.deleteMany();
+  console.log('🗑️ Cleared existing services');
 
   // Create sample services
   const services = [
     {
-      name: 'Massage Suédois',
-      description: 'Un massage relaxant qui détend les muscles en profondeur. Idéal pour réduire le stress et améliorer la circulation sanguine.',
-      duration: 60,
-      price: 70,
+      name: 'Massage tonique',
+      description: 'Le massage tonique prépare et apaise les muscles avant et après l\'effort. Il est également recommandé aux personnes très tendues ou stressées. Ce massage favorise l\'élimination des toxines et relance la circulation sanguine et lymphatique.',
+      duration: 45,
+      price: 80,
       displayOrder: 1,
       isActive: true,
     },
     {
-      name: 'Massage Deep Tissue',
-      description: 'Massage thérapeutique ciblant les couches profondes des muscles et des tissus conjonctifs. Parfait pour soulager les tensions chroniques.',
-      duration: 90,
-      price: 95,
+      name: 'Massage face postérieure',
+      description: 'Ce massage cible le dos, l\'arrière des jambes et des cuisses. Il inclut également un massage du crâne pour stimuler la circulation sanguine et apaiser le mental. Idéal pour les personnes ressentant une charge mentale ou physique.',
+      duration: 30,
+      price: 35,
       displayOrder: 2,
       isActive: true,
     },
     {
-      name: 'Massage aux Pierres Chaudes',
-      description: 'Massage utilisant des pierres volcaniques chaudes pour détendre les muscles et apaiser l\'esprit.',
-      duration: 75,
-      price: 85,
+      name: 'Massage du dos',
+      description: 'Ce massage permet de dénouer les tensions accumulées, améliorer la posture et soulager les courbatures. Il oxygène le corps, stimule la circulation et favorise un sommeil réparateur. Idéal en fin de journée ou après un effort physique.',
+      duration: 20,
+      price: 25,
       displayOrder: 3,
       isActive: true,
     },
     {
-      name: 'Massage Express',
-      description: 'Massage rapide et efficace pour soulager les tensions du dos et de la nuque. Parfait pour une pause détente.',
-      duration: 30,
-      price: 40,
+      name: 'Le massage by N\'J',
+      description: 'Ce massage alliant tonicité, effleurages et relaxation vous transportera vers une détente profonde. Débutant par un massage tonique, votre circulation sanguine et lymphatique sera relancée ce qui permettra de drainer les toxines accumulées. Vos muscles seront détendus. Par la suite, les manipulations du massage relaxant viendront calmer toute cette agitation afin d\'apaiser le mental et le corps. Enfin, des effleurages vous permettront de lacher-prise et de vous relaxer.',
+      duration: 75,
+      price: 25,
       displayOrder: 4,
+      isActive: true,
+    },
+    {
+      name: 'Massage relaxant',
+      description: 'Le massage relaxant permet d\'éliminer l\'anxiété et le stress accumulés. Il vise à relancer la circulation sanguine et lymphatique et contribue au bien-être du corps et de l\'esprit.',
+      duration: 60,
+      price: 65,
+      displayOrder: 5,
+      isActive: true,
+    },
+    {
+      name: 'Massage prénatal',
+      description: 'Massage spécialement adapté aux femmes enceintes pour soulager les tensions et favoriser le bien-être pendant la grossesse.',
+      duration: 40,
+      price: 60,
+      displayOrder: 6,
       isActive: true,
     },
   ];
 
   for (const service of services) {
-    const created = await prisma.service.upsert({
-      where: { id: service.name }, // Using name as temporary unique identifier
-      update: {},
-      create: service,
+    const created = await prisma.service.create({
+      data: service,
     });
     console.log(`✅ Service created: ${created.name}`);
   }
@@ -124,11 +140,11 @@ async function main() {
     where: { id: 'default' }, // Using a fixed ID
     update: {},
     create: {
-      salonName: 'Zen Massage',
-      salonDescription: 'Bienvenue chez Zen Massage, votre havre de paix et de relaxation. Nous vous proposons une gamme complète de massages thérapeutiques et relaxants pour votre bien-être.',
-      salonAddress: '123 Rue de la Paix, 75001 Paris',
-      salonPhone: '+33 1 23 45 67 89',
-      salonEmail: 'contact@zenmassage.fr',
+      salonName: 'Salon Aly Dous\'heure Le Robert Martinique',
+      salonDescription: 'Découvrez nos massages relaxants et toniques dans notre salon au Robert. Tarifs de 25€ à 80€, sur rendez-vous uniquement.',
+      salonAddress: 'Le Robert, Martinique',
+      salonPhone: '+596 596 XX XX XX', // Placeholder for Martinique number
+      salonEmail: 'contact@alydousheure.com',
       defaultOpenTime: '09:00',
       defaultCloseTime: '18:00',
       bookingAdvanceMinDays: 1,
