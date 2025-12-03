@@ -156,6 +156,27 @@ async function main() {
   });
   console.log('✅ Site settings created');
 
+  // Create a test booking for the PRO user
+  // const testService = await prisma.service.findFirst({
+  //   where: { name: 'Massage tonique' },
+  // });
+
+  // if (testService) {
+  //   const testBooking = await prisma.booking.create({
+  //     data: {
+  //       userId: pro.id,
+  //       serviceId: testService.id,
+  //       date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
+  //       startTime: '10:00',
+  //       endTime: '10:45',
+  //       status: 'CONFIRMED',
+  //       priceAtBooking: testService.price,
+  //       notes: 'Réservation de test pour démonstration',
+  //     },
+  //   });
+  //   console.log('✅ Test booking created for PRO user');
+  // }
+
   console.log('🎉 Seed completed successfully!');
   console.log('\n📝 Login credentials:');
   console.log('Admin: admin@masseuse.com / Admin123!');
