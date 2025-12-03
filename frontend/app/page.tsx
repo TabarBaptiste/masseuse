@@ -17,7 +17,7 @@ export default function Home() {
               <span className="text-amber-700 text-sm font-medium tracking-[0.3em] uppercase">Bien-être & Sérénité</span>
             </div>
             <h1 className="heading-serif text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold text-stone-800 leading-tight">
-              Zen Massage
+              Aly Dous'heure
             </h1>
             <p className="text-base sm:text-xl md:text-2xl text-stone-600 max-w-3xl mx-auto font-light leading-relaxed px-4">
               Offrez-vous un moment de pure relaxation dans notre havre de paix.

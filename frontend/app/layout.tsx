@@ -18,7 +18,7 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Zen Massage - Réservation en ligne",
+  title: "Aly Dous'heure - Réservation en ligne",
   description: "Réservez votre séance de massage en ligne. Services de massage professionnel à Paris.",
 };
 
