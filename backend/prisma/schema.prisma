@@ -1,0 +1,249 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum UserRole {
+  USER
+  PRO
+  ADMIN
+}
+
+enum BookingStatus {
+  PENDING      // En attente de confirmation
+  CONFIRMED    // Confirmée
+  COMPLETED    // Effectuée
+  CANCELLED    // Annulée par le client
+  NO_SHOW      // Client absent
+}
+
+enum DayOfWeek {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
+
+// ========================================
+// UTILISATEURS
+// ========================================
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  password      String    // Hash bcrypt
+  firstName     String
+  lastName      String
+  phone         String?
+  role          UserRole  @default(USER)
+  
+  emailVerified Boolean   @default(false)
+  isActive      Boolean   @default(true)
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  // Relations
+  bookings      Booking[]
+  reviews       Review[]
+  
+  @@index([email])
+  @@index([role])
+}
+
+// ========================================
+// PRESTATIONS
+// ========================================
+
+model Service {
+  id          String   @id @default(cuid())
+  name        String
+  description String   @db.Text
+  duration    Int      // Durée en minutes
+  price       Decimal  @db.Decimal(10, 2)
+  
+  isActive    Boolean  @default(true)
+  displayOrder Int     @default(0) // Pour trier l'affichage
+  
+  imageUrl    String?  // URL de l'image (optionnel)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  bookings    Booking[]
+  
+  @@index([isActive, displayOrder])
+}
+
+// ========================================
+// DISPONIBILITÉS HEBDOMADAIRES
+// ========================================
+
+model WeeklyAvailability {
+  id          String    @id @default(cuid())
+  dayOfWeek   DayOfWeek
+  startTime   String    // Format "HH:mm" ex: "09:00"
+  endTime     String    // Format "HH:mm" ex: "18:00"
+  
+  isActive    Boolean   @default(true)
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  @@unique([dayOfWeek, startTime, endTime])
+  @@index([dayOfWeek, isActive])
+}
+
+// ========================================
+// BLOCAGES DE CRÉNEAUX
+// ========================================
+
+model BlockedSlot {
+  id          String   @id @default(cuid())
+  date        DateTime @db.Date
+  startTime   String   // Format "HH:mm"
+  endTime     String   // Format "HH:mm"
+  reason      String?  // Raison du blocage (congés, rdv perso...)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([date])
+}
+
+// ========================================
+// RÉSERVATIONS
+// ========================================
+
+model Booking {
+  id          String        @id @default(cuid())
+  
+  // Client
+  userId      String
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Prestation
+  serviceId   String
+  service     Service       @relation(fields: [serviceId], references: [id], onDelete: Restrict)
+  
+  // Date et heure
+  date        DateTime      @db.Date
+  startTime   String        // Format "HH:mm"
+  endTime     String        // Format "HH:mm"
+  
+  // Statut
+  status      BookingStatus @default(PENDING)
+  
+  // Informations supplémentaires
+  notes       String?       @db.Text // Notes du client
+  proNotes    String?       @db.Text // Notes privées de la masseuse
+  
+  // Prix au moment de la réservation (au cas où le prix change)
+  priceAtBooking Decimal    @db.Decimal(10, 2)
+  
+  // Annulation
+  cancelledAt DateTime?
+  cancelReason String?      @db.Text
+  
+  // Rappels
+  reminderSentAt DateTime?
+  
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  
+  // Relations
+  reviews     Review[]
+  
+  @@index([userId])
+  @@index([serviceId])
+  @@index([date, startTime])
+  @@index([status])
+}
+
+// ========================================
+// AVIS CLIENTS
+// ========================================
+
+model Review {
+  id          String   @id @default(cuid())
+  
+  // Client
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Réservation associée
+  bookingId   String   @unique
+  booking     Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  
+  // Évaluation
+  rating      Int      // Note sur 5
+  comment     String?  @db.Text
+  
+  // Modération
+  isApproved  Boolean  @default(false)
+  isPublished Boolean  @default(false)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([userId])
+  @@index([isPublished])
+  @@index([rating])
+}
+
+// ========================================
+// PARAMÈTRES GÉNÉRAUX DU SITE
+// ========================================
+
+model SiteSettings {
+  id                    String   @id @default(cuid())
+  
+  // Informations du salon
+  salonName             String   @default("Mon Salon")
+  salonDescription      String   @db.Text
+  salonAddress          String?
+  salonPhone            String?
+  salonEmail            String?
+  
+  // Images
+  logoUrl               String?
+  heroImageUrl          String?
+  
+  // Horaires par défaut (affichage)
+  defaultOpenTime       String   @default("09:00")
+  defaultCloseTime      String   @default("18:00")
+  
+  // Paramètres de réservation
+  bookingAdvanceMinDays Int      @default(0)    // Nb jours min avant réservation
+  bookingAdvanceMaxDays Int      @default(60)   // Nb jours max avant réservation
+  cancellationDeadlineHours Int  @default(24)   // Délai annulation (en heures)
+  
+  // Notifications
+  emailNotificationsEnabled Boolean @default(true)
+  reminderDaysBefore        Int     @default(1) // J-1 par défaut
+  
+  // Réseaux sociaux
+  facebookUrl           String?
+  instagramUrl          String?
+  
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  
+  @@map("site_settings")
+}
