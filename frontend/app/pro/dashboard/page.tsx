@@ -21,6 +21,7 @@ function DashboardContent() {
     const [filter, setFilter] = useState<BookingStatus | 'ALL'>('ALL');
     const [dateFilter, setDateFilter] = useState<string>('');
     const [nameFilter, setNameFilter] = useState<string>('');
+    const [showStats, setShowStats] = useState(false);
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -129,10 +130,16 @@ function DashboardContent() {
                     <p className="text-gray-600">
                         Gérez vos réservations et votre planning
                     </p>
+                    <button
+                        onClick={() => setShowStats(!showStats)}
+                        className="mt-4 px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-sm font-medium transition-colors sm:hidden"
+                    >
+                        {showStats ? 'Masquer les statistiques' : 'Afficher les statistiques'}
+                    </button>
                 </div>
 
                 {/* Stats Cards */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+                <div className={`${showStats ? 'block' : 'hidden'} grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8`}>
                     <Card>
                         <div className="text-sm text-gray-600 mb-1">Aujourd'hui</div>
                         <div className="text-3xl font-bold text-amber-800">{stats.today}</div>
@@ -243,8 +250,8 @@ function DashboardContent() {
                                 <button
                                     onClick={() => setFilter('ALL')}
                                     className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${filter === 'ALL'
-                                            ? 'bg-amber-800 text-white'
-                                            : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300'
+                                        ? 'bg-amber-800 text-white'
+                                        : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300'
                                         }`}
                                 >
                                     Toutes
@@ -252,8 +259,8 @@ function DashboardContent() {
                                 <button
                                     onClick={() => setFilter(BookingStatus.PENDING)}
                                     className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${filter === BookingStatus.PENDING
-                                            ? 'bg-amber-800 text-white'
-                                            : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300'
+                                        ? 'bg-amber-800 text-white'
+                                        : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300'
                                         }`}
                                 >
                                     En attente
@@ -261,11 +268,20 @@ function DashboardContent() {
                                 <button
                                     onClick={() => setFilter(BookingStatus.CONFIRMED)}
                                     className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${filter === BookingStatus.CONFIRMED
-                                            ? 'bg-amber-800 text-white'
-                                            : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300'
+                                        ? 'bg-amber-800 text-white'
+                                        : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300'
                                         }`}
                                 >
                                     Confirmées
+                                </button>
+                                <button
+                                    onClick={() => setFilter(BookingStatus.COMPLETED)}
+                                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${filter === BookingStatus.COMPLETED
+                                        ? 'bg-amber-800 text-white'
+                                        : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300'
+                                        }`}
+                                >
+                                    Terminées
                                 </button>
                             </div>
                             <div className="flex flex-col sm:flex-row gap-4">
