@@ -16,7 +16,7 @@ export default function ServicesPage() {
       try {
         const response = await api.get<Service[]>('/services');
         setServices(response.data);
-      } catch (err) {
+      } catch (_err) {
         setError('Erreur lors du chargement des services');
       } finally {
         setIsLoading(false);

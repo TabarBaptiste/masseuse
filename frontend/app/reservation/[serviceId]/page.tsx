@@ -45,7 +45,7 @@ function ReservationContent() {
       try {
         const response = await api.get<Service>(`/services/${params.serviceId}`);
         setService(response.data);
-      } catch (err) {
+      } catch (_err) {
         setError('Service introuvable');
       } finally {
         setIsLoadingService(false);
@@ -105,9 +105,10 @@ function ReservationContent() {
       
       // Redirect to profile/bookings page
       router.push('/profile?tab=bookings');
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } };
       setError(
-        err.response?.data?.message ||
+        error.response?.data?.message ||
           'Erreur lors de la réservation. Veuillez réessayer.'
       );
     } finally {

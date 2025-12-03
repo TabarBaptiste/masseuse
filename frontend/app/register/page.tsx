@@ -38,11 +38,12 @@ export default function RegisterPage() {
     setError('');
 
     try {
-      const { confirmPassword, ...registerData } = data;
+      const { confirmPassword: _confirmPassword, ...registerData } = data;
       await registerUser(registerData);
       router.push('/profile');
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Une erreur est survenue');
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } };
+      setError(error.response?.data?.message || 'Une erreur est survenue');
     } finally {
       setIsLoading(false);
     }

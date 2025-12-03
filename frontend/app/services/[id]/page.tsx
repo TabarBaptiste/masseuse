@@ -23,7 +23,7 @@ export default function ServiceDetailPage() {
       try {
         const response = await api.get<Service>(`/services/${params.id}`);
         setService(response.data);
-      } catch (err) {
+      } catch (_err) {
         setError('Service introuvable');
       } finally {
         setIsLoading(false);

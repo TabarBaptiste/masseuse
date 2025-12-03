@@ -33,8 +33,9 @@ export default function LoginPage() {
     try {
       await login(data);
       router.push('/profile');
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Identifiants invalides');
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } };
+      setError(error.response?.data?.message || 'Identifiants invalides');
     } finally {
       setIsLoading(false);
     }

@@ -2,7 +2,6 @@
 
 import React from 'react';
 import clsx from 'clsx';
-import { Loading } from '@/components/ui/Loading';
 
 interface TimeSlotPickerProps {
   slots: string[];

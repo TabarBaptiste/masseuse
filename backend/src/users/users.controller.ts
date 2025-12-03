@@ -40,7 +40,11 @@ export class UsersController {
   @Patch('me')
   updateMe(@CurrentUser() user: any, @Body() updateUserDto: UpdateUserDto) {
     // Regular users can only update their own profile (limited fields)
-    const { role, isActive, ...allowedFields } = updateUserDto;
+    const {
+      role: _role,
+      isActive: _isActive,
+      ...allowedFields
+    } = updateUserDto;
     return this.usersService.update(user.id, allowedFields);
   }
 
