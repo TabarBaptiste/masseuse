@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException, BadRequestException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateReviewDto, UpdateReviewDto } from './dto';
-import { BookingStatus } from '../../generated/prisma';
+import { BookingStatus } from '@prisma/client';
 
 @Injectable()
 export class ReviewsService {

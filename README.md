@@ -12,7 +12,7 @@ Application web full-stack pour la réservation de séances de massage, avec ges
 
 ### Prérequis
 
-- Node.js 18+
+- Node.js 22+
 - PostgreSQL 14+
 - npm ou yarn
 
