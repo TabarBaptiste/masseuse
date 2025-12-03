@@ -15,10 +15,7 @@ export class ServicesService {
   async findAll(includeInactive = false) {
     return this.prisma.service.findMany({
       where: includeInactive ? {} : { isActive: true },
-      orderBy: [
-        { displayOrder: 'asc' },
-        { name: 'asc' },
-      ],
+      orderBy: [{ displayOrder: 'asc' }, { name: 'asc' }],
     });
   }
 
@@ -45,7 +42,7 @@ export class ServicesService {
 
   async remove(id: string) {
     await this.findOne(id); // Check if service exists
-    
+
     return this.prisma.service.delete({
       where: { id },
     });

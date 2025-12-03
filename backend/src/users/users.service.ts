@@ -70,7 +70,7 @@ export class UsersService {
 
   async remove(id: string) {
     await this.findOne(id); // Check if user exists
-    
+
     return this.prisma.user.delete({
       where: { id },
       select: {

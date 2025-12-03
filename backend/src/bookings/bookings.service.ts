@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException, BadRequestException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateBookingDto, UpdateBookingDto } from './dto';
 import { BookingStatus, DayOfWeek } from '@prisma/client';
@@ -28,19 +33,27 @@ export class BookingsService {
     today.setHours(0, 0, 0, 0);
     bookingDate.setHours(0, 0, 0, 0);
 
-    const daysInAdvance = Math.floor((bookingDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+    const daysInAdvance = Math.floor(
+      (bookingDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24),
+    );
 
     if (settings) {
       if (daysInAdvance < settings.bookingAdvanceMinDays) {
-        throw new BadRequestException(`Bookings must be made at least ${settings.bookingAdvanceMinDays} days in advance`);
+        throw new BadRequestException(
+          `Bookings must be made at least ${settings.bookingAdvanceMinDays} days in advance`,
+        );
       }
       if (daysInAdvance > settings.bookingAdvanceMaxDays) {
-        throw new BadRequestException(`Bookings cannot be made more than ${settings.bookingAdvanceMaxDays} days in advance`);
+        throw new BadRequestException(
+          `Bookings cannot be made more than ${settings.bookingAdvanceMaxDays} days in advance`,
+        );
       }
     }
 
     // Calculate end time
-    const [startHour, startMinute] = createBookingDto.startTime.split(':').map(Number);
+    const [startHour, startMinute] = createBookingDto.startTime
+      .split(':')
+      .map(Number);
     const endMinutes = startHour * 60 + startMinute + service.duration;
     const endHour = Math.floor(endMinutes / 60);
     const endMinute = endMinutes % 60;
@@ -134,13 +147,19 @@ export class BookingsService {
     const slotInterval = 30; // 30 minutes interval
 
     for (const availability of weeklyAvailabilities) {
-      const [startHour, startMinute] = availability.startTime.split(':').map(Number);
+      const [startHour, startMinute] = availability.startTime
+        .split(':')
+        .map(Number);
       const [endHour, endMinute] = availability.endTime.split(':').map(Number);
 
       const startMinutes = startHour * 60 + startMinute;
       const endMinutes = endHour * 60 + endMinute;
 
-      for (let time = startMinutes; time + service.duration <= endMinutes; time += slotInterval) {
+      for (
+        let time = startMinutes;
+        time + service.duration <= endMinutes;
+        time += slotInterval
+      ) {
         const slotStartHour = Math.floor(time / 60);
         const slotStartMinute = time % 60;
         const slotStartTime = `${String(slotStartHour).padStart(2, '0')}:${String(slotStartMinute).padStart(2, '0')}`;
@@ -151,13 +170,23 @@ export class BookingsService {
         const slotEndTime = `${String(slotEndHour).padStart(2, '0')}:${String(slotEndMinute).padStart(2, '0')}`;
 
         // Check if slot overlaps with blocked slots
-        const isBlocked = blockedSlots.some(blocked => 
-          this.timesOverlap(slotStartTime, slotEndTime, blocked.startTime, blocked.endTime)
+        const isBlocked = blockedSlots.some((blocked) =>
+          this.timesOverlap(
+            slotStartTime,
+            slotEndTime,
+            blocked.startTime,
+            blocked.endTime,
+          ),
         );
 
         // Check if slot overlaps with existing bookings
-        const isBooked = existingBookings.some(booking =>
-          this.timesOverlap(slotStartTime, slotEndTime, booking.startTime, booking.endTime)
+        const isBooked = existingBookings.some((booking) =>
+          this.timesOverlap(
+            slotStartTime,
+            slotEndTime,
+            booking.startTime,
+            booking.endTime,
+          ),
         );
 
         if (!isBlocked && !isBooked) {
@@ -192,10 +221,7 @@ export class BookingsService {
           },
         },
       },
-      orderBy: [
-        { date: 'desc' },
-        { startTime: 'desc' },
-      ],
+      orderBy: [{ date: 'desc' }, { startTime: 'desc' }],
     });
   }
 
@@ -228,7 +254,12 @@ export class BookingsService {
     return booking;
   }
 
-  async update(id: string, updateBookingDto: UpdateBookingDto, userId?: string, userRole?: string) {
+  async update(
+    id: string,
+    updateBookingDto: UpdateBookingDto,
+    userId?: string,
+    userRole?: string,
+  ) {
     const booking = await this.findOne(id, userId, userRole);
 
     // Users can only update their own bookings and limited fields
@@ -280,7 +311,10 @@ export class BookingsService {
     const booking = await this.findOne(id, userId, userRole);
 
     // Check if booking can be cancelled
-    if (booking.status === BookingStatus.CANCELLED || booking.status === BookingStatus.COMPLETED) {
+    if (
+      booking.status === BookingStatus.CANCELLED ||
+      booking.status === BookingStatus.COMPLETED
+    ) {
       throw new BadRequestException('This booking cannot be cancelled');
     }
 
@@ -292,11 +326,12 @@ export class BookingsService {
       bookingDateTime.setHours(hours, minutes);
 
       const now = new Date();
-      const hoursUntilBooking = (bookingDateTime.getTime() - now.getTime()) / (1000 * 60 * 60);
+      const hoursUntilBooking =
+        (bookingDateTime.getTime() - now.getTime()) / (1000 * 60 * 60);
 
       if (hoursUntilBooking < settings.cancellationDeadlineHours) {
         throw new BadRequestException(
-          `Bookings can only be cancelled at least ${settings.cancellationDeadlineHours} hours in advance`
+          `Bookings can only be cancelled at least ${settings.cancellationDeadlineHours} hours in advance`,
         );
       }
     }
@@ -323,7 +358,11 @@ export class BookingsService {
     });
   }
 
-  private async isSlotAvailable(date: string, startTime: string, endTime: string): Promise<boolean> {
+  private async isSlotAvailable(
+    date: string,
+    startTime: string,
+    endTime: string,
+  ): Promise<boolean> {
     const requestedDate = new Date(date);
     const dayOfWeek = this.getDayOfWeek(requestedDate);
 
@@ -340,7 +379,10 @@ export class BookingsService {
     }
 
     // Check if time is within weekly availability
-    if (startTime < weeklyAvailability.startTime || endTime > weeklyAvailability.endTime) {
+    if (
+      startTime < weeklyAvailability.startTime ||
+      endTime > weeklyAvailability.endTime
+    ) {
       return false;
     }
 
@@ -352,7 +394,14 @@ export class BookingsService {
     });
 
     for (const blocked of blockedSlots) {
-      if (this.timesOverlap(startTime, endTime, blocked.startTime, blocked.endTime)) {
+      if (
+        this.timesOverlap(
+          startTime,
+          endTime,
+          blocked.startTime,
+          blocked.endTime,
+        )
+      ) {
         return false;
       }
     }
@@ -368,7 +417,14 @@ export class BookingsService {
     });
 
     for (const booking of existingBookings) {
-      if (this.timesOverlap(startTime, endTime, booking.startTime, booking.endTime)) {
+      if (
+        this.timesOverlap(
+          startTime,
+          endTime,
+          booking.startTime,
+          booking.endTime,
+        )
+      ) {
         return false;
       }
     }
@@ -376,12 +432,25 @@ export class BookingsService {
     return true;
   }
 
-  private timesOverlap(start1: string, end1: string, start2: string, end2: string): boolean {
+  private timesOverlap(
+    start1: string,
+    end1: string,
+    start2: string,
+    end2: string,
+  ): boolean {
     return start1 < end2 && end1 > start2;
   }
 
   private getDayOfWeek(date: Date): DayOfWeek {
-    const days = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
+    const days = [
+      'SUNDAY',
+      'MONDAY',
+      'TUESDAY',
+      'WEDNESDAY',
+      'THURSDAY',
+      'FRIDAY',
+      'SATURDAY',
+    ];
     return days[date.getDay()] as DayOfWeek;
   }
 }

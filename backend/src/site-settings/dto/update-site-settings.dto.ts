@@ -1,4 +1,11 @@
-import { IsString, IsNumber, IsBoolean, IsOptional, Min, Matches } from 'class-validator';
+import {
+  IsString,
+  IsNumber,
+  IsBoolean,
+  IsOptional,
+  Min,
+  Matches,
+} from 'class-validator';
 
 export class UpdateSiteSettingsDto {
   @IsString()
@@ -31,12 +38,16 @@ export class UpdateSiteSettingsDto {
 
   @IsString()
   @IsOptional()
-  @Matches(/^([0-1][0-9]|2[0-3]):[0-5][0-9]$/, { message: 'defaultOpenTime must be in HH:mm format' })
+  @Matches(/^([0-1][0-9]|2[0-3]):[0-5][0-9]$/, {
+    message: 'defaultOpenTime must be in HH:mm format',
+  })
   defaultOpenTime?: string;
 
   @IsString()
   @IsOptional()
-  @Matches(/^([0-1][0-9]|2[0-3]):[0-5][0-9]$/, { message: 'defaultCloseTime must be in HH:mm format' })
+  @Matches(/^([0-1][0-9]|2[0-3]):[0-5][0-9]$/, {
+    message: 'defaultCloseTime must be in HH:mm format',
+  })
   defaultCloseTime?: string;
 
   @IsNumber()

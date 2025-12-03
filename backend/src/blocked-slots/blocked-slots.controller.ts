@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  Query,
+} from '@nestjs/common';
 import { BlockedSlotsService } from './blocked-slots.service';
 import { CreateBlockedSlotDto, UpdateBlockedSlotDto } from './dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -35,7 +45,10 @@ export class BlockedSlotsController {
   @Patch(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.PRO, UserRole.ADMIN)
-  update(@Param('id') id: string, @Body() updateBlockedSlotDto: UpdateBlockedSlotDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateBlockedSlotDto: UpdateBlockedSlotDto,
+  ) {
     return this.blockedSlotsService.update(id, updateBlockedSlotDto);
   }
 

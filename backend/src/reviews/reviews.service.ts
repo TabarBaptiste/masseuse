@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException, BadRequestException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateReviewDto, UpdateReviewDto } from './dto';
 import { BookingStatus } from '@prisma/client';
@@ -136,7 +141,7 @@ export class ReviewsService {
 
   async remove(id: string) {
     await this.findOne(id); // Check if review exists
-    
+
     return this.prisma.review.delete({
       where: { id },
     });

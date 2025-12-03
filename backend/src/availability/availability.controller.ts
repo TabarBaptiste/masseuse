@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  Query,
+} from '@nestjs/common';
 import { AvailabilityService } from './availability.service';
 import { CreateAvailabilityDto, UpdateAvailabilityDto } from './dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -30,7 +40,10 @@ export class AvailabilityController {
   @Patch(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.PRO, UserRole.ADMIN)
-  update(@Param('id') id: string, @Body() updateAvailabilityDto: UpdateAvailabilityDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateAvailabilityDto: UpdateAvailabilityDto,
+  ) {
     return this.availabilityService.update(id, updateAvailabilityDto);
   }
 

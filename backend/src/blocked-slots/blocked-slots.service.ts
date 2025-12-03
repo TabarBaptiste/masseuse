@@ -19,7 +19,7 @@ export class BlockedSlotsService {
 
   async findAll(fromDate?: string, toDate?: string) {
     const where: any = {};
-    
+
     if (fromDate || toDate) {
       where.date = {};
       if (fromDate) {
@@ -32,10 +32,7 @@ export class BlockedSlotsService {
 
     return this.prisma.blockedSlot.findMany({
       where,
-      orderBy: [
-        { date: 'asc' },
-        { startTime: 'asc' },
-      ],
+      orderBy: [{ date: 'asc' }, { startTime: 'asc' }],
     });
   }
 
@@ -67,7 +64,7 @@ export class BlockedSlotsService {
 
   async remove(id: string) {
     await this.findOne(id); // Check if blocked slot exists
-    
+
     return this.prisma.blockedSlot.delete({
       where: { id },
     });

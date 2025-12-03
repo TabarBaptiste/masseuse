@@ -15,7 +15,8 @@ export class SiteSettingsService {
       settings = await this.prisma.siteSettings.create({
         data: {
           salonName: 'Mon Salon de Massage',
-          salonDescription: 'Bienvenue dans notre salon de massage professionnel.',
+          salonDescription:
+            'Bienvenue dans notre salon de massage professionnel.',
         },
       });
     }

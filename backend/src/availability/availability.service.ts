@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateAvailabilityDto, UpdateAvailabilityDto } from './dto';
 
@@ -30,10 +34,7 @@ export class AvailabilityService {
   async findAll(includeInactive = false) {
     return this.prisma.weeklyAvailability.findMany({
       where: includeInactive ? {} : { isActive: true },
-      orderBy: [
-        { dayOfWeek: 'asc' },
-        { startTime: 'asc' },
-      ],
+      orderBy: [{ dayOfWeek: 'asc' }, { startTime: 'asc' }],
     });
   }
 
@@ -60,7 +61,7 @@ export class AvailabilityService {
 
   async remove(id: string) {
     await this.findOne(id); // Check if availability exists
-    
+
     return this.prisma.weeklyAvailability.delete({
       where: { id },
     });

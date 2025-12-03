@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  Query,
+} from '@nestjs/common';
 import { BookingsService } from './bookings.service';
 import { CreateBookingDto, UpdateBookingDto } from './dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -28,12 +38,18 @@ export class BookingsController {
   @Get()
   @UseGuards(RolesGuard)
   @Roles(UserRole.PRO, UserRole.ADMIN)
-  findAll(@Query('userId') userId?: string, @Query('status') status?: BookingStatus) {
+  findAll(
+    @Query('userId') userId?: string,
+    @Query('status') status?: BookingStatus,
+  ) {
     return this.bookingsService.findAll(userId, status);
   }
 
   @Get('my-bookings')
-  findMyBookings(@CurrentUser() user: any, @Query('status') status?: BookingStatus) {
+  findMyBookings(
+    @CurrentUser() user: any,
+    @Query('status') status?: BookingStatus,
+  ) {
     return this.bookingsService.findAll(user.id, status);
   }
 
@@ -48,7 +64,12 @@ export class BookingsController {
     @Body() updateBookingDto: UpdateBookingDto,
     @CurrentUser() user: any,
   ) {
-    return this.bookingsService.update(id, updateBookingDto, user.id, user.role);
+    return this.bookingsService.update(
+      id,
+      updateBookingDto,
+      user.id,
+      user.role,
+    );
   }
 
   @Post(':id/cancel')
