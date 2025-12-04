@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useAuthStore } from '@/store/auth';
 import { UserRole } from '@/types';
+import { Menu, X, User, Settings, LogOut, Calendar, Home } from 'lucide-react';
 
 export const Header: React.FC = () => {
   const { user, isAuthenticated, isInitialized, logout } = useAuthStore();
@@ -22,12 +23,18 @@ export const Header: React.FC = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex lg:items-center lg:space-x-6">
-            <Link href="/services" className="text-stone-700 hover:text-amber-800 px-3 py-2 text-sm font-medium transition-colors">
-              Nos Soins
+            <Link href="/" className="flex items-center space-x-2 text-stone-700 hover:text-amber-800 px-3 py-2 text-sm font-medium transition-colors">
+              <Home className="w-4 h-4" />
+              <span>Accueil</span>
+            </Link>
+            <Link href="/services" className="flex items-center space-x-2 text-stone-700 hover:text-amber-800 px-3 py-2 text-sm font-medium transition-colors">
+              <Calendar className="w-4 h-4" />
+              <span>Mes Soins</span>
             </Link>
             {isInitialized && isAuthenticated && (
-              <Link href="/profile" className="text-stone-700 hover:text-amber-800 px-3 py-2 text-sm font-medium transition-colors">
-                {user?.firstName}
+              <Link href="/profile" className="flex items-center space-x-2 text-stone-700 hover:text-amber-800 px-3 py-2 text-sm font-medium transition-colors">
+                <User className="w-4 h-4" />
+                <span>{user?.firstName}</span>
               </Link>
             )}
             
@@ -53,9 +60,10 @@ export const Header: React.FC = () => {
                 )}
                 <button
                   onClick={logout}
-                  className="bg-stone-100 hover:bg-stone-200 text-stone-800 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                  className="flex items-center space-x-2 bg-stone-100 hover:bg-stone-200 text-stone-800 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
                 >
-                  Déconnexion
+                  <LogOut className="w-4 h-4" />
+                  <span>Déconnexion</span>
                 </button>
               </div>
             ) : (
@@ -80,13 +88,9 @@ export const Header: React.FC = () => {
             >
               <span className="sr-only">Ouvrir le menu</span>
               {!mobileMenuOpen ? (
-                <svg className="block h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-                </svg>
+                <Menu className="block h-6 w-6" />
               ) : (
-                <svg className="block h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
+                <X className="block h-6 w-6" />
               )}
             </button>
           </div>
@@ -97,20 +101,30 @@ export const Header: React.FC = () => {
           <div className="lg:hidden border-t border-stone-200">
             <div className="px-2 pt-2 pb-3 space-y-1">
               <Link
-                href="/services"
-                className="block px-3 py-2 rounded-lg text-base font-medium text-stone-700 hover:text-amber-800 hover:bg-stone-50 transition-colors"
+                href="/"
+                className="flex items-center space-x-3 px-3 py-2 rounded-lg text-base font-medium text-stone-700 hover:text-amber-800 hover:bg-stone-50 transition-colors"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                Nos Soins
+                <Home className="w-5 h-5" />
+                <span>Accueil</span>
+              </Link>
+              <Link
+                href="/services"
+                className="flex items-center space-x-3 px-3 py-2 rounded-lg text-base font-medium text-stone-700 hover:text-amber-800 hover:bg-stone-50 transition-colors"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <Calendar className="w-5 h-5" />
+                <span>Mes Soins</span>
               </Link>
               
               {isInitialized && isAuthenticated && (
                 <Link
                   href="/profile"
-                  className="block px-3 py-2 rounded-lg text-base font-medium text-stone-700 hover:text-amber-800 hover:bg-stone-50 transition-colors"
+                  className="flex items-center space-x-3 px-3 py-2 rounded-lg text-base font-medium text-stone-700 hover:text-amber-800 hover:bg-stone-50 transition-colors"
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  {user?.firstName}
+                  <User className="w-5 h-5" />
+                  <span>{user?.firstName}</span>
                 </Link>
               )}
 
@@ -127,20 +141,22 @@ export const Header: React.FC = () => {
                   {user?.role === UserRole.PRO && (
                     <Link
                       href="/pro/dashboard"
-                      className="block px-3 py-2 rounded-lg text-base font-medium text-stone-700 hover:text-amber-800 hover:bg-stone-50 transition-colors"
+                      className="flex items-center space-x-3 px-3 py-2 rounded-lg text-base font-medium text-stone-700 hover:text-amber-800 hover:bg-stone-50 transition-colors"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      Dashboard PRO
+                      <Settings className="w-5 h-5" />
+                      <span>Dashboard PRO</span>
                     </Link>
                   )}
                   
                   {user?.role === UserRole.ADMIN && (
                     <Link
                       href="/admin/dashboard"
-                      className="block px-3 py-2 rounded-lg text-base font-medium text-stone-700 hover:text-amber-800 hover:bg-stone-50 transition-colors"
+                      className="flex items-center space-x-3 px-3 py-2 rounded-lg text-base font-medium text-stone-700 hover:text-amber-800 hover:bg-stone-50 transition-colors"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      Dashboard Admin
+                      <Settings className="w-5 h-5" />
+                      <span>Dashboard Admin</span>
                     </Link>
                   )}
                   

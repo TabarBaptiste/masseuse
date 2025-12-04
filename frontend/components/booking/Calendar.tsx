@@ -53,7 +53,7 @@ export const Calendar: React.FC<CalendarProps> = ({
               : 'bg-gray-200 text-gray-400 cursor-not-allowed'
           )}
         >
-          ← Semaine précédente
+          ←
         </button>
         <span className="font-semibold text-lg">
           {format(currentWeekStart, 'MMMM yyyy', { locale: fr })}
@@ -68,7 +68,7 @@ export const Calendar: React.FC<CalendarProps> = ({
               : 'bg-gray-200 text-gray-400 cursor-not-allowed'
           )}
         >
-          Semaine suivante →
+          →
         </button>
       </div>
 

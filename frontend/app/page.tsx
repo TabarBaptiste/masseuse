@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
+import { ShieldCheck, Heart, Sparkles } from 'lucide-react';
 
 export default function Home() {
   return (
@@ -30,7 +31,7 @@ export default function Home() {
                   size="lg" 
                   className="w-full sm:w-auto bg-amber-800 hover:bg-amber-900 text-white px-6 sm:px-10 py-3 sm:py-4 text-base sm:text-lg rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
                 >
-                  Découvrir nos soins
+                  Découvrir mes soins
                 </Button>
               </Link>
               <Link href="/register" className="w-full sm:w-auto">
@@ -77,14 +78,12 @@ export default function Home() {
               <div className="relative inline-block mb-6">
                 <div className="absolute inset-0 bg-amber-200 rounded-full blur-xl opacity-30 group-hover:opacity-50 transition-opacity"></div>
                 <div className="relative bg-linear-to-br from-amber-100 to-amber-50 rounded-2xl w-24 h-24 flex items-center justify-center mx-auto shadow-md group-hover:shadow-xl transition-all duration-300">
-                  <svg className="w-12 h-12 text-amber-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                  </svg>
+                  <ShieldCheck className="w-12 h-12 text-amber-800" />
                 </div>
               </div>
               <h3 className="heading-serif text-2xl font-semibold mb-3 text-stone-800">Expertise Certifiée</h3>
               <p className="text-stone-600 leading-relaxed">
-                Nos thérapeutes diplômés possèdent plus de 10 ans d'expérience dans l'art du massage thérapeutique.
+                Mes thérapeutes diplômés possèdent plus de 10 ans d'expérience dans l'art du massage thérapeutique.
               </p>
             </div>
             
@@ -92,9 +91,7 @@ export default function Home() {
               <div className="relative inline-block mb-6">
                 <div className="absolute inset-0 bg-amber-200 rounded-full blur-xl opacity-30 group-hover:opacity-50 transition-opacity"></div>
                 <div className="relative bg-linear-to-br from-amber-100 to-amber-50 rounded-2xl w-24 h-24 flex items-center justify-center mx-auto shadow-md group-hover:shadow-xl transition-all duration-300">
-                  <svg className="w-12 h-12 text-amber-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                  </svg>
+                  <Heart className="w-12 h-12 text-amber-800" />
                 </div>
               </div>
               <h3 className="heading-serif text-2xl font-semibold mb-3 text-stone-800">Soins Personnalisés</h3>
@@ -107,9 +104,7 @@ export default function Home() {
               <div className="relative inline-block mb-6">
                 <div className="absolute inset-0 bg-amber-200 rounded-full blur-xl opacity-30 group-hover:opacity-50 transition-opacity"></div>
                 <div className="relative bg-linear-to-br from-amber-100 to-amber-50 rounded-2xl w-24 h-24 flex items-center justify-center mx-auto shadow-md group-hover:shadow-xl transition-all duration-300">
-                  <svg className="w-12 h-12 text-amber-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
+                  <Sparkles className="w-12 h-12 text-amber-800" />
                 </div>
               </div>
               <h3 className="heading-serif text-2xl font-semibold mb-3 text-stone-800">Ambiance Zen</h3>
@@ -125,7 +120,7 @@ export default function Home() {
       <section className="py-24 bg-stone-800 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <span className="text-amber-400 text-sm font-medium tracking-[0.3em] uppercase">Nos Prestations</span>
+            <span className="text-amber-400 text-sm font-medium tracking-[0.3em] uppercase">Mes Prestations</span>
             <h2 className="heading-serif text-4xl md:text-5xl font-bold mt-4 mb-6">
               Des Soins d'Exception
             </h2>
@@ -139,7 +134,7 @@ export default function Home() {
                 size="lg" 
                 className="bg-amber-600 hover:bg-amber-700 text-white px-12 py-6 text-lg rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
               >
-                Voir tous nos soins
+                Voir tous mes soins
               </Button>
             </Link>
           </div>
@@ -158,7 +153,7 @@ export default function Home() {
             <span className="text-amber-800">de pure détente</span>
           </h2>
           <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-stone-600 mb-8 sm:mb-12 max-w-2xl mx-auto font-light px-4">
-            Réservez dès maintenant votre séance et laissez nos mains expertes
+            Réservez dès maintenant votre séance et laissez mes mains expertes
             prendre soin de vous
           </p>
           <div className="flex flex-col gap-4 sm:gap-6 justify-center items-center">
