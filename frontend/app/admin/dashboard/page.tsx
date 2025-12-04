@@ -5,6 +5,7 @@ import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { UserRole, User, Service, SiteSettings } from '@/types';
 import { Card } from '@/components/ui/Card';
 import api from '@/lib/api';
+import Link from 'next/link';
 
 export default function AdminDashboardPage() {
     return (
@@ -97,9 +98,11 @@ function DashboardContent() {
                             Gestion des utilisateurs
                         </h2>
                         <div className="space-y-3">
-                            <button className="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors">
-                                Voir tous les utilisateurs
-                            </button>
+                            <Link href="/admin/users" className="block">
+                                <button className="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors">
+                                    Voir tous les utilisateurs
+                                </button>
+                            </Link>
                             <button className="w-full px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium transition-colors">
                                 Ajouter un professionnel
                             </button>
