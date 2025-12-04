@@ -93,15 +93,21 @@ export class AuthService {
       role: user.role,
     };
 
-    return {
-      user: {
-        id: user.id,
-        email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        role: user.role,
-      },
-      access_token: this.jwtService.sign(payload),
-    };
+    try {
+      const token = this.jwtService.sign(payload);
+      return {
+        user: {
+          id: user.id,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          role: user.role,
+        },
+        access_token: token,
+      };
+    } catch (error) {
+      console.error('💥 JWT generation failed:', error.message);
+      throw error;
+    }
   }
 }
