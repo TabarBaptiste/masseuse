@@ -232,7 +232,7 @@ export class BookingsService {
           },
         },
       },
-      orderBy: [{ date: 'desc' }, { startTime: 'desc' }],
+      orderBy: [{ date: 'asc' }, { startTime: 'asc' }],
     });
   }
 

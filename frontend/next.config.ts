@@ -5,6 +5,10 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true,
   },
+  // Désactiver les téléchargements de polices externes en développement
+  experimental: {
+    webVitalsAttribution: ['CLS', 'LCP'],
+  },
 };
 
 export default nextConfig;
