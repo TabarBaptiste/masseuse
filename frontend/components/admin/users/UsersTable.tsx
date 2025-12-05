@@ -69,7 +69,7 @@ export const UsersTable: React.FC<UsersTableProps> = ({
                                 <tr key={user.id} className="hover:bg-gray-50">
                                     <td className="px-6 py-4 whitespace-nowrap">
                                         <div className="flex items-center">
-                                            <div className="flex-shrink-0 h-10 w-10 bg-amber-100 rounded-full flex items-center justify-center">
+                                            <div className="shrink-0 h-10 w-10 bg-amber-100 rounded-full flex items-center justify-center">
                                                 <span className="text-amber-800 font-medium">
                                                     {user.firstName[0]}{user.lastName[0]}
                                                 </span>
