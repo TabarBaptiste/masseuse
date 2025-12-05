@@ -104,7 +104,8 @@ Page dédiée affichant :
 ### 🔧 Corrections urgentes
 - [ ] Redirection après déconnexion
 - [ ] Boutons défectueux
-- [ ] Icônes manquantes
+- [x] Icônes manquantes
+- [ ] Icônes manquantes calendrier
 - [ ] Règle des 8 caractères login
 - [ ] Statistiques Dashboard Admin
 

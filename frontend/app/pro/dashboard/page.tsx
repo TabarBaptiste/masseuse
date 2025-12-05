@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { UserRole, Booking, BookingStatus } from '@/types';
 import { Card } from '@/components/ui/Card';
+import { Phone, Mail, X } from 'lucide-react';
 import api from '@/lib/api';
 // import { ClientPageRoot } from 'next/dist/client/components/client-page';
 
@@ -187,9 +188,14 @@ function DashboardContent() {
                                             <div className="text-sm text-gray-600">
                                                 {booking.user?.firstName} {booking.user?.lastName}
                                             </div>
+                                            {booking.user?.email && (
+                                                <div className="text-sm text-gray-600">
+                                                    <Mail className="inline-block mr-1 w-4 h-4" /> {booking.user.email}
+                                                </div>
+                                            )}
                                             {booking.user?.phone && (
                                                 <div className="text-sm text-gray-600">
-                                                    📞 {booking.user.phone}
+                                                    <Phone className="inline-block mr-1 w-4 h-4" /> {booking.user.phone}
                                                 </div>
                                             )}
                                             {booking.notes && (
@@ -302,7 +308,7 @@ function DashboardContent() {
                                     onClick={() => { setDateFilter(''); setNameFilter(''); }}
                                     className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg text-sm font-medium transition-colors"
                                 >
-                                    Effacer filtres
+                                    <X className="inline-block mr-1 w-4 h-4" /> Effacer filtres
                                 </button>
                             </div>
                         </div>
@@ -349,12 +355,12 @@ function DashboardContent() {
                                                 </div>
                                                 {booking.user?.email && (
                                                     <div className="text-sm text-gray-600">
-                                                        📧 {booking.user.email}
+                                                        <Mail className="inline-block mr-1 w-4 h-4" /> {booking.user.email}
                                                     </div>
                                                 )}
                                                 {booking.user?.phone && (
                                                     <div className="text-sm text-gray-600">
-                                                        📞 {booking.user.phone}
+                                                        <Phone className="inline-block mr-1 w-4 h-4" /> {booking.user.phone}
                                                     </div>
                                                 )}
                                                 <div className="text-sm text-gray-600 mt-2">
