@@ -1,124 +1,141 @@
+# 📋 Plan de Développement - Application Massage
 
-📌 1. Problèmes techniques généraux
+## 🎯 Vue d'ensemble
 
-1.1. Connexion / Déconnexion
-	•	Corriger la logique du guard / middleware.
-	•	Empêcher la redirection automatique vers l’accueil lorsqu’un utilisateur PRO / ADMIN se déconnecte après avoir visité une page protégée.
+Ce document détaille les **corrections techniques**, **réorganisations structurelles** et **améliorations fonctionnelles** à apporter à l'application de gestion de massages.
 
-1.2. Boutons
-	•	Vérifier tous les boutons de la page d’accueil.
-	•	Nettoyer les handlers et les événements click défectueux.
+---
 
-1.3. Icônes et affichage
-	•	Rendre le logo du calendrier visible sur mobile.
-	•	Ajouter / corriger les icônes manquantes dans le Dashboard PRO.
+## 🔧 1. Problèmes techniques généraux
 
-1.4. Validation Login
-	•	Retirer l’obligation des 8 caractères uniquement sur la page Login.
+### 1.1. 🔐 Connexion / Déconnexion
+- **Corriger la logique du guard/middleware** pour une authentification robuste
+- **Empêcher la redirection automatique** vers l'accueil lors de la déconnexion d'un utilisateur PRO/ADMIN après visite de pages protégées
 
-1.5. Dashboard Admin : compteur utilisateurs
-	•	Harmoniser l’affichage des statistiques avec la présentation du Dashboard PRO.
+### 1.2. 🎛️ Boutons et interactions
+- **Vérifier tous les boutons** de la page d'accueil pour s'assurer de leur fonctionnalité
+- **Nettoyer les handlers** et événements click défectueux
 
-⸻
+### 1.3. 🎨 Icônes et affichage
+- **Rendre le logo du calendrier visible** sur les appareils mobiles
+- **Ajouter/corriger les icônes manquantes** dans le Dashboard PRO
 
-📌 2. Dashboard Admin – Problèmes de structure
+### 1.4. ✅ Validation Login
+- **Retirer l'obligation des 8 caractères** uniquement sur la page de connexion
 
-2.1. Boutons inutiles à supprimer
-	•	Supprimer :
-	•	Gérer les rôles
-	•	Ajouter un utilisateur
-	•	Ajouter un service
-	•	Modifier les prix
-➡️ Ces actions doivent être intégrées directement dans leurs pages respectives.
+### 1.5. 📊 Dashboard Admin - Compteurs utilisateurs
+- **Harmoniser l'affichage des statistiques** avec la présentation du Dashboard PRO
 
-⸻
+---
 
-📌 3. Réorganisation des pages
+## 🏗️ 2. Dashboard Admin – Problèmes de structure
 
-3.1. Page : “Voir tous les utilisateurs”
-	•	Ajouter les actions du CRUD directement dans cette page :
-	•	Modifier le rôle
-	•	Ajouter un utilisateur
-	•	Supprimer un utilisateur
-➡️ La page devient un CRUD complet pour les utilisateurs.
+### 2.1. 🚮 Boutons inutiles à supprimer
+Les actions suivantes doivent être **intégrées directement dans leurs pages respectives** :
+- ❌ Gérer les rôles
+- ❌ Ajouter un utilisateur
+- ❌ Ajouter un service
+- ❌ Modifier les prix
 
-3.2. Page : “Voir tous les services”
-	•	conserver la redirection vers la page “Services”, mais y intégrer le CRUD PRO / ADMIN :
-	•	Ajouter un service
-	•	Modifier un service
-	•	Modifier les prix
-	•	Activer / désactiver un service
-➡️ Les boutons “Ajouter un service” et “Modifier les prix” du Dashboard doivent être supprimés.
+---
 
-3.3. Page : “Configuration”
-	•	Vérifier l’affichage complet de site_settings.
-	•	Vérifier le CRUD.
-	•	Déterminer l’usage exact du bouton Notifications (emails ? SMS ? alertes internes ?).
+## 📄 3. Réorganisation des pages
 
-3.4. Page : “Voir toutes les réservations”
-	•	Harmoniser avec la page du Dashboard PRO (ou fusionner si même contenu).
+### 3.1. 👥 Page : "Voir tous les utilisateurs"
+**Transformer en CRUD complet** avec les actions suivantes :
+- ✏️ Modifier le rôle d'un utilisateur
+- ➕ Ajouter un nouvel utilisateur
+- 🗑️ Supprimer un utilisateur
 
-3.5. Page : “Rapports et statistiques”
+### 3.2. 💆‍♀️ Page : "Voir tous les services"
+**Intégrer le CRUD PRO/ADMIN** :
+- ➕ Ajouter un service
+- ✏️ Modifier un service existant
+- 💰 Modifier les prix
+- 🔄 Activer/désactiver un service
 
-Créer un tableau de bord analytique affichant :
-	•	Nombre de réservations
-	•	Activité des clients
-	•	Périodes de l’année les plus actives
-	•	Périodes de la journée les plus actives
+> **Note** : Supprimer les boutons correspondants du Dashboard
 
-⸻
+### 3.3. ⚙️ Page : "Configuration"
+- ✅ **Vérifier l'affichage complet** des paramètres du site (`site_settings`)
+- ✅ **Vérifier le CRUD** complet
+- ❓ **Déterminer l'usage** du bouton Notifications (emails/SMS/alertes internes)
 
-📌 4. Boutons avancés (Admin avancé)
+### 3.4. 📅 Page : "Voir toutes les réservations"
+- 🔄 **Harmoniser avec le Dashboard PRO** (ou fusionner si contenu identique)
 
-4.1. Sauvegarder la base de données
-	•	Mettre en place une fonctionnalité de backup SQL téléchargeable.
+### 3.5. 📈 Page : "Rapports et statistiques" *(À créer)*
+Tableau de bord analytique affichant :
+- 📊 **Nombre de réservations** (total/mensuel/quotidien)
+- 👥 **Activité des clients** (nouveaux vs récurrents)
+- 📅 **Périodes de l'année les plus actives**
+- 🕐 **Périodes de la journée les plus actives**
 
-4.2. Vider le cache
-	•	Définir ce qui doit être purgé :
-	•	sessions ?
-	•	cache API ?
-	•	ISR Next.js ?
+---
 
-4.3. Logs système
+## 🛠️ 4. Boutons avancés (Admin avancé)
 
-Créer une page affichant :
-	•	Logs backend
-	•	Logs d’accès
-	•	Logs des tâches automatiques (cron / workers)
+### 4.1. 💾 Sauvegarder la base de données
+- **Implémenter une fonctionnalité de backup SQL** téléchargeable
+- Format : `.sql` ou `.zip`
 
-4.4. Mise à jour système
+### 4.2. 🗑️ Vider le cache
+**Définir précisément ce qui doit être purgé** :
+- 🔐 Sessions utilisateur ?
+- 🚀 Cache API ?
+- ⚡ ISR Next.js ?
 
-Définir la fonction exacte du bouton :
-	•	Mise à jour du code ?
-	•	Mise à jour du schéma Prisma ?
-	•	Mise à jour des services / dépendances ?
+### 4.3. 📋 Logs système *(À créer)*
+Page dédiée affichant :
+- 🔧 **Logs backend** (erreurs, requêtes)
+- 📝 **Logs d'accès** (connexions, actions)
+- ⏰ **Logs des tâches automatiques** (cron/workers)
 
-⸻
+### 4.4. 🔄 Mise à jour système
+**Définir la fonction exacte** :
+- 📦 Mise à jour du code source ?
+- 🗄️ Mise à jour du schéma Prisma ?
+- 🔧 Mise à jour des services/dépendances ?
 
-📌 Résumé (Checklist rapide)
+---
 
-🔧 Corrections urgentes
-	•	Redirection après déconnexion
-	•	Boutons qui bug
-	•	Icônes manquantes
-	•	Règle des 8 caractères login
-	•	Statistiques Dashboard Admin
+## ✅ Checklist rapide - Résumé
 
-🚮 Suppressions
-	•	Gérer les rôles
-	•	Ajouter un utilisateur
-	•	Ajouter un service
-	•	Modifier les prix
+### 🔧 Corrections urgentes
+- [ ] Redirection après déconnexion
+- [ ] Boutons défectueux
+- [ ] Icônes manquantes
+- [ ] Règle des 8 caractères login
+- [ ] Statistiques Dashboard Admin
 
-🏗 Réorganisation
-	•	CRUD complet sur “Voir tous les utilisateurs”
-	•	CRUD complet sur “Voir tous les services”
-	•	Nouvelle page Statistiques
-	•	Clarifier page Réservations
-	•	Clarifier page Notifications
+### 🚮 Suppressions
+- [ ] Bouton "Gérer les rôles"
+- [ ] Bouton "Ajouter un utilisateur"
+- [ ] Bouton "Ajouter un service"
+- [ ] Bouton "Modifier les prix"
 
-🧑‍💻 Définition de boutons avancés
-	•	Sauvegarde BDD
-	•	Vider cache
-	•	Logs système
-	•	Mise à jour système
+### 🏗️ Réorganisation
+- [ ] CRUD complet sur "Voir tous les utilisateurs"
+- [ ] CRUD complet sur "Voir tous les services"
+- [ ] Nouvelle page Statistiques
+- [ ] Clarifier page Réservations
+- [ ] Clarifier page Notifications
+
+### 🧑‍💻 Définition boutons avancés
+- [ ] Sauvegarde BDD
+- [ ] Vider cache
+- [ ] Logs système
+- [ ] Mise à jour système
+
+---
+
+## 📝 Notes et commentaires
+
+- **Priorité** : Commencer par les corrections techniques générales
+- **Architecture** : Préférer l'intégration directe plutôt que la multiplication des boutons
+- **UX** : Maintenir une interface cohérente et intuitive
+- **Sécurité** : Vérifier les permissions sur toutes les nouvelles fonctionnalités
+
+---
+
+*Dernière mise à jour : Décembre 2025*
