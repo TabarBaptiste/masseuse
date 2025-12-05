@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useAuthStore } from '@/store/auth';
 import { UserRole } from '@/types';
-import { Menu, X, User, Settings, LogOut, Calendar, Home } from 'lucide-react';
+import { Menu, X, User, Settings, LogOut, Flower, Home, MonitorCog, LogIn } from 'lucide-react';
 
 export const Header: React.FC = () => {
   const { user, isAuthenticated, isInitialized, logout } = useAuthStore();
@@ -28,7 +28,7 @@ export const Header: React.FC = () => {
               <span>Accueil</span>
             </Link>
             <Link href="/services" className="flex items-center space-x-2 text-stone-700 hover:text-amber-800 px-3 py-2 text-sm font-medium transition-colors">
-              <Calendar className="w-4 h-4" />
+              <Flower className="w-4 h-4" />
               <span>Mes Soins</span>
             </Link>
             {isInitialized && isAuthenticated && (
@@ -37,7 +37,7 @@ export const Header: React.FC = () => {
                 <span>{user?.firstName}</span>
               </Link>
             )}
-            
+
             {/* Auth Section Desktop */}
             {!isInitialized ? (
               <div className="ml-4 pl-4 border-l border-stone-200">
@@ -49,8 +49,8 @@ export const Header: React.FC = () => {
                   {user?.firstName}
                 </span> */}
                 {user?.role === UserRole.PRO && (
-                  <Link href="/pro/dashboard" className="text-stone-700 hover:text-amber-800 text-sm font-medium transition-colors">
-                    Dashboard PRO
+                  <Link href="/pro/dashboard" className="flex items-center space-x-2 text-stone-700 hover:text-amber-800 text-sm font-medium transition-colors">
+                    <Settings className="w-4 h-4" /><span>Dashboard PRO</span>
                   </Link>
                 )}
                 {user?.role === UserRole.ADMIN && (
@@ -68,8 +68,9 @@ export const Header: React.FC = () => {
               </div>
             ) : (
               <div className="flex items-center space-x-3 ml-4 pl-4 border-l border-stone-200">
-                <Link href="/login" className="text-stone-700 hover:text-amber-800 px-3 py-2 text-sm font-medium transition-colors">
-                  Connexion
+                <Link href="/login" className="flex items-center space-x-2 text-stone-700 hover:text-amber-800 px-3 py-2 text-sm font-medium transition-colors">
+                  <LogIn className="w-4 h-4" />
+                  <span>Connexion</span>
                 </Link>
                 <Link href="/login" className="bg-amber-800 hover:bg-amber-900 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all shadow-sm hover:shadow-md">
                   Réserver
@@ -113,10 +114,10 @@ export const Header: React.FC = () => {
                 className="flex items-center space-x-3 px-3 py-2 rounded-lg text-base font-medium text-stone-700 hover:text-amber-800 hover:bg-stone-50 transition-colors"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                <Calendar className="w-5 h-5" />
+                <Flower className="w-5 h-5" />
                 <span>Mes Soins</span>
               </Link>
-              
+
               {isInitialized && isAuthenticated && (
                 <Link
                   href="/profile"
@@ -137,7 +138,7 @@ export const Header: React.FC = () => {
                   <div className="px-3 py-2 text-sm text-stone-600 border-t border-stone-200 mt-2 pt-2">
                     {user?.firstName} {user?.lastName}
                   </div>
-                  
+
                   {user?.role === UserRole.PRO && (
                     <Link
                       href="/pro/dashboard"
@@ -148,7 +149,7 @@ export const Header: React.FC = () => {
                       <span>Dashboard PRO</span>
                     </Link>
                   )}
-                  
+
                   {user?.role === UserRole.ADMIN && (
                     <Link
                       href="/admin/dashboard"
@@ -159,7 +160,7 @@ export const Header: React.FC = () => {
                       <span>Dashboard Admin</span>
                     </Link>
                   )}
-                  
+
                   <button
                     onClick={() => {
                       logout();
@@ -174,13 +175,14 @@ export const Header: React.FC = () => {
                 <div className="space-y-1 border-t border-stone-200 mt-2 pt-2">
                   <Link
                     href="/login"
-                    className="block px-3 py-2 rounded-lg text-base font-medium text-stone-700 hover:text-amber-800 hover:bg-stone-50 transition-colors"
+                    className="flex items-center space-x-3 py-2 rounded-lg text-base font-medium text-stone-700 hover:text-amber-800 hover:bg-stone-50 transition-colors"
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                    Connexion
+                    <LogIn className="w-5 h-5" />
+                    <span>Connexion</span>
                   </Link>
                   <Link
-                    href="/register"
+                    href="/login"
                     className="block px-3 py-2 rounded-lg text-base font-medium bg-amber-800 text-white hover:bg-amber-900 transition-colors text-center"
                     onClick={() => setMobileMenuOpen(false)}
                   >
