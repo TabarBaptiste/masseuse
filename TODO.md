@@ -116,8 +116,8 @@ Page dédiée affichant :
 - [x] Bouton "Modifier les prix"
 
 ### 🏗️ Réorganisation
-- [ ] CRUD complet sur "Voir tous les utilisateurs"
-- [ ] CRUD complet sur "Voir tous les services"
+- [x] CRUD complet sur "Voir tous les utilisateurs"
+- [x] CRUD complet sur "Voir tous les services"
 - [ ] Nouvelle page Statistiques
 - [ ] Clarifier page Réservations
 - [ ] Clarifier page Notifications

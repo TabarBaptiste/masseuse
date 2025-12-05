@@ -118,9 +118,11 @@ function DashboardContent() {
                             Gestion des services
                         </h2>
                         <div className="space-y-3">
-                            <button className="w-full px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-sm font-medium transition-colors">
-                                Voir tous les services
-                            </button>
+                            <Link href="/services" className="block">
+                                <button className="w-full px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-sm font-medium transition-colors">
+                                    Voir tous les services
+                                </button>
+                            </Link>
                             {/* <button className="w-full px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg text-sm font-medium transition-colors">
                                 Ajouter un service
                             </button>
