@@ -67,7 +67,7 @@ function DashboardContent() {
                 </div>
 
                 {/* Stats Cards */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+                <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
                     <Card>
                         <div className="text-sm text-gray-600 mb-1">Utilisateurs</div>
                         <div className="text-3xl font-bold text-blue-600">{stats.totalUsers}</div>
@@ -103,12 +103,12 @@ function DashboardContent() {
                                     Voir tous les utilisateurs
                                 </button>
                             </Link>
-                            <button className="w-full px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium transition-colors">
+                            {/* <button className="w-full px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium transition-colors">
                                 Ajouter un professionnel
                             </button>
                             <button className="w-full px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-sm font-medium transition-colors">
                                 Gérer les rôles
-                            </button>
+                            </button> */}
                         </div>
                     </Card>
 
@@ -121,12 +121,12 @@ function DashboardContent() {
                             <button className="w-full px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-sm font-medium transition-colors">
                                 Voir tous les services
                             </button>
-                            <button className="w-full px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg text-sm font-medium transition-colors">
+                            {/* <button className="w-full px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg text-sm font-medium transition-colors">
                                 Ajouter un service
                             </button>
                             <button className="w-full px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium transition-colors">
                                 Modifier les prix
-                            </button>
+                            </button> */}
                         </div>
                     </Card>
 

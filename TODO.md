@@ -106,14 +106,14 @@ Page dédiée affichant :
 - [ ] Boutons défectueux
 - [x] Icônes manquantes
 - [ ] Icônes manquantes calendrier
-- [ ] Règle des 8 caractères login
+- [x] Règle des 8 caractères login
 - [ ] Statistiques Dashboard Admin
 
 ### 🚮 Suppressions
-- [ ] Bouton "Gérer les rôles"
-- [ ] Bouton "Ajouter un utilisateur"
-- [ ] Bouton "Ajouter un service"
-- [ ] Bouton "Modifier les prix"
+- [x] Bouton "Gérer les rôles"
+- [x] Bouton "Ajouter un utilisateur"
+- [x] Bouton "Ajouter un service"
+- [x] Bouton "Modifier les prix"
 
 ### 🏗️ Réorganisation
 - [ ] CRUD complet sur "Voir tous les utilisateurs"
