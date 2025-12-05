@@ -148,9 +148,6 @@ function DashboardContent() {
                                     Disponibilités
                                 </button>
                             </Link>
-                            <button className="w-full px-4 py-2 bg-pink-600 hover:bg-pink-700 text-white rounded-lg text-sm font-medium transition-colors">
-                                Notifications
-                            </button>
                         </div>
                     </Card>
 
@@ -165,9 +162,11 @@ function DashboardContent() {
                                     Voir toutes les réservations
                                 </button>
                             </Link>
-                            <button className="w-full px-4 py-2 bg-lime-600 hover:bg-lime-700 text-white rounded-lg text-sm font-medium transition-colors">
-                                Rapports et statistiques
-                            </button>
+                            <Link href="/pro/stats" className="block">
+                                <button className="w-full px-4 py-2 bg-lime-600 hover:bg-lime-700 text-white rounded-lg text-sm font-medium transition-colors">
+                                    Rapports et statistiques
+                                </button>
+                            </Link>
                             <button className="w-full px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-medium transition-colors">
                                 Gérer les conflits
                             </button>
@@ -176,7 +175,7 @@ function DashboardContent() {
                 </div>
 
                 {/* Recent Activity or Quick Actions */}
-                <div className="mt-8">
+                {/* <div className="mt-8">
                     <Card>
                         <h2 className="text-xl font-semibold text-gray-900 mb-4">
                             Actions rapides
@@ -196,7 +195,7 @@ function DashboardContent() {
                             </button>
                         </div>
                     </Card>
-                </div>
+                </div> */}
             </div >
         </div >
     );

@@ -118,7 +118,7 @@ Page dédiée affichant :
 ### 🏗️ Réorganisation
 - [x] CRUD complet sur "Voir tous les utilisateurs"
 - [x] CRUD complet sur "Voir tous les services"
-- [ ] Nouvelle page Statistiques
+- [x] Nouvelle page Statistiques
 - [x] Clarifier page Réservations
 - [ ] Clarifier page Notifications
 
