@@ -234,6 +234,7 @@ function SettingsContent() {
                         <h2 className="text-xl font-semibold text-gray-900 mb-4">
                             Horaires par défaut
                         </h2>
+                        {/* <div className="grid grid-cols-2 gap-4"> */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label htmlFor="defaultOpenTime" className="block text-sm font-medium text-gray-700 mb-2">
@@ -405,7 +406,7 @@ function SettingsContent() {
                     </Card>
 
                     {/* Actions */}
-                    <div className="flex flex-col sm:flex-row gap-4">
+                    <div className="flex gap-4">
                         <Link
                             href="/admin/dashboard"
                             className="flex-1 px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-medium transition-colors text-center"
