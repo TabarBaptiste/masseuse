@@ -119,7 +119,7 @@ Page dédiée affichant :
 - [x] CRUD complet sur "Voir tous les utilisateurs"
 - [x] CRUD complet sur "Voir tous les services"
 - [ ] Nouvelle page Statistiques
-- [ ] Clarifier page Réservations
+- [x] Clarifier page Réservations
 - [ ] Clarifier page Notifications
 
 ### 🧑‍💻 Définition boutons avancés

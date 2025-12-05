@@ -138,9 +138,11 @@ function DashboardContent() {
                             Paramètres du site
                         </h2>
                         <div className="space-y-3">
-                            <button className="w-full px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium transition-colors">
-                                Configuration générale
-                            </button>
+                            <Link href="/pro/settings" className="block">
+                                <button className="w-full px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium transition-colors">
+                                    Configuration générale
+                                </button>
+                            </Link>
                             <button className="w-full px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-sm font-medium transition-colors">
                                 Disponibilités
                             </button>
@@ -156,9 +158,11 @@ function DashboardContent() {
                             Aperçu des réservations
                         </h2>
                         <div className="space-y-3">
-                            <button className="w-full px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg text-sm font-medium transition-colors">
-                                Voir toutes les réservations
-                            </button>
+                            <Link href="/pro/dashboard" className="block">
+                                <button className="w-full px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg text-sm font-medium transition-colors">
+                                    Voir toutes les réservations
+                                </button>
+                            </Link>
                             <button className="w-full px-4 py-2 bg-lime-600 hover:bg-lime-700 text-white rounded-lg text-sm font-medium transition-colors">
                                 Rapports et statistiques
                             </button>
@@ -191,7 +195,7 @@ function DashboardContent() {
                         </div>
                     </Card>
                 </div>
-            </div>
-        </div>
+            </div >
+        </div >
     );
 }
