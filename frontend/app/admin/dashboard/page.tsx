@@ -143,9 +143,11 @@ function DashboardContent() {
                                     Configuration générale
                                 </button>
                             </Link>
-                            <button className="w-full px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-sm font-medium transition-colors">
-                                Disponibilités
-                            </button>
+                            <Link href="/pro/availability" className="block">
+                                <button className="w-full px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-sm font-medium transition-colors">
+                                    Disponibilités
+                                </button>
+                            </Link>
                             <button className="w-full px-4 py-2 bg-pink-600 hover:bg-pink-700 text-white rounded-lg text-sm font-medium transition-colors">
                                 Notifications
                             </button>
