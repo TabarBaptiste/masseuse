@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useAuthStore } from '@/store/auth';
 import { UserRole } from '@/types';
-import { Menu, X, User, Settings, LogOut, Flower, Home, MonitorCog, LogIn } from 'lucide-react';
+import { Menu, X, User, Settings, LogOut, Flower, Home, LogIn } from 'lucide-react';
 
 export const Header: React.FC = () => {
   const { user, isAuthenticated, isInitialized, logout } = useAuthStore();

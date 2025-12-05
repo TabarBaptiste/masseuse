@@ -8,6 +8,7 @@ const nextConfig: NextConfig = {
   // Désactiver les téléchargements de polices externes en développement
   experimental: {
     webVitalsAttribution: ['CLS', 'LCP'],
+    // turbopackUseSystemTlsCerts: true,
   },
 };
 

@@ -102,12 +102,12 @@ Page dédiée affichant :
 ## ✅ Checklist rapide - Résumé
 
 ### 🔧 Corrections urgentes
-- [ ] Redirection après déconnexion
-- [ ] Boutons défectueux
+- [x] Redirection après déconnexion
+- [x] Boutons défectueux
 - [x] Icônes manquantes
 - [ ] Icônes manquantes calendrier
 - [x] Règle des 8 caractères login
-- [ ] Statistiques Dashboard Admin
+- [x] Statistiques Dashboard Admin
 
 ### 🚮 Suppressions
 - [x] Bouton "Gérer les rôles"
