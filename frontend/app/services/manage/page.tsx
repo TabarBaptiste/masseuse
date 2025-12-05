@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import api from '@/lib/api';
@@ -9,7 +9,7 @@ import { Loading } from '@/components/ui/Loading';
 import { useAuthStore } from '@/store/auth';
 import { ArrowLeft } from 'lucide-react';
 
-export default function ManageServicePage() {
+function ManageServiceContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const { user, isAuthenticated } = useAuthStore();
@@ -208,5 +208,13 @@ export default function ManageServicePage() {
                 </div>
             </div>
         </div>
+    );
+}
+
+export default function ManageServicePage() {
+    return (
+        <Suspense fallback={<Loading />}>
+            <ManageServiceContent />
+        </Suspense>
     );
 }
