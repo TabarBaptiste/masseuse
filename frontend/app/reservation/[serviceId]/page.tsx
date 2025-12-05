@@ -14,6 +14,7 @@ import { TimeSlotPicker } from '@/components/booking/TimeSlotPicker';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Loading } from '@/components/ui/Loading';
+import { Breadcrumb } from '@/components/ui/Breadcrumb';
 
 interface BookingFormData {
   notes?: string;
@@ -136,6 +137,14 @@ function ReservationContent() {
   return (
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <Breadcrumb
+          items={[
+            { label: 'Services', href: '/services' },
+            { label: service.name, href: `/services/${service.id}` },
+            { label: 'Réservation' }
+          ]}
+          className="mb-8"
+        />
         <h1 className="text-3xl font-bold text-gray-900 mb-8">
           Réserver : {service.name}
         </h1>

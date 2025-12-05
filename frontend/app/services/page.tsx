@@ -7,6 +7,7 @@ import { Service, UserRole } from '@/types';
 import { ServiceCard } from '@/components/services/ServiceCard';
 import { Loading } from '@/components/ui/Loading';
 import { useAuthStore } from '@/store/auth';
+import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { Plus, Edit, Trash2 } from 'lucide-react';
 
 export default function ServicesPage() {
@@ -64,6 +65,10 @@ export default function ServicesPage() {
   return (
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <Breadcrumb
+          items={[{ label: 'Services' }]}
+          className="mb-8"
+        />
         <div className="text-center mb-12">
           <div className="flex justify-center items-center gap-4 mb-4">
             <h1 className="text-4xl font-bold text-gray-900">

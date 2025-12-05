@@ -7,6 +7,7 @@ import api from '@/lib/api';
 import { Service, UserRole } from '@/types';
 import { Loading } from '@/components/ui/Loading';
 import { useAuthStore } from '@/store/auth';
+import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { ArrowLeft } from 'lucide-react';
 
 function ManageServiceContent() {
@@ -86,14 +87,14 @@ function ManageServiceContent() {
     return (
         <div className="min-h-screen bg-gray-50 py-12">
             <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+                <Breadcrumb
+                    items={[
+                        { label: 'Services', href: '/services' },
+                        { label: isEdit ? 'Modifier le service' : 'Nouveau service' }
+                    ]}
+                    className="mb-8"
+                />
                 <div className="mb-8">
-                    <Link
-                        href="/services"
-                        className="inline-flex items-center space-x-2 text-amber-800 hover:text-amber-900 mb-4"
-                    >
-                        <ArrowLeft className="w-5 h-5" />
-                        <span>Retour aux services</span>
-                    </Link>
                     <h1 className="text-3xl font-bold text-gray-900">
                         {isEdit ? 'Modifier le service' : 'Nouveau service'}
                     </h1>

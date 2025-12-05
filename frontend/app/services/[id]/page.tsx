@@ -9,6 +9,7 @@ import { Service } from '@/types';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Loading } from '@/components/ui/Loading';
+import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { useAuthStore } from '@/store/auth';
 
 export default function ServiceDetailPage() {
@@ -64,9 +65,13 @@ export default function ServiceDetailPage() {
   return (
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <Link href="/services" className="text-blue-600 hover:text-blue-700 mb-6 inline-block">
-          ← Retour aux services
-        </Link>
+        <Breadcrumb
+          items={[
+            { label: 'Services', href: '/services' },
+            { label: service.name }
+          ]}
+          className="mb-6"
+        />
 
         <Card>
           {service.imageUrl && (

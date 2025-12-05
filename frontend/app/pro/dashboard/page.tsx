@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { UserRole, Booking, BookingStatus } from '@/types';
 import { Card } from '@/components/ui/Card';
+import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { Phone, Mail, X } from 'lucide-react';
 import api from '@/lib/api';
 // import { ClientPageRoot } from 'next/dist/client/components/client-page';
@@ -123,6 +124,10 @@ function DashboardContent() {
     return (
         <div className="min-h-screen bg-gray-50 py-8">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <Breadcrumb
+                    items={[{ label: 'Dashboard Professionnel' }]}
+                    className="mb-8"
+                />
                 <div className="mb-8">
                     <h1 className="text-3xl font-bold text-gray-900 mb-2">
                         Dashboard Professionnel

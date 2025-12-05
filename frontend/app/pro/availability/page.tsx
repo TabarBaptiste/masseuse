@@ -6,6 +6,7 @@ import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { UserRole, WeeklyAvailability, DayOfWeek } from '@/types';
 import { Card } from '@/components/ui/Card';
 import { Loading } from '@/components/ui/Loading';
+import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import api from '@/lib/api';
 import { ArrowLeft, Plus, Edit2, Trash2, Save, X } from 'lucide-react';
 import Link from 'next/link';
@@ -157,6 +158,13 @@ function AvailabilityContent() {
     return (
         <div className="min-h-screen bg-gray-50 py-8">
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <Breadcrumb
+                    items={[
+                        { label: 'Administration', href: '/admin/dashboard' },
+                        { label: 'Disponibilités' }
+                    ]}
+                    className="mb-8"
+                />
                 <div className="mb-8">
                     <Link
                         href="/admin/dashboard"

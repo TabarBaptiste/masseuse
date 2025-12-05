@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { UserRole, User } from '@/types';
 import api from '@/lib/api';
+import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { Users, ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
 import { UsersStats, UsersFilters, UsersTable, EditUserModal } from '@/components/admin/users';
@@ -157,6 +158,13 @@ function UsersContent() {
     return (
         <div className="min-h-screen bg-gray-50 py-8">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <Breadcrumb
+                    items={[
+                        { label: 'Administration', href: '/admin/dashboard' },
+                        { label: 'Utilisateurs' }
+                    ]}
+                    className="mb-8"
+                />
                 {/* Header */}
                 <div className="mb-8">
                     <Link href="/admin/dashboard" className="inline-flex items-center text-sm text-gray-600 hover:text-amber-800 mb-4">
