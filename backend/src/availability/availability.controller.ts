@@ -27,6 +27,11 @@ export class AvailabilityController {
     return this.availabilityService.create(createAvailabilityDto);
   }
 
+  @Get('working-days')
+  getWorkingDays() {
+    return this.availabilityService.getWorkingDays();
+  }
+
   @Get()
   findAll(@Query('includeInactive') includeInactive?: string) {
     return this.availabilityService.findAll(includeInactive === 'true');

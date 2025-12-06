@@ -35,12 +35,27 @@ function ReservationContent() {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
   const [availableSlots, setAvailableSlots] = useState<string[]>([]);
+  const [workingDays, setWorkingDays] = useState<string[]>([]);
   const [isLoadingService, setIsLoadingService] = useState(true);
   const [isLoadingSlots, setIsLoadingSlots] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
 
   const { register, handleSubmit } = useForm<BookingFormData>();
+
+  // Fetch working days on mount (once)
+  useEffect(() => {
+    const fetchWorkingDays = async () => {
+      try {
+        const response = await api.get<string[]>('/availability/working-days');
+        setWorkingDays(response.data);
+      } catch (err) {
+        console.error('Error fetching working days:', err);
+      }
+    };
+
+    fetchWorkingDays();
+  }, []);
 
   useEffect(() => {
     const fetchService = async () => {
@@ -160,6 +175,7 @@ function ReservationContent() {
               <Calendar
                 selectedDate={selectedDate}
                 onSelectDate={setSelectedDate}
+                workingDays={workingDays}
               />
             </div>
 

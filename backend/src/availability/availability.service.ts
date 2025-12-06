@@ -66,4 +66,14 @@ export class AvailabilityService {
       where: { id },
     });
   }
+
+  async getWorkingDays() {
+    const availabilities = await this.prisma.weeklyAvailability.findMany({
+      where: { isActive: true },
+      select: { dayOfWeek: true },
+      distinct: ['dayOfWeek'],
+    });
+
+    return availabilities.map(a => a.dayOfWeek);
+  }
 }

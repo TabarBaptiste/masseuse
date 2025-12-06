@@ -26,7 +26,6 @@ export default function ServicesPage() {
   const fetchServices = async () => {
     try {
       const response = await api.get<Service[]>('/services');
-      console.log('API response:', response.data);
       if (Array.isArray(response.data)) {
         setServices(response.data);
       } else {

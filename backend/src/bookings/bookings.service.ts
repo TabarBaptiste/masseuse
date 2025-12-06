@@ -51,13 +51,7 @@ export class BookingsService {
     }
 
     // Calculate end time
-    const [startHour, startMinute] = createBookingDto.startTime
-      .split(':')
-      .map(Number);
-    const endMinutes = startHour * 60 + startMinute + service.duration;
-    const endHour = Math.floor(endMinutes / 60);
-    const endMinute = endMinutes % 60;
-    const endTime = `${String(endHour).padStart(2, '0')}:${String(endMinute).padStart(2, '0')}`;
+    const endTime = this.calculateEndTime(createBookingDto.startTime, service.duration);
 
     // Check if slot is available
     const isAvailable = await this.isSlotAvailable(
@@ -114,33 +108,17 @@ export class BookingsService {
     const dayOfWeek = this.getDayOfWeek(requestedDate);
 
     // Get weekly availability for this day
-    const weeklyAvailabilities = await this.prisma.weeklyAvailability.findMany({
-      where: {
-        dayOfWeek,
-        isActive: true,
-      },
-    });
+    const weeklyAvailabilities = await this.getWeeklyAvailabilitiesForDay(dayOfWeek);
 
     if (weeklyAvailabilities.length === 0) {
       return [];
     }
 
-    // Get blocked slots for this date
-    const blockedSlots = await this.prisma.blockedSlot.findMany({
-      where: {
-        date: requestedDate,
-      },
-    });
-
-    // Get existing bookings for this date
-    const existingBookings = await this.prisma.booking.findMany({
-      where: {
-        date: requestedDate,
-        status: {
-          in: [BookingStatus.PENDING, BookingStatus.CONFIRMED],
-        },
-      },
-    });
+    // Get blocked slots and existing bookings for this date
+    const [blockedSlots, existingBookings] = await Promise.all([
+      this.getBlockedSlotsForDate(requestedDate),
+      this.getExistingBookingsForDate(requestedDate),
+    ]);
 
     // Generate available slots
     const availableSlots: string[] = [];
@@ -163,33 +141,10 @@ export class BookingsService {
         const slotStartHour = Math.floor(time / 60);
         const slotStartMinute = time % 60;
         const slotStartTime = `${String(slotStartHour).padStart(2, '0')}:${String(slotStartMinute).padStart(2, '0')}`;
+        const slotEndTime = this.calculateEndTime(slotStartTime, service.duration);
 
-        const slotEndMinutes = time + service.duration;
-        const slotEndHour = Math.floor(slotEndMinutes / 60);
-        const slotEndMinute = slotEndMinutes % 60;
-        const slotEndTime = `${String(slotEndHour).padStart(2, '0')}:${String(slotEndMinute).padStart(2, '0')}`;
-
-        // Check if slot overlaps with blocked slots
-        const isBlocked = blockedSlots.some((blocked) =>
-          this.timesOverlap(
-            slotStartTime,
-            slotEndTime,
-            blocked.startTime,
-            blocked.endTime,
-          ),
-        );
-
-        // Check if slot overlaps with existing bookings
-        const isBooked = existingBookings.some((booking) =>
-          this.timesOverlap(
-            slotStartTime,
-            slotEndTime,
-            booking.startTime,
-            booking.endTime,
-          ),
-        );
-
-        if (!isBlocked && !isBooked) {
+        // Check if slot conflicts with blocked slots or existing bookings
+        if (!this.isSlotConflicting(slotStartTime, slotEndTime, blockedSlots, existingBookings)) {
           availableSlots.push(slotStartTime);
         }
       }
@@ -378,69 +333,30 @@ export class BookingsService {
     const dayOfWeek = this.getDayOfWeek(requestedDate);
 
     // Check weekly availability
-    const weeklyAvailability = await this.prisma.weeklyAvailability.findFirst({
-      where: {
-        dayOfWeek,
-        isActive: true,
-      },
-    });
+    const weeklyAvailabilities = await this.getWeeklyAvailabilitiesForDay(dayOfWeek);
 
-    if (!weeklyAvailability) {
+    if (weeklyAvailabilities.length === 0) {
       return false;
     }
 
-    // Check if time is within weekly availability
-    if (
-      startTime < weeklyAvailability.startTime ||
-      endTime > weeklyAvailability.endTime
-    ) {
+    // Check if time is within any weekly availability slot
+    const isWithinAvailability = weeklyAvailabilities.some(
+      (availability) =>
+        startTime >= availability.startTime && endTime <= availability.endTime,
+    );
+
+    if (!isWithinAvailability) {
       return false;
     }
 
-    // Check blocked slots
-    const blockedSlots = await this.prisma.blockedSlot.findMany({
-      where: {
-        date: requestedDate,
-      },
-    });
+    // Get blocked slots and existing bookings
+    const [blockedSlots, existingBookings] = await Promise.all([
+      this.getBlockedSlotsForDate(requestedDate),
+      this.getExistingBookingsForDate(requestedDate),
+    ]);
 
-    for (const blocked of blockedSlots) {
-      if (
-        this.timesOverlap(
-          startTime,
-          endTime,
-          blocked.startTime,
-          blocked.endTime,
-        )
-      ) {
-        return false;
-      }
-    }
-
-    // Check existing bookings
-    const existingBookings = await this.prisma.booking.findMany({
-      where: {
-        date: requestedDate,
-        status: {
-          in: [BookingStatus.PENDING, BookingStatus.CONFIRMED],
-        },
-      },
-    });
-
-    for (const booking of existingBookings) {
-      if (
-        this.timesOverlap(
-          startTime,
-          endTime,
-          booking.startTime,
-          booking.endTime,
-        )
-      ) {
-        return false;
-      }
-    }
-
-    return true;
+    // Check if slot conflicts with blocked slots or existing bookings
+    return !this.isSlotConflicting(startTime, endTime, blockedSlots, existingBookings);
   }
 
   private timesOverlap(
@@ -463,5 +379,85 @@ export class BookingsService {
       'SATURDAY',
     ];
     return days[date.getDay()] as DayOfWeek;
+  }
+
+  /**
+   * Calculate end time given a start time and duration in minutes
+   */
+  private calculateEndTime(startTime: string, durationMinutes: number): string {
+    const [startHour, startMinute] = startTime.split(':').map(Number);
+    const totalMinutes = startHour * 60 + startMinute + durationMinutes;
+    const endHour = Math.floor(totalMinutes / 60);
+    const endMinute = totalMinutes % 60;
+    return `${String(endHour).padStart(2, '0')}:${String(endMinute).padStart(2, '0')}`;
+  }
+
+  /**
+   * Get active weekly availabilities for a specific day
+   */
+  private async getWeeklyAvailabilitiesForDay(dayOfWeek: DayOfWeek) {
+    return this.prisma.weeklyAvailability.findMany({
+      where: {
+        dayOfWeek,
+        isActive: true,
+      },
+    });
+  }
+
+  /**
+   * Get blocked slots for a specific date
+   */
+  private async getBlockedSlotsForDate(date: Date) {
+    return this.prisma.blockedSlot.findMany({
+      where: { date },
+    });
+  }
+
+  /**
+   * Get existing bookings (pending or confirmed) for a specific date
+   */
+  private async getExistingBookingsForDate(date: Date) {
+    return this.prisma.booking.findMany({
+      where: {
+        date,
+        status: {
+          in: [BookingStatus.PENDING, BookingStatus.CONFIRMED],
+        },
+      },
+    });
+  }
+
+  /**
+   * Check if a time slot conflicts with blocked slots or existing bookings
+   */
+  private isSlotConflicting(
+    slotStartTime: string,
+    slotEndTime: string,
+    blockedSlots: any[],
+    existingBookings: any[],
+  ): boolean {
+    // Check if slot overlaps with blocked slots
+    const isBlocked = blockedSlots.some((blocked) =>
+      this.timesOverlap(
+        slotStartTime,
+        slotEndTime,
+        blocked.startTime,
+        blocked.endTime,
+      ),
+    );
+
+    if (isBlocked) return true;
+
+    // Check if slot overlaps with existing bookings
+    const isBooked = existingBookings.some((booking) =>
+      this.timesOverlap(
+        slotStartTime,
+        slotEndTime,
+        booking.startTime,
+        booking.endTime,
+      ),
+    );
+
+    return isBooked;
   }
 }
