@@ -200,44 +200,41 @@ function ReservationContent() {
               </div>
             )}
 
-            {/* Step 3: Add Notes & Confirm */}
+            {/* Optional Notes */}
             {selectedSlot && (
+              <div>
+                <h2 className="text-xl font-semibold mb-4">
+                  3. Notes (optionnel)
+                </h2>
+                <Card>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Informations complémentaires
+                    </label>
+                    <textarea
+                      {...register('notes')}
+                      rows={4}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Préférences, informations spéciales..."
+                    />
+                  </div>
+                </Card>
+              </div>
+            )}
+
+            {/* Step 3: Confirm */}
+            {/* {selectedSlot && (
               <div>
                 <h2 className="text-xl font-semibold mb-4">
                   3. Confirmez votre réservation
                 </h2>
                 <Card>
-                  <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                    {error && (
-                      <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-                        {error}
-                      </div>
-                    )}
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Notes (optionnel)
-                      </label>
-                      <textarea
-                        {...register('notes')}
-                        rows={4}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="Informations complémentaires, préférences..."
-                      />
-                    </div>
-
-                    <Button
-                      type="submit"
-                      className="w-full"
-                      size="lg"
-                      disabled={isSubmitting}
-                    >
-                      {isSubmitting ? 'Réservation en cours...' : 'Confirmer la réservation'}
-                    </Button>
-                  </form>
+                  <p className="text-sm text-gray-600">
+                    Vérifiez les informations ci-dessous et confirmez votre réservation.
+                  </p>
                 </Card>
               </div>
-            )}
+            )} */}
           </div>
 
           {/* Booking Summary */}
@@ -274,6 +271,28 @@ function ReservationContent() {
                   </div>
                 )}
               </div>
+
+              {/* Confirm Button */}
+              {selectedSlot && (
+                <div className="mt-6 pt-6 border-t border-gray-200">
+                  <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                    {error && (
+                      <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+                        {error}
+                      </div>
+                    )}
+
+                    <Button
+                      type="submit"
+                      className="w-full"
+                      size="lg"
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? 'Réservation en cours...' : 'Confirmer la réservation'}
+                    </Button>
+                  </form>
+                </div>
+              )}
             </Card>
           </div>
         </div>
