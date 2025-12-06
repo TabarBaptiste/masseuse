@@ -1,5 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 
 // Load environment variables
@@ -39,7 +40,25 @@ async function bootstrap() {
   // Set global prefix
   app.setGlobalPrefix('api');
 
+  // Configure Swagger
+  const config = new DocumentBuilder()
+    .setTitle('Masseuse API')
+    .setDescription('API pour l\'application de réservation de massages')
+    .setVersion('1.0')
+    // .addTag('auth', 'Authentification')
+    // .addTag('users', 'Utilisateurs')
+    // .addTag('services', 'Services')
+    // .addTag('bookings', 'Réservations')
+    // .addTag('availability', 'Disponibilités')
+    // .addTag('reviews', 'Avis')
+    // .addTag('blocked-slots', 'Créneaux bloqués')
+    // .addTag('site-settings', 'Paramètres du site')
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api/docs', app, document);
+
   await app.listen(process.env.PORT ?? 3001);
   console.log(`Application is running on: ${await app.getUrl()}`);
+  console.log(`Swagger UI available at: ${await app.getUrl()}/api/docs`);
 }
 void bootstrap();
