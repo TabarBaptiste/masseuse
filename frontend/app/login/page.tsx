@@ -32,7 +32,11 @@ export default function LoginPage() {
     
     try {
       await login(data);
-      router.push('/profile');
+      
+      // Redirect to stored URL or default to profile
+      const redirectUrl = localStorage.getItem('redirectAfterLogin') || '/profile';
+      localStorage.removeItem('redirectAfterLogin'); // Clean up
+      router.push(redirectUrl);
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } };
       setError(error.response?.data?.message || 'Identifiants invalides');

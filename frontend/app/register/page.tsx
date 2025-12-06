@@ -40,7 +40,11 @@ export default function RegisterPage() {
     try {
       const { confirmPassword: _confirmPassword, ...registerData } = data;
       await registerUser(registerData);
-      router.push('/profile');
+      
+      // Redirect to stored URL or default to profile
+      const redirectUrl = localStorage.getItem('redirectAfterLogin') || '/profile';
+      localStorage.removeItem('redirectAfterLogin'); // Clean up
+      router.push(redirectUrl);
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } };
       setError(error.response?.data?.message || 'Une erreur est survenue');
