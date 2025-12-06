@@ -204,7 +204,9 @@ export default function RegisterPage() {
               error={errors.confirmPassword?.message}
             />
 
-            {confirmPassword && <PasswordConfirmationIndicator password={password} confirmPassword={confirmPassword} />}
+            {confirmPassword && password && hasMinLength(password) && hasSpecialChar(password) && hasNumber(password) && (
+              <PasswordConfirmationIndicator password={password} confirmPassword={confirmPassword} />
+            )}
 
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? 'Création...' : 'Créer mon compte'}
