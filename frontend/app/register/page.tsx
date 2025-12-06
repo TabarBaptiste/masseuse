@@ -8,6 +8,7 @@ import { useAuthStore } from '@/store/auth';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card } from '@/components/ui/Card';
+import { Check, X } from 'lucide-react';
 
 interface RegisterFormData {
   email: string;
@@ -32,6 +33,65 @@ export default function RegisterPage() {
   } = useForm<RegisterFormData>();
 
   const password = watch('password');
+  const confirmPassword = watch('confirmPassword');
+
+  // Password validation functions
+  const hasMinLength = (pwd: string) => pwd.length >= 8;
+  const hasSpecialChar = (pwd: string) => /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(pwd);
+  const hasNumber = (pwd: string) => /\d/.test(pwd);
+  const passwordsMatch = (pwd: string, confirmPwd: string) => pwd === confirmPwd && pwd.length > 0;
+
+  // Password strength component
+  const PasswordStrengthIndicator = ({ password }: { password: string }) => {
+    const criteria = [
+      { label: 'Au moins 8 caractères', valid: hasMinLength(password) },
+      { label: 'Au moins 1 caractère spécial (!@#$%^&*)', valid: hasSpecialChar(password) },
+      { label: 'Au moins 1 chiffre', valid: hasNumber(password) },
+    ];
+
+    return (
+      <div className="mt-2 space-y-1">
+        {criteria.map((criterion, index) => (
+          <div key={index} className="flex items-center text-sm">
+            {criterion.valid ? (
+              <Check className="w-4 h-4 text-green-500 mr-2" />
+            ) : (
+              <X className="w-4 h-4 text-gray-400 mr-2" />
+            )}
+            <span className={criterion.valid ? 'text-green-700' : 'text-gray-500'}>
+              {criterion.label}
+            </span>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+  // Password confirmation component
+  const PasswordConfirmationIndicator = ({ 
+    password, 
+    confirmPassword 
+  }: { 
+    password: string; 
+    confirmPassword: string 
+  }) => {
+    const isValid = passwordsMatch(password, confirmPassword);
+
+    return (
+      <div className="mt-2">
+        <div className="flex items-center text-sm">
+          {isValid ? (
+            <Check className="w-4 h-4 text-green-500 mr-2" />
+          ) : (
+            <X className="w-4 h-4 text-gray-400 mr-2" />
+          )}
+          <span className={isValid ? 'text-green-700' : 'text-gray-500'}>
+            {isValid ? 'Les mots de passe correspondent' : 'Les mots de passe ne correspondent pas'}
+          </span>
+        </div>
+      </div>
+    );
+  };
 
   const onSubmit = async (data: RegisterFormData) => {
     setIsLoading(true);
@@ -119,9 +179,19 @@ export default function RegisterPage() {
               {...register('password', {
                 required: 'Mot de passe requis',
                 minLength: { value: 8, message: 'Minimum 8 caractères' },
+                validate: {
+                  hasSpecialChar: (value) => 
+                    /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(value) || 
+                    'Au moins 1 caractère spécial requis (!@#$%^&*...)',
+                  hasNumber: (value) => 
+                    /\d/.test(value) || 
+                    'Au moins 1 chiffre requis',
+                },
               })}
               error={errors.password?.message}
             />
+
+            {password && <PasswordStrengthIndicator password={password} />}
 
             <Input
               label="Confirmer le mot de passe"
@@ -133,6 +203,8 @@ export default function RegisterPage() {
               })}
               error={errors.confirmPassword?.message}
             />
+
+            {confirmPassword && <PasswordConfirmationIndicator password={password} confirmPassword={confirmPassword} />}
 
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? 'Création...' : 'Créer mon compte'}
