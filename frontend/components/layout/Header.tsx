@@ -54,8 +54,8 @@ export const Header: React.FC = () => {
                   </Link>
                 )}
                 {user?.role === UserRole.ADMIN && (
-                  <Link href="/admin/dashboard" className="text-stone-700 hover:text-amber-800 text-sm font-medium transition-colors">
-                    Admin
+                  <Link href="/admin/dashboard" className="flex items-center space-x-2 text-stone-700 hover:text-amber-800 text-sm font-medium transition-colors">
+                    <Settings className="w-4 h-4" /><span>Dashboard Admin</span>
                   </Link>
                 )}
                 <button

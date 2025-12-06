@@ -7,6 +7,7 @@ import api from '@/lib/api';
 import { Service, UserRole } from '@/types';
 import { Loading } from '@/components/ui/Loading';
 import { useAuthStore } from '@/store/auth';
+import { useServicesStore } from '@/store/services';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { ArrowLeft } from 'lucide-react';
 
@@ -14,6 +15,7 @@ function ManageServiceContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const { user, isAuthenticated } = useAuthStore();
+    const { services, setServices, updateLastFetched } = useServicesStore();
     const [service, setService] = useState<Service | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [saving, setSaving] = useState(false);
@@ -37,6 +39,15 @@ function ManageServiceContent() {
     }, [canManageServices, isEdit, serviceId, router]);
 
     const fetchService = async () => {
+        // Vérifier d'abord dans le store
+        const cachedService = services.find((s: Service) => s.id === serviceId);
+        if (cachedService) {
+            setService(cachedService);
+            setIsLoading(false);
+            return;
+        }
+
+        // Sinon, charger depuis l'API
         try {
             const response = await api.get<Service>(`/services/${serviceId}`);
             setService(response.data);
@@ -61,10 +72,21 @@ function ManageServiceContent() {
                 isActive: formData.get('isActive') === 'on',
             };
 
+            let updatedService: Service;
             if (isEdit && serviceId) {
-                await api.patch(`/services/${serviceId}`, data);
+                const response = await api.patch(`/services/${serviceId}`, data);
+                updatedService = response.data;
+                // Mettre à jour le service dans le store
+                const updatedServices = services.map((s: Service) =>
+                    s.id === serviceId ? updatedService : s
+                );
+                setServices(updatedServices);
             } else {
-                await api.post('/services', data);
+                const response = await api.post('/services', data);
+                updatedService = response.data;
+                // Ajouter le nouveau service au store
+                setServices([...services, updatedService]);
+                updateLastFetched();
             }
 
             router.push('/services');

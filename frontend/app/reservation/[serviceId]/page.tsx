@@ -15,6 +15,8 @@ import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Loading } from '@/components/ui/Loading';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
+import { useWorkingDaysStore } from '@/store/working-days';
+import { useServicesStore } from '@/store/services';
 
 interface BookingFormData {
   notes?: string;
@@ -31,34 +33,65 @@ export default function ReservationPage() {
 function ReservationContent() {
   const router = useRouter();
   const params = useParams();
-  const [service, setService] = useState<Service | null>(null);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
   const [availableSlots, setAvailableSlots] = useState<string[]>([]);
-  const [workingDays, setWorkingDays] = useState<string[]>([]);
-  const [isLoadingService, setIsLoadingService] = useState(true);
   const [isLoadingSlots, setIsLoadingSlots] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
 
   const { register, handleSubmit } = useForm<BookingFormData>();
 
-  // Fetch working days on mount (once)
+  // Utiliser les stores pour les données cachées
+  const {
+    workingDays,
+    isLoading: isLoadingWorkingDays,
+    isCacheValid: isWorkingDaysCacheValid,
+    setWorkingDays,
+    setLoading: setLoadingWorkingDays,
+    updateLastFetched: updateWorkingDaysLastFetched
+  } = useWorkingDaysStore();
+
+  const { services } = useServicesStore();
+
+  // Récupérer le service depuis le store ou l'état local
+  const [service, setService] = useState<Service | null>(null);
+  const [isLoadingService, setIsLoadingService] = useState(true);
+
+  // Fetch working days avec cache
   useEffect(() => {
     const fetchWorkingDays = async () => {
+      if (isWorkingDaysCacheValid()) {
+        return; // Utiliser le cache
+      }
+
+      setLoadingWorkingDays(true);
       try {
         const response = await api.get<string[]>('/availability/working-days');
         setWorkingDays(response.data);
+        updateWorkingDaysLastFetched();
       } catch (err) {
         console.error('Error fetching working days:', err);
+      } finally {
+        setLoadingWorkingDays(false);
       }
     };
 
     fetchWorkingDays();
-  }, []);
+  }, [isWorkingDaysCacheValid, setWorkingDays, setLoadingWorkingDays, updateWorkingDaysLastFetched]);
 
+  // Fetch service avec possibilité d'utiliser le cache
   useEffect(() => {
     const fetchService = async () => {
+      // Vérifier d'abord dans le store
+      const cachedService = services.find((s: Service) => s.id === params.serviceId);
+      if (cachedService) {
+        setService(cachedService);
+        setIsLoadingService(false);
+        return;
+      }
+
+      // Sinon, charger depuis l'API
       try {
         const response = await api.get<Service>(`/services/${params.serviceId}`);
         setService(response.data);
@@ -72,7 +105,7 @@ function ReservationContent() {
     if (params.serviceId) {
       fetchService();
     }
-  }, [params.serviceId]);
+  }, [params.serviceId, services]);
 
   useEffect(() => {
     const fetchAvailableSlots = async () => {
@@ -80,7 +113,7 @@ function ReservationContent() {
 
       setIsLoadingSlots(true);
       setSelectedSlot(null);
-      
+
       try {
         const dateStr = format(selectedDate, 'yyyy-MM-dd');
         const response = await api.get<string[]>('/bookings/available-slots', {
@@ -119,14 +152,14 @@ function ReservationContent() {
       };
 
       await api.post('/bookings', bookingData);
-      
+
       // Redirect to profile/bookings page
       router.push('/profile?tab=bookings');
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } };
       setError(
         error.response?.data?.message ||
-          'Erreur lors de la réservation. Veuillez réessayer.'
+        'Erreur lors de la réservation. Veuillez réessayer.'
       );
     } finally {
       setIsSubmitting(false);

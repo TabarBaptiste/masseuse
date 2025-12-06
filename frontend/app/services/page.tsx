@@ -1,33 +1,49 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import api from '@/lib/api';
 import { Service, UserRole } from '@/types';
 import { ServiceCard } from '@/components/services/ServiceCard';
 import { Loading } from '@/components/ui/Loading';
 import { useAuthStore } from '@/store/auth';
+import { useServicesStore } from '@/store/services';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { Plus, Edit, Trash2 } from 'lucide-react';
 
 export default function ServicesPage() {
   const router = useRouter();
   const { user, isAuthenticated } = useAuthStore();
-  const [services, setServices] = useState<Service[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState('');
+  const {
+    services,
+    isLoading,
+    error,
+    isCacheValid,
+    setServices,
+    setLoading,
+    setError,
+    updateLastFetched
+  } = useServicesStore();
 
   const canManageServices = isAuthenticated && (user?.role === UserRole.ADMIN || user?.role === UserRole.PRO);
 
   useEffect(() => {
     fetchServices();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchServices = async () => {
+    // Si le cache est valide, ne pas refaire la requête
+    if (isCacheValid()) {
+      return;
+    }
+
+    setLoading(true);
     try {
       const response = await api.get<Service[]>('/services');
       if (Array.isArray(response.data)) {
         setServices(response.data);
+        updateLastFetched();
       } else {
         console.error('API did not return an array:', response.data);
         setError('Erreur: données invalides reçues du serveur');
@@ -35,7 +51,7 @@ export default function ServicesPage() {
     } catch {
       setError('Erreur lors du chargement des services');
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
@@ -44,7 +60,9 @@ export default function ServicesPage() {
 
     try {
       await api.delete(`/services/${id}`);
-      setServices(services.filter(s => s.id !== id));
+      // Mettre à jour le store en filtrant le service supprimé
+      const updatedServices = services.filter((s: Service) => s.id !== id);
+      setServices(updatedServices);
     } catch (error) {
       console.error('Erreur lors de la suppression:', error);
       alert('Erreur lors de la suppression du service');

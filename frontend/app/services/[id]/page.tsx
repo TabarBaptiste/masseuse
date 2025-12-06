@@ -11,17 +11,28 @@ import { Card } from '@/components/ui/Card';
 import { Loading } from '@/components/ui/Loading';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { useAuthStore } from '@/store/auth';
+import { useServicesStore } from '@/store/services';
 
 export default function ServiceDetailPage() {
   const params = useParams();
   const router = useRouter();
   const { isAuthenticated } = useAuthStore();
+  const { services } = useServicesStore();
   const [service, setService] = useState<Service | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
 
   useEffect(() => {
     const fetchService = async () => {
+      // Vérifier d'abord dans le store
+      const cachedService = services.find((s: Service) => s.id === params.id);
+      if (cachedService) {
+        setService(cachedService);
+        setIsLoading(false);
+        return;
+      }
+
+      // Sinon, charger depuis l'API
       try {
         const response = await api.get<Service>(`/services/${params.id}`);
         setService(response.data);
@@ -35,7 +46,7 @@ export default function ServiceDetailPage() {
     if (params.id) {
       fetchService();
     }
-  }, [params.id]);
+  }, [params.id, services]);
 
   const handleBooking = () => {
     if (!isAuthenticated) {
