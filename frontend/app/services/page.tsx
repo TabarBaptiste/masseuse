@@ -26,7 +26,13 @@ export default function ServicesPage() {
   const fetchServices = async () => {
     try {
       const response = await api.get<Service[]>('/services');
-      setServices(response.data);
+      console.log('API response:', response.data);
+      if (Array.isArray(response.data)) {
+        setServices(response.data);
+      } else {
+        console.error('API did not return an array:', response.data);
+        setError('Erreur: données invalides reçues du serveur');
+      }
     } catch {
       setError('Erreur lors du chargement des services');
     } finally {
@@ -89,11 +95,11 @@ export default function ServicesPage() {
           </p>
         </div>
 
-        {services.length === 0 ? (
+        {Array.isArray(services) && services.length === 0 ? (
           <p className="text-center text-gray-600">
             Aucun service disponible pour le moment.
           </p>
-        ) : (
+        ) : Array.isArray(services) ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {services.map((service) => (
               <div key={service.id} className="relative">
@@ -119,6 +125,10 @@ export default function ServicesPage() {
               </div>
             ))}
           </div>
+        ) : (
+          <p className="text-center text-red-600">
+            Erreur: données des services invalides
+          </p>
         )}
       </div>
     </div>

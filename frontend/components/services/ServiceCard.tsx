@@ -1,14 +1,26 @@
 import React from 'react';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Service } from '@/types';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
+import { useAuthStore } from '@/store/auth';
 
 interface ServiceCardProps {
   service: Service;
 }
 
 export const ServiceCard: React.FC<ServiceCardProps> = ({ service }) => {
+  const router = useRouter();
+  const { isAuthenticated } = useAuthStore();
+
+  const handleBooking = () => {
+    if (!isAuthenticated) {
+      router.push('/login');
+      return;
+    }
+    router.push(`/reservation/${service.id}`);
+  };
+
   return (
     <Card>
       {service.imageUrl && (
@@ -34,11 +46,9 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ service }) => {
           </span>
         </div>
       </div>
-      <Link href={`/services/${service.id}`}>
-        <Button className="w-full">
-          Voir les détails
-        </Button>
-      </Link>
+      <Button onClick={handleBooking} className="w-full">
+        Réserver ce massage
+      </Button>
     </Card>
   );
 };
