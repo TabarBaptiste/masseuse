@@ -4,6 +4,7 @@ import React from 'react';
 import { format, addDays, startOfWeek, isSameDay, getDay } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import clsx from 'clsx';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 
 interface CalendarProps {
   selectedDate: Date | null;
@@ -66,7 +67,7 @@ export const Calendar: React.FC<CalendarProps> = ({
               : 'bg-gray-200 text-gray-400 cursor-not-allowed'
           )}
         >
-          ←
+          <ArrowLeft  className="w-5 h-5"/>
         </button>
         <span className="font-semibold text-lg">
           {format(currentWeekStart, 'MMMM yyyy', { locale: fr })}
@@ -81,7 +82,7 @@ export const Calendar: React.FC<CalendarProps> = ({
               : 'bg-gray-200 text-gray-400 cursor-not-allowed'
           )}
         >
-          →
+          <ArrowRight  className="w-5 h-5"/>
         </button>
       </div>
 
