@@ -1,13 +1,14 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { UserRole, User } from '@/types';
 import api from '@/lib/api';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { Users, ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
-import { UsersStats, UsersFilters, UsersTable, EditUserModal } from '@/components/admin/users';
+import { UsersStats, UsersFilters, UsersTable } from '@/components/admin/users';
 
 export default function AdminUsersPage() {
     return (
@@ -18,14 +19,13 @@ export default function AdminUsersPage() {
 }
 
 function UsersContent() {
+    const router = useRouter();
     const [users, setUsers] = useState<User[]>([]);
     const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [roleFilter, setRoleFilter] = useState<'ALL' | UserRole>('ALL');
     const [statusFilter, setStatusFilter] = useState<'ALL' | 'ACTIVE' | 'INACTIVE'>('ALL');
-    const [editingUser, setEditingUser] = useState<User | null>(null);
-    const [showEditModal, setShowEditModal] = useState(false);
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -111,28 +111,7 @@ function UsersContent() {
     };
 
     const handleEditUser = (user: User) => {
-        setEditingUser(user);
-        setShowEditModal(true);
-    };
-
-    const handleSaveEdit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!editingUser) return;
-
-        try {
-            await api.patch(`/users/${editingUser.id}`, {
-                firstName: editingUser.firstName,
-                lastName: editingUser.lastName,
-                email: editingUser.email,
-                phone: editingUser.phone,
-            });
-            setShowEditModal(false);
-            setEditingUser(null);
-            await fetchUsers();
-        } catch (error) {
-            console.error('Erreur lors de la modification:', error);
-            alert('Erreur lors de la modification de l\'utilisateur');
-        }
+        router.push(`/admin/users/edit/${user.id}`);
     };
 
     const stats = {
@@ -206,14 +185,6 @@ function UsersContent() {
                     onDeleteUser={handleDeleteUser}
                 />
             </div>
-
-            {/* Edit Modal */}
-            <EditUserModal
-                editingUser={editingUser}
-                onClose={() => setShowEditModal(false)}
-                onSave={handleSaveEdit}
-                onUserChange={setEditingUser}
-            />
         </div>
     );
 }
