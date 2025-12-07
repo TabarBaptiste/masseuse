@@ -44,6 +44,27 @@ $ npm run start:dev
 $ npm run start:prod
 ```
 
+## Build issues
+
+If you get a permissions error during `npm run build` (EPERM while trying to access files in `dist`), try the following:
+
+- Stop any running process that may be locking build files (e.g. `node`, `npm run start:dev`):
+
+```powershell
+Get-WmiObject Win32_Process | Where-Object { $_.Name -eq 'node.exe' } | Select-Object ProcessId,CommandLine | Format-List
+Stop-Process -Id <The node process id>
+```
+
+- Clean the build output and rebuild:
+
+```powershell
+npm run clean
+npm run build
+```
+
+- If the problem persists, run an elevated PowerShell or temporarily disable antivirus/file indexing for the project folder.
+
+
 ## Run tests
 
 ```bash
