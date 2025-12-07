@@ -6,8 +6,8 @@ import { UserRole, Booking, BookingStatus } from '@/types';
 import { Card } from '@/components/ui/Card';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { Phone, Mail, X, User } from 'lucide-react';
+import { useAuthStore } from '@/store/auth';
 import api from '@/lib/api';
-// import { ClientPageRoot } from 'next/dist/client/components/client-page';
 
 export default function ProDashboardPage() {
     return (
@@ -25,28 +25,51 @@ function DashboardContent() {
     const [nameFilter, setNameFilter] = useState<string>('');
     const [showStats, setShowStats] = useState(false);
 
+    const { user, isAuthenticated, isInitialized } = useAuthStore();
+
+    useEffect(() => {
+        // Initialize user data
+        useAuthStore.getState().loadUser();
+    }, []);
+
     useEffect(() => {
         window.scrollTo(0, 0);
     }, []);
 
     useEffect(() => {
+        // Only fetch bookings if user is authenticated and has the right role
+        if (!isInitialized || !isAuthenticated || !user) {
+            console.log('Not ready to fetch bookings:', { isInitialized, isAuthenticated, user: user?.role });
+            return;
+        }
+
+        if (user.role !== UserRole.PRO && user.role !== UserRole.ADMIN) {
+            console.error('User does not have permission to access bookings. Role:', user.role);
+            return;
+        }
+
         const fetchBookings = async () => {
             try {
                 const params: Record<string, string> = {};
                 if (filter !== 'ALL') params.status = filter;
                 if (dateFilter) params.date = dateFilter;
                 if (nameFilter) params.name = nameFilter;
+                console.log('Fetching bookings with params:', params, 'User role:', user.role);
                 const response = await api.get('/bookings', { params });
                 setBookings(response.data);
-            } catch (error) {
+            } catch (error: any) {
                 console.error('Erreur lors de la récupération des réservations:', error);
+                if (error.response?.status === 403) {
+                    console.error('403 Forbidden - User role:', user.role, 'User ID:', user.id);
+                    alert('Accès refusé. Vous n\'avez pas les permissions nécessaires pour accéder aux réservations.');
+                }
             } finally {
                 setLoading(false);
             }
         };
 
         fetchBookings();
-    }, [filter, dateFilter, nameFilter]);
+    }, [filter, dateFilter, nameFilter, isAuthenticated, isInitialized, user]);
 
     const formatDate = (dateString: string) => {
         return new Date(dateString).toLocaleDateString('fr-FR', {
