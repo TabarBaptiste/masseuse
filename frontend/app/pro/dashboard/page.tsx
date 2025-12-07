@@ -101,6 +101,93 @@ function DashboardContent() {
         }
     };
 
+    const renderBookingCard = (booking: Booking, showActions: boolean = true) => (
+        <Card key={booking.id}>
+            <div className="flex flex-col gap-4">
+                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                    <div className="flex-1">
+                        <div className="flex items-center gap-3 mb-2">
+                            <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(booking.status)}`}>
+                                {getStatusText(booking.status)}
+                            </span>
+                        </div>
+                        <div className="text-base font-semibold text-gray-900 mb-1">
+                            {(() => {
+                                const isToday = new Date(booking.date).toDateString() === new Date().toDateString();
+                                return isToday ? `Aujourd'hui à ${booking.startTime}` : formatDate(booking.date);
+                            })()}
+                        </div>
+                        <div className="text-sm text-gray-700 mb-2">
+                            {booking.startTime} - {booking.endTime} • {booking.service?.name}
+                        </div>
+                        <div className="text-sm text-gray-600">
+                            <User className="inline-block mr-1 w-4 h-4" /> {booking.user?.firstName} {booking.user?.lastName}
+                        </div>
+                        {booking.user?.email && (
+                            <div className="text-sm text-gray-600">
+                                <Mail className="inline-block mr-1 w-4 h-4" /> {booking.user.email}
+                            </div>
+                        )}
+                        {booking.user?.phone && (
+                            <div className="text-sm text-gray-600">
+                                <Phone className="inline-block mr-1 w-4 h-4" /> {booking.user.phone}
+                            </div>
+                        )}
+                        <div className="text-sm text-gray-600 mt-2">
+                            <strong>Prix:</strong> {booking.priceAtBooking}€
+                        </div>
+                        {booking.notes && (
+                            <div className="text-sm text-gray-600 mt-2 p-2 bg-blue-50 rounded">
+                                <strong>Note du client:</strong> {booking.notes}
+                            </div>
+                        )}
+                        {booking.proNotes && (
+                            <div className="text-sm text-gray-600 mt-2 p-2 bg-amber-50 rounded">
+                                <strong>Note privée:</strong> {booking.proNotes}
+                            </div>
+                        )}
+                    </div>
+                    {showActions && (
+                        <div className="flex flex-wrap gap-2">
+                            {booking.status === BookingStatus.PENDING && (
+                                <>
+                                    <button
+                                        onClick={() => handleStatusChange(booking.id, BookingStatus.CONFIRMED)}
+                                        className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium transition-colors"
+                                    >
+                                        {getStatusText(BookingStatus.CONFIRMED)}
+                                    </button>
+                                    <button
+                                        onClick={() => handleStatusChange(booking.id, BookingStatus.CANCELLED)}
+                                        className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium transition-colors"
+                                    >
+                                        {getStatusText(BookingStatus.CANCELLED)}
+                                    </button>
+                                </>
+                            )}
+                            {booking.status === BookingStatus.CONFIRMED && (
+                                <>
+                                    <button
+                                        onClick={() => handleStatusChange(booking.id, BookingStatus.COMPLETED)}
+                                        className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors"
+                                    >
+                                        {getStatusText(BookingStatus.COMPLETED)}
+                                    </button>
+                                    <button
+                                        onClick={() => handleStatusChange(booking.id, BookingStatus.NO_SHOW)}
+                                        className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg text-sm font-medium transition-colors"
+                                    >
+                                        {getStatusText(BookingStatus.NO_SHOW)}
+                                    </button>
+                                </>
+                            )}
+                        </div>
+                    )}
+                </div>
+            </div>
+        </Card>
+    );
+
     // const upcomingBookings = bookings.filter(b => {
     //     const bookingDate = new Date(b.date);
     //     const today = new Date();
@@ -273,90 +360,7 @@ function DashboardContent() {
                                         À venir
                                     </h2>
                                     <div className="space-y-4">
-                                        {upcomingBookings.map((booking) => (
-                                            <Card key={booking.id}>
-                                                <div className="flex flex-col gap-4">
-                                                    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-                                                        <div className="flex-1">
-                                                            <div className="flex items-center gap-3 mb-2">
-                                                                <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(booking.status)}`}>
-                                                                    {getStatusText(booking.status)}
-                                                                </span>
-                                                            </div>
-                                                            <div className="text-base font-semibold text-gray-900 mb-1">
-                                                                {(() => {
-                                                                    const isToday = new Date(booking.date).toDateString() === new Date().toDateString();
-                                                                    return isToday ? `Aujourd'hui à ${booking.startTime}` : formatDate(booking.date);
-                                                                })()}
-                                                            </div>
-                                                            <div className="text-sm text-gray-700 mb-2">
-                                                                {booking.startTime} - {booking.endTime} • {booking.service?.name}
-                                                            </div>
-                                                            <div className="text-sm text-gray-600">
-                                                                <User className="inline-block mr-1 w-4 h-4" /> {booking.user?.firstName} {booking.user?.lastName}
-                                                            </div>
-                                                            {booking.user?.email && (
-                                                                <div className="text-sm text-gray-600">
-                                                                    <Mail className="inline-block mr-1 w-4 h-4" /> {booking.user.email}
-                                                                </div>
-                                                            )}
-                                                            {booking.user?.phone && (
-                                                                <div className="text-sm text-gray-600">
-                                                                    <Phone className="inline-block mr-1 w-4 h-4" /> {booking.user.phone}
-                                                                </div>
-                                                            )}
-                                                            <div className="text-sm text-gray-600 mt-2">
-                                                                <strong>Prix:</strong> {booking.priceAtBooking}€
-                                                            </div>
-                                                            {booking.notes && (
-                                                                <div className="text-sm text-gray-600 mt-2 p-2 bg-blue-50 rounded">
-                                                                    <strong>Note du client:</strong> {booking.notes}
-                                                                </div>
-                                                            )}
-                                                            {booking.proNotes && (
-                                                                <div className="text-sm text-gray-600 mt-2 p-2 bg-amber-50 rounded">
-                                                                    <strong>Note privée:</strong> {booking.proNotes}
-                                                                </div>
-                                                            )}
-                                                        </div>
-                                                        <div className="flex flex-wrap gap-2">
-                                                            {booking.status === BookingStatus.PENDING && (
-                                                                <>
-                                                                    <button
-                                                                        onClick={() => handleStatusChange(booking.id, BookingStatus.CONFIRMED)}
-                                                                        className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium transition-colors"
-                                                                    >
-                                                                        {getStatusText(BookingStatus.CONFIRMED)}
-                                                                    </button>
-                                                                    <button
-                                                                        onClick={() => handleStatusChange(booking.id, BookingStatus.CANCELLED)}
-                                                                        className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium transition-colors"
-                                                                    >
-                                                                        {getStatusText(BookingStatus.CANCELLED)}
-                                                                    </button>
-                                                                </>
-                                                            )}
-                                                            {booking.status === BookingStatus.CONFIRMED && (
-                                                                <>
-                                                                    <button
-                                                                        onClick={() => handleStatusChange(booking.id, BookingStatus.COMPLETED)}
-                                                                        className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors"
-                                                                    >
-                                                                        {getStatusText(BookingStatus.COMPLETED)}
-                                                                    </button>
-                                                                    <button
-                                                                        onClick={() => handleStatusChange(booking.id, BookingStatus.NO_SHOW)}
-                                                                        className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg text-sm font-medium transition-colors"
-                                                                    >
-                                                                        {getStatusText(BookingStatus.NO_SHOW)}
-                                                                    </button>
-                                                                </>
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </Card>
-                                        ))}
+                                        {upcomingBookings.map((booking) => renderBookingCard(booking, true))}
                                     </div>
                                 </div>
                             )}
@@ -368,59 +372,7 @@ function DashboardContent() {
                                         Passé
                                     </h2>
                                     <div className="space-y-4">
-                                        {pastBookings.map((booking) => (
-                                            <Card key={booking.id}>
-                                                <div className="flex flex-col gap-4">
-                                                    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-                                                        <div className="flex-1">
-                                                            <div className="flex items-center gap-3 mb-2">
-                                                                <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(booking.status)}`}>
-                                                                    {getStatusText(booking.status)}
-                                                                </span>
-                                                            </div>
-                                                            <div className="text-base font-semibold text-gray-900 mb-1">
-                                                                {(() => {
-                                                                    const isToday = new Date(booking.date).toDateString() === new Date().toDateString();
-                                                                    return isToday ? `Aujourd'hui à ${booking.startTime}` : formatDate(booking.date);
-                                                                })()}
-                                                            </div>
-                                                            <div className="text-sm text-gray-700 mb-2">
-                                                                {booking.startTime} - {booking.endTime} • {booking.service?.name}
-                                                            </div>
-                                                            <div className="text-sm text-gray-600">
-                                                                <User className="inline-block mr-1 w-4 h-4" /> {booking.user?.firstName} {booking.user?.lastName}
-                                                            </div>
-                                                            {booking.user?.email && (
-                                                                <div className="text-sm text-gray-600">
-                                                                    <Mail className="inline-block mr-1 w-4 h-4" /> {booking.user.email}
-                                                                </div>
-                                                            )}
-                                                            {booking.user?.phone && (
-                                                                <div className="text-sm text-gray-600">
-                                                                    <Phone className="inline-block mr-1 w-4 h-4" /> {booking.user.phone}
-                                                                </div>
-                                                            )}
-                                                            <div className="text-sm text-gray-600 mt-2">
-                                                                <strong>Prix:</strong> {booking.priceAtBooking}€
-                                                            </div>
-                                                            {booking.notes && (
-                                                                <div className="text-sm text-gray-600 mt-2 p-2 bg-blue-50 rounded">
-                                                                    <strong>Note du client:</strong> {booking.notes}
-                                                                </div>
-                                                            )}
-                                                            {booking.proNotes && (
-                                                                <div className="text-sm text-gray-600 mt-2 p-2 bg-amber-50 rounded">
-                                                                    <strong>Note privée:</strong> {booking.proNotes}
-                                                                </div>
-                                                            )}
-                                                        </div>
-                                                        <div className="flex flex-wrap gap-2">
-                                                            {/* Pas de boutons d'action pour les réservations passées */}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </Card>
-                                        ))}
+                                        {pastBookings.map((booking) => renderBookingCard(booking, false))}
                                     </div>
                                 </div>
                             )}
