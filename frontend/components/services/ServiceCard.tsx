@@ -52,11 +52,11 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ service }) => {
           />
         </div>
       )}
-      <div className="p-6">
+      <div className="p-4">
         <h3 className="text-xl font-semibold text-gray-900 mb-2">
           {service.name}
         </h3>
-        <p className="text-gray-600 mb-4 line-clamp-3">
+        <p className="text-gray-600 mb-4">
           {service.description}
         </p>
         <div className="flex justify-between items-center mb-4">
