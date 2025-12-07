@@ -42,17 +42,17 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ service }) => {
   const imageUrl = getCloudinaryUrl(service.imageUrl);
 
   return (
-    <Card className="overflow-hidden">
+    <div className="bg-white rounded-lg shadow-md overflow-hidden">
       {imageUrl && (
-        <div className="relative w-full h-48">
+        <div className="w-full h-48">
           <img
             src={imageUrl}
             alt={service.name}
-            className="absolute inset-0 w-full h-full object-cover"
+            className="w-full h-full object-cover"
           />
         </div>
       )}
-      <div className={imageUrl ? 'pt-4' : ''}>
+      <div className="p-6">
         <h3 className="text-xl font-semibold text-gray-900 mb-2">
           {service.name}
         </h3>
@@ -73,6 +73,6 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ service }) => {
           Réserver ce massage
         </Button>
       </div>
-    </Card>
+    </div>
   );
 };
