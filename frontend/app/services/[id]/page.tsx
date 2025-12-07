@@ -13,6 +13,24 @@ import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { useAuthStore } from '@/store/auth';
 import { useServicesStore } from '@/store/services';
 
+const getCloudinaryUrl = (imageUrl: string | null | undefined) => {
+  if (!imageUrl) return null;
+
+  // Si c'est déjà une URL Cloudinary, la retourner telle quelle
+  if (imageUrl.includes('cloudinary.com')) {
+    return imageUrl;
+  }
+
+  // Si c'est un public_id Cloudinary, construire l'URL
+  const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+  if (cloudName && imageUrl) {
+    return `https://res.cloudinary.com/${cloudName}/image/upload/c_fill,w_800,h_400,f_auto,q_auto/${imageUrl}`;
+  }
+
+  // Fallback vers l'URL originale
+  return imageUrl;
+};
+
 export default function ServiceDetailPage() {
   const params = useParams();
   const router = useRouter();
@@ -85,9 +103,9 @@ export default function ServiceDetailPage() {
         />
 
         <Card>
-          {service.imageUrl && (
+          {service.imageUrl && getCloudinaryUrl(service.imageUrl) && (
             <img
-              src={service.imageUrl}
+              src={getCloudinaryUrl(service.imageUrl)!}
               alt={service.name}
               className="w-full h-64 object-cover rounded-lg mb-6"
             />

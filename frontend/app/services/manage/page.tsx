@@ -8,8 +8,8 @@ import { Service, UserRole } from '@/types';
 import { Loading } from '@/components/ui/Loading';
 import { useAuthStore } from '@/store/auth';
 import { useServicesStore } from '@/store/services';
+import { CloudinaryUpload } from '@/components/ui/CloudinaryUpload';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
-import { ArrowLeft } from 'lucide-react';
 
 function ManageServiceContent() {
     const router = useRouter();
@@ -185,19 +185,17 @@ function ManageServiceContent() {
                             </div>
                         </div>
 
-                        <div>
-                            <label htmlFor="imageUrl" className="block text-sm font-medium text-gray-700 mb-2">
-                                URL de l'image
-                            </label>
-                            <input
-                                type="url"
-                                id="imageUrl"
-                                name="imageUrl"
-                                defaultValue={service?.imageUrl || ''}
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                                placeholder="https://exemple.com/image.jpg"
-                            />
-                        </div>
+                        <CloudinaryUpload
+                            value={service?.imageUrl}
+                            onChange={(url: string) => {
+                                // Mettre à jour la valeur dans le formulaire
+                                const form = document.querySelector('form') as HTMLFormElement;
+                                const hiddenInput = form.querySelector('input[name="imageUrl"]') as HTMLInputElement;
+                                if (hiddenInput) {
+                                    hiddenInput.value = url;
+                                }
+                            }}
+                        />
 
                         <div className="flex items-center">
                             <input
