@@ -23,7 +23,7 @@ export class AuthService {
     });
 
     if (existingUser) {
-      throw new ConflictException('Email already in use');
+      throw new ConflictException('Email déjà utilisé');
     }
 
     // Hash password
@@ -68,7 +68,7 @@ export class AuthService {
     });
 
     if (!user) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedException('Aucun compte n\'est associé à cette adresse e-mail.');
     }
 
     // Check if user is active
@@ -83,7 +83,7 @@ export class AuthService {
     );
 
     if (!isPasswordValid) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedException('Mot de passe incorrect.');
     }
 
     // Generate JWT token

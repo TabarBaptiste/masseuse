@@ -60,7 +60,7 @@ export class UsersService {
       });
 
       if (existingUser) {
-        throw new ConflictException('Email already in use');
+        throw new ConflictException('Email déjà utilisé');
       }
     }
 

@@ -30,6 +30,7 @@ export default function RegisterPage() {
     handleSubmit,
     watch,
     formState: { errors },
+    setValue,
   } = useForm<RegisterFormData>();
 
   const password = watch('password');
@@ -108,6 +109,9 @@ export default function RegisterPage() {
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } };
       setError(error.response?.data?.message || 'Une erreur est survenue');
+      // Clear password fields on error
+      setValue('password', '');
+      setValue('confirmPassword', '');
     } finally {
       setIsLoading(false);
     }
@@ -127,7 +131,7 @@ export default function RegisterPage() {
         </div>
 
         <Card>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-6">
             {error && (
               <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
                 {error}
