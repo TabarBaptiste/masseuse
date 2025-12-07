@@ -33,6 +33,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ service }) => {
 
   const handleBooking = () => {
     if (!isAuthenticated) {
+      localStorage.setItem('redirectAfterLogin', `/reservation/${service.id}`);
       router.push('/login');
       return;
     }
