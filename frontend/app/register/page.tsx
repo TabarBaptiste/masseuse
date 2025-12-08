@@ -113,7 +113,7 @@ export default function RegisterPage() {
 
     try {
       const { confirmPassword: _confirmPassword, phonePrefix, phoneNumber, ...registerData } = data;
-      registerData.phone = phonePrefix + phoneNumber;
+      registerData.phone = phonePrefix + ' ' + phoneNumber;
       await registerUser(registerData);
 
       // Redirect to stored URL or default to profile
