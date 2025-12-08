@@ -57,9 +57,10 @@ function DashboardContent() {
                 console.log('Fetching bookings with params:', params, 'User role:', user.role);
                 const response = await api.get('/bookings', { params });
                 setBookings(response.data);
-            } catch (error: any) {
+            } catch (error: unknown) {
                 console.error('Erreur lors de la récupération des réservations:', error);
-                if (error.response?.status === 403) {
+                const axiosError = error as { response?: { status: number } };
+                if (axiosError.response?.status === 403) {
                     console.error('403 Forbidden - User role:', user.role, 'User ID:', user.id);
                     alert('Accès refusé. Vous n\'avez pas les permissions nécessaires pour accéder aux réservations.');
                 }

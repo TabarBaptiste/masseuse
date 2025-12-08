@@ -7,7 +7,7 @@ interface FormFieldProps {
     value?: string | number | boolean;
     defaultValue?: string | number | boolean;
     onChange?: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
-    onUserChange?: (value: any) => void;
+    onUserChange?: (value: string | number | boolean) => void;
     placeholder?: string;
     required?: boolean;
     min?: string | number;

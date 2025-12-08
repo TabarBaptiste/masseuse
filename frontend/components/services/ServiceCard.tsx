@@ -1,7 +1,6 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { Service } from '@/types';
-import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { useAuthStore } from '@/store/auth';
 

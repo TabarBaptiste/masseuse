@@ -7,7 +7,7 @@ import { Card } from '@/components/ui/Card';
 import { Loading } from '@/components/ui/Loading';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import api from '@/lib/api';
-import { ArrowLeft, Calendar, Clock, TrendingUp, Users, Euro, Award } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock, TrendingUp, Euro, Award } from 'lucide-react';
 import Link from 'next/link';
 
 export default function StatsPage() {
