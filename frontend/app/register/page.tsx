@@ -138,9 +138,10 @@ export default function RegisterPage() {
               </div>
             )}
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Input
                 label="Prénom"
+                placeholder="Entrez votre prénom"
                 {...register('firstName', {
                   required: 'Prénom requis',
                   minLength: { value: 2, message: 'Minimum 2 caractères' },
@@ -150,6 +151,7 @@ export default function RegisterPage() {
 
               <Input
                 label="Nom"
+                placeholder="Entrez votre nom"
                 {...register('lastName', {
                   required: 'Nom requis',
                   minLength: { value: 2, message: 'Minimum 2 caractères' },
@@ -161,6 +163,7 @@ export default function RegisterPage() {
             <Input
               label="Email"
               type="email"
+              placeholder="exemple@email.com"
               {...register('email', {
                 required: 'Email requis',
                 pattern: {
@@ -172,14 +175,16 @@ export default function RegisterPage() {
             />
 
             <Input
-              label="Téléphone (optionnel)"
+              label="Téléphone"
               type="tel"
+              placeholder="+596 696 12 34 56"
               {...register('phone')}
             />
 
             <Input
               label="Mot de passe"
               type="password"
+              placeholder="Entrez un mot de passe sécurisé"
               {...register('password', {
                 required: 'Mot de passe requis',
                 minLength: { value: 8, message: 'Minimum 8 caractères' },
@@ -200,6 +205,7 @@ export default function RegisterPage() {
             <Input
               label="Confirmer le mot de passe"
               type="password"
+              placeholder="Confirmez votre mot de passe"
               {...register('confirmPassword', {
                 required: 'Confirmation requise',
                 validate: (value) =>
