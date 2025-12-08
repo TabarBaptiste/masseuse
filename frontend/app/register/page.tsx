@@ -1,12 +1,13 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { useAuthStore } from '@/store/auth';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
+import { PhoneInput } from '@/components/ui/PhoneInput';
 import { Card } from '@/components/ui/Card';
 import { Check, X } from 'lucide-react';
 
@@ -17,6 +18,8 @@ interface RegisterFormData {
   firstName: string;
   lastName: string;
   phone?: string;
+  phonePrefix: string;
+  phoneNumber: string;
 }
 
 export default function RegisterPage() {
@@ -24,6 +27,8 @@ export default function RegisterPage() {
   const registerUser = useAuthStore((state) => state.register);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [phonePrefix, setPhonePrefix] = useState('+596');
+  const [phoneNumber, setPhoneNumber] = useState('');
 
   const {
     register,
@@ -32,6 +37,14 @@ export default function RegisterPage() {
     formState: { errors },
     setValue,
   } = useForm<RegisterFormData>();
+
+  useEffect(() => {
+    setValue('phonePrefix', phonePrefix);
+  }, [phonePrefix, setValue]);
+
+  useEffect(() => {
+    setValue('phoneNumber', phoneNumber);
+  }, [phoneNumber, setValue]);
 
   const password = watch('password');
   const confirmPassword = watch('confirmPassword');
@@ -69,12 +82,12 @@ export default function RegisterPage() {
   };
 
   // Password confirmation component
-  const PasswordConfirmationIndicator = ({ 
-    password, 
-    confirmPassword 
-  }: { 
-    password: string; 
-    confirmPassword: string 
+  const PasswordConfirmationIndicator = ({
+    password,
+    confirmPassword
+  }: {
+    password: string;
+    confirmPassword: string
   }) => {
     const isValid = passwordsMatch(password, confirmPassword);
 
@@ -99,9 +112,10 @@ export default function RegisterPage() {
     setError('');
 
     try {
-      const { confirmPassword: _confirmPassword, ...registerData } = data;
+      const { confirmPassword: _confirmPassword, phonePrefix, phoneNumber, ...registerData } = data;
+      registerData.phone = phonePrefix + phoneNumber;
       await registerUser(registerData);
-      
+
       // Redirect to stored URL or default to profile
       const redirectUrl = localStorage.getItem('redirectAfterLogin') || '/profile';
       localStorage.removeItem('redirectAfterLogin'); // Clean up
@@ -174,11 +188,12 @@ export default function RegisterPage() {
               error={errors.email?.message}
             />
 
-            <Input
+            <PhoneInput
               label="Téléphone"
-              type="tel"
-              placeholder="+596 696 12 34 56"
-              {...register('phone')}
+              prefixValue={phonePrefix}
+              numberValue={phoneNumber}
+              onPrefixChange={setPhonePrefix}
+              onNumberChange={setPhoneNumber}
             />
 
             <Input
@@ -189,11 +204,11 @@ export default function RegisterPage() {
                 required: 'Mot de passe requis',
                 minLength: { value: 8, message: 'Minimum 8 caractères' },
                 validate: {
-                  hasSpecialChar: (value) => 
-                    /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(value) || 
+                  hasSpecialChar: (value) =>
+                    /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(value) ||
                     'Au moins 1 caractère spécial requis (!@#$%^&*...)',
-                  hasNumber: (value) => 
-                    /\d/.test(value) || 
+                  hasNumber: (value) =>
+                    /\d/.test(value) ||
                     'Au moins 1 chiffre requis',
                 },
               })}
