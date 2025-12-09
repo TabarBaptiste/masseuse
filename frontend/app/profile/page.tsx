@@ -166,7 +166,7 @@ function ProfileContent() {
           </Card>
 
           <Card>
-            <h2 className="text-xl font-semibold mb-4">Mes réservations</h2>
+            <h2 className="text-xl font-semibold mb-4">Mes réservations{loading ? '' : ` (${bookings.length})`}</h2>
             {loading ? (
               <div className="space-y-4">
                 <div className="border rounded-lg p-4 bg-white animate-pulse">
