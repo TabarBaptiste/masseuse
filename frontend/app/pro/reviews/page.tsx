@@ -74,9 +74,9 @@ function ReviewsContent() {
 
         // Filter by status
         if (statusFilter === 'PUBLISHED') {
-            filtered = filtered.filter(review => review.isPublished);
+            filtered = filtered.filter(review => review.isApproved);
         } else if (statusFilter === 'UNPUBLISHED') {
-            filtered = filtered.filter(review => !review.isPublished);
+            filtered = filtered.filter(review => !review.isApproved);
         }
 
         setFilteredReviews(filtered);
@@ -103,7 +103,7 @@ function ReviewsContent() {
             // Mettre à jour l'état local
             setReviews(reviews.map(review =>
                 review.id === reviewId
-                    ? { ...review, isPublished: !currentStatus }
+                    ? { ...review, isApproved: !currentStatus }
                     : review
             ));
         } catch (err) {
@@ -166,8 +166,8 @@ function ReviewsContent() {
         });
     };
 
-    const publishedCount = reviews.filter(r => r.isPublished).length;
-    const unpublishedCount = reviews.filter(r => !r.isPublished).length;
+    const publishedCount = reviews.filter(r => r.isApproved).length;
+    const unpublishedCount = reviews.filter(r => !r.isApproved).length;
 
     if (loading) {
         return (
@@ -339,7 +339,7 @@ function ReviewsContent() {
                                                         {formatDate(review.createdAt)}
                                                     </div>
                                                     <div className="flex items-center gap-2">
-                                                        {review.isPublished ? (
+                                                        {review.isApproved ? (
                                                             <div className="flex items-center gap-2 text-green-600">
                                                                 <Eye className="w-4 h-4" />
                                                                 <span className="text-sm font-medium">Publié</span>
@@ -364,11 +364,11 @@ function ReviewsContent() {
                                         </div>
                                         <div className="flex items-center gap-3">
                                             <span className="text-sm text-gray-500">
-                                                {review.isPublished ? 'Visible' : 'Masqué'}
+                                                {review.isApproved ? 'Visible' : 'Masqué'}
                                             </span>
                                             <ToggleSwitch
-                                                enabled={review.isPublished}
-                                                onChange={() => handleToggleReview(review.id, review.isPublished)}
+                                                enabled={review.isApproved}
+                                                onChange={() => handleToggleReview(review.id, review.isApproved)}
                                                 disabled={togglingReviews.has(review.id)}
                                             />
                                         </div>

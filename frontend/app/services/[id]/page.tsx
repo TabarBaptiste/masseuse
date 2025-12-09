@@ -6,12 +6,14 @@ import Image from 'next/image';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import api from '@/lib/api';
-import { Service, Review } from '@/types';
+import { Service, Review, Booking } from '@/types';
 import { Button } from '@/components/ui/Button';
 import { Loading } from '@/components/ui/Loading';
 import { useAuthStore } from '@/store/auth';
 import { useServicesStore } from '@/store/services';
-import { Clock, Star, ArrowLeft, Calendar, User, Quote } from 'lucide-react';
+import { SelectBookingForReviewModal } from '@/components/ui/SelectBookingForReviewModal';
+import { EditReviewModal } from '@/components/ui/EditReviewModal';
+import { Clock, Star, ArrowLeft, Calendar, User, Quote, MessageSquare } from 'lucide-react';
 
 const getCloudinaryUrl = (imageUrl: string | null | undefined, width: number = 1200, height: number = 600) => {
   if (!imageUrl) return null;
@@ -88,6 +90,9 @@ export default function ServiceDetailPage() {
   const [isLoadingReviews, setIsLoadingReviews] = useState(true);
   const [togglingReviews, setTogglingReviews] = useState<Set<string>>(new Set());
   const [error, setError] = useState('');
+  const [userCompletedBookings, setUserCompletedBookings] = useState<Booking[]>([]);
+  const [showBookingSelectionModal, setShowBookingSelectionModal] = useState(false);
+  const [editingReview, setEditingReview] = useState<{ id: string; rating: number; comment: string; serviceName: string } | null>(null);
 
   useEffect(() => {
     const fetchService = async () => {
@@ -125,7 +130,7 @@ export default function ServiceDetailPage() {
         setReviews(response.data);
 
         // Calculer la moyenne seulement avec les avis publiés
-        const publishedReviews = response.data.filter(review => review.isPublished);
+        const publishedReviews = response.data.filter(review => review.isApproved);
         if (publishedReviews.length > 0) {
           const avg = publishedReviews.reduce((sum, r) => sum + r.rating, 0) / publishedReviews.length;
           setAverageRating(Math.round(avg * 10) / 10);
@@ -142,12 +147,79 @@ export default function ServiceDetailPage() {
     }
   }, [params.id, user?.role]);
 
+  // Fetch completed bookings for the current user
+  useEffect(() => {
+    const fetchUserBookings = async () => {
+      if (!isAuthenticated || !params.id) return;
+
+      try {
+        const response = await api.get<Booking[]>(`/reviews/service/${params.id}/user-bookings`);
+        setUserCompletedBookings(response.data);
+      } catch (err) {
+        console.error('Erreur lors du chargement des réservations:', err);
+      }
+    };
+
+    fetchUserBookings();
+  }, [isAuthenticated, params.id]);
+
   const handleBooking = () => {
     if (!isAuthenticated) {
       router.push('/login');
       return;
     }
     router.push(`/reservation/${service?.id}`);
+  };
+
+  const handleLeaveReview = () => {
+    if (!isAuthenticated) {
+      router.push('/login');
+      return;
+    }
+
+    if (userCompletedBookings.length === 0) {
+      alert('Vous devez avoir effectué au moins une réservation pour laisser un avis');
+      return;
+    }
+
+    setShowBookingSelectionModal(true);
+  };
+
+  const refreshReviews = async () => {
+    try {
+      const publishedOnly = !(user?.role === 'PRO' || user?.role === 'ADMIN');
+      const response = await api.get<Review[]>(`/reviews/service/${params.id}?publishedOnly=${publishedOnly}`);
+      setReviews(response.data);
+
+      // Recalculer la moyenne
+      const publishedReviews = response.data.filter(review => review.isApproved);
+      if (publishedReviews.length > 0) {
+        const avg = publishedReviews.reduce((sum, r) => sum + r.rating, 0) / publishedReviews.length;
+        setAverageRating(Math.round(avg * 10) / 10);
+      } else {
+        setAverageRating(0);
+      }
+
+      // Refresh bookings
+      if (isAuthenticated) {
+        const bookingsResponse = await api.get<Booking[]>(`/reviews/service/${params.id}/user-bookings`);
+        setUserCompletedBookings(bookingsResponse.data);
+      }
+    } catch (err) {
+      console.error('Erreur lors du rafraîchissement des avis:', err);
+    }
+  };
+
+  const handleReviewClick = (review: Review) => {
+    // Only allow user to edit their own reviews
+    if (user && review.userId === user.id) {
+      setEditingReview({
+        id: review.id,
+        rating: review.rating,
+        comment: review.comment || '',
+        serviceName: service?.name || 'Service',
+      });
+    }
   };
 
   const handleToggleReview = async (reviewId: string, currentStatus: boolean) => {
@@ -165,7 +237,7 @@ export default function ServiceDetailPage() {
       setReviews(response.data);
 
       // Recalculer la moyenne avec les avis publiés
-      const publishedReviews = response.data.filter(review => review.isPublished);
+      const publishedReviews = response.data.filter(review => review.isApproved);
       if (publishedReviews.length > 0) {
         const avg = publishedReviews.reduce((sum, r) => sum + r.rating, 0) / publishedReviews.length;
         setAverageRating(Math.round(avg * 10) / 10);
@@ -236,11 +308,11 @@ export default function ServiceDetailPage() {
         <div className="absolute bottom-0 left-0 right-0 p-6 md:p-12">
           <div className="max-w-5xl mx-auto">
             {/* Rating */}
-            {reviews.filter(r => r.isPublished).length > 0 && (
+            {reviews.filter(r => r.isApproved).length > 0 && (
               <div className="flex items-center gap-3 mb-4">
                 <StarRating rating={averageRating} size="lg" />
                 <span className="text-white font-medium text-lg">{averageRating}/5</span>
-                <span className="text-white/80">({reviews.filter(r => r.isPublished).length} avis)</span>
+                <span className="text-white/80">({reviews.filter(r => r.isApproved).length} avis)</span>
               </div>
             )}
 
@@ -290,7 +362,7 @@ export default function ServiceDetailPage() {
                     <span className="text-stone-600">Prix</span>
                     <span className="font-bold text-2xl text-amber-800">{service.price}€</span>
                   </div>
-                  {reviews.filter(r => r.isPublished).length > 0 && (
+                  {reviews.filter(r => r.isApproved).length > 0 && (
                     <div className="flex items-center justify-between py-3">
                       <span className="text-stone-600">Note</span>
                       <div className="flex items-center gap-2">
@@ -323,16 +395,27 @@ export default function ServiceDetailPage() {
       {/* Reviews Section */}
       <section className="py-12 md:py-16 bg-stone-50">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="heading-serif text-2xl md:text-3xl font-semibold text-stone-800">
-              {user?.role === 'PRO' || user?.role === 'ADMIN' ? 'Avis clients' : 'Vos avis'}
-            </h2>
-            {reviews.filter(r => r.isPublished).length > 0 && (
-              <div className="flex items-center gap-2">
-                <StarRating rating={averageRating} />
-                <span className="font-semibold text-stone-800">{averageRating}/5</span>
-                <span className="text-stone-500">({reviews.filter(r => r.isPublished).length} avis)</span>
-              </div>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+            <div className="flex-1">
+              <h2 className="heading-serif text-2xl md:text-3xl font-semibold text-stone-800 mb-2">
+                {user?.role === 'PRO' || user?.role === 'ADMIN' ? 'Avis clients' : 'Vos avis'}
+              </h2>
+              {reviews.filter(r => r.isApproved).length > 0 && (
+                <div className="flex items-center gap-2">
+                  <StarRating rating={averageRating} />
+                  <span className="font-semibold text-stone-800">{averageRating}/5</span>
+                  <span className="text-stone-500">({reviews.filter(r => r.isApproved).length} avis)</span>
+                </div>
+              )}
+            </div>
+            {isAuthenticated && user && userCompletedBookings.length > 0 && user.role !== 'ADMIN' && user.role !== 'PRO' && !reviews.some(review => review.userId === user.id) && (
+              <Button
+                onClick={handleLeaveReview}
+                className="bg-amber-600 hover:bg-amber-700 flex items-center gap-2"
+              >
+                <MessageSquare className="w-4 h-4" />
+                Laisser un avis
+              </Button>
             )}
           </div>
 
@@ -355,36 +438,42 @@ export default function ServiceDetailPage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {reviews.map((review) => (
-                <div
-                  key={review.id}
-                  className="bg-white rounded-2xl p-6 shadow-sm border border-stone-100 hover:shadow-md transition-shadow"
-                >
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
-                      <User className="w-6 h-6 text-amber-800" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="font-semibold text-stone-800">
-                          {review.user?.firstName} {review.user?.lastName?.charAt(0)}.
-                        </span>
-                        <div className="flex items-center gap-3">
-                          <StarRating rating={review.rating} size="sm" />
-                          {(user?.role === 'PRO' || user?.role === 'ADMIN') && (
-                            <div className="flex items-center gap-2">
-                              <span className="text-xs text-stone-500">
-                                {review.isPublished ? 'Publié' : 'Masqué'}
-                              </span>
-                              <ToggleSwitch
-                                enabled={review.isPublished}
-                                onChange={() => handleToggleReview(review.id, review.isPublished)}
-                                disabled={togglingReviews.has(review.id)}
-                              />
-                            </div>
-                          )}
-                        </div>
+              {reviews.map((review) => {
+                const isUserReview = user && review.userId === user.id;
+                return (
+                  <div
+                    key={review.id}
+                    onClick={() => handleReviewClick(review)}
+                    className={`bg-white rounded-2xl p-6 shadow-sm border border-stone-100 hover:shadow-md transition-shadow ${isUserReview ? 'cursor-pointer ring-2 ring-amber-200' : ''
+                      }`}
+                  >
+                    <div className="flex items-start gap-4">
+                      <div className="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
+                        <User className="w-6 h-6 text-amber-800" />
                       </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center gap-2">
+                            <span className="font-semibold text-stone-800">
+                              {review.user?.firstName} {review.user?.lastName?.charAt(0)}.
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <StarRating rating={review.rating} size="sm" />
+                            {(user?.role === 'PRO' || user?.role === 'ADMIN') && (
+                              <div className="flex items-center gap-2">
+                                <span className="text-xs text-stone-500">
+                                  {review.isApproved ? 'Publié' : 'Masqué'}
+                                </span>
+                                <ToggleSwitch
+                                  enabled={review.isApproved}
+                                  onChange={() => handleToggleReview(review.id, review.isApproved)}
+                                  disabled={togglingReviews.has(review.id)}
+                                />
+                              </div>
+                            )}
+                          </div>
+                        </div>
                       {review.comment && (
                         <p className="text-stone-600 leading-relaxed">
                           {review.comment}
@@ -400,7 +489,8 @@ export default function ServiceDetailPage() {
                     </div>
                   </div>
                 </div>
-              ))}
+              );
+              })}
             </div>
           )}
         </div>
@@ -424,6 +514,27 @@ export default function ServiceDetailPage() {
           </Button>
         </div>
       </section>
+
+      {/* Modals */}
+      {showBookingSelectionModal && service && (
+        <SelectBookingForReviewModal
+          bookings={userCompletedBookings}
+          serviceName={service.name}
+          onClose={() => setShowBookingSelectionModal(false)}
+          onReviewSubmitted={refreshReviews}
+        />
+      )}
+
+      {editingReview && (
+        <EditReviewModal
+          reviewId={editingReview.id}
+          currentRating={editingReview.rating}
+          currentComment={editingReview.comment}
+          serviceName={editingReview.serviceName}
+          onClose={() => setEditingReview(null)}
+          onReviewUpdated={refreshReviews}
+        />
+      )}
     </div>
   );
 }

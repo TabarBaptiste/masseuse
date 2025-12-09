@@ -96,7 +96,6 @@ export interface Review {
   rating: number;
   comment?: string;
   isApproved: boolean;
-  isPublished: boolean;
   createdAt: string;
   updatedAt: string;
   user?: User;
