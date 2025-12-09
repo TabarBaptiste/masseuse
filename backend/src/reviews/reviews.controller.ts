@@ -62,6 +62,13 @@ export class ReviewsController {
     return this.reviewsService.approve(id);
   }
 
+  @Post(':id/unpublish')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.PRO, UserRole.ADMIN)
+  unpublish(@Param('id') id: string) {
+    return this.reviewsService.unpublish(id);
+  }
+
   @Delete(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)

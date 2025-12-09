@@ -167,6 +167,10 @@ export class ReviewsService {
     return this.update(id, { isApproved: true, isPublished: true });
   }
 
+  async unpublish(id: string) {
+    return this.update(id, { isApproved: false, isPublished: false });
+  }
+
   async remove(id: string) {
     await this.findOne(id); // Check if review exists
 

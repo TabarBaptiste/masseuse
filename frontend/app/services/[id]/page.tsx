@@ -58,16 +58,35 @@ const StarRating = ({ rating, size = 'md' }: { rating: number; size?: 'sm' | 'md
   );
 };
 
+// Composant Toggle Switch
+const ToggleSwitch = ({ enabled, onChange, disabled = false }: { enabled: boolean; onChange: () => void; disabled?: boolean }) => {
+  return (
+    <button
+      type="button"
+      onClick={onChange}
+      disabled={disabled}
+      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 ${enabled ? 'bg-green-600' : 'bg-stone-300'
+        } ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+    >
+      <span
+        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${enabled ? 'translate-x-6' : 'translate-x-1'
+          }`}
+      />
+    </button>
+  );
+};
+
 export default function ServiceDetailPage() {
   const params = useParams();
   const router = useRouter();
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, user } = useAuthStore();
   const { services } = useServicesStore();
   const [service, setService] = useState<Service | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [averageRating, setAverageRating] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingReviews, setIsLoadingReviews] = useState(true);
+  const [togglingReviews, setTogglingReviews] = useState<Set<string>>(new Set());
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -99,12 +118,16 @@ export default function ServiceDetailPage() {
     const fetchReviews = async () => {
       setIsLoadingReviews(true);
       try {
-        const response = await api.get<Review[]>(`/reviews/service/${params.id}`);
+        // Si l'utilisateur est PRO ou ADMIN, on récupère tous les avis (y compris non approuvés)
+        // Sinon, seulement les avis publiés
+        const publishedOnly = !(user?.role === 'PRO' || user?.role === 'ADMIN');
+        const response = await api.get<Review[]>(`/reviews/service/${params.id}?publishedOnly=${publishedOnly}`);
         setReviews(response.data);
 
-        // Calculer la moyenne
-        if (response.data.length > 0) {
-          const avg = response.data.reduce((sum, r) => sum + r.rating, 0) / response.data.length;
+        // Calculer la moyenne seulement avec les avis publiés
+        const publishedReviews = response.data.filter(review => review.isPublished);
+        if (publishedReviews.length > 0) {
+          const avg = publishedReviews.reduce((sum, r) => sum + r.rating, 0) / publishedReviews.length;
           setAverageRating(Math.round(avg * 10) / 10);
         }
       } catch (err) {
@@ -117,7 +140,7 @@ export default function ServiceDetailPage() {
     if (params.id) {
       fetchReviews();
     }
-  }, [params.id]);
+  }, [params.id, user?.role]);
 
   const handleBooking = () => {
     if (!isAuthenticated) {
@@ -125,6 +148,41 @@ export default function ServiceDetailPage() {
       return;
     }
     router.push(`/reservation/${service?.id}`);
+  };
+
+  const handleToggleReview = async (reviewId: string, currentStatus: boolean) => {
+    // Ajouter l'ID à la liste des reviews en cours de modification
+    setTogglingReviews(prev => new Set(prev).add(reviewId));
+
+    try {
+      // Endpoint pour activer/désactiver l'avis
+      const endpoint = currentStatus ? `/reviews/${reviewId}/unpublish` : `/reviews/${reviewId}/approve`;
+      await api.post(endpoint);
+
+      // Recharger les avis après modification
+      const publishedOnly = !(user?.role === 'PRO' || user?.role === 'ADMIN');
+      const response = await api.get<Review[]>(`/reviews/service/${params.id}?publishedOnly=${publishedOnly}`);
+      setReviews(response.data);
+
+      // Recalculer la moyenne avec les avis publiés
+      const publishedReviews = response.data.filter(review => review.isPublished);
+      if (publishedReviews.length > 0) {
+        const avg = publishedReviews.reduce((sum, r) => sum + r.rating, 0) / publishedReviews.length;
+        setAverageRating(Math.round(avg * 10) / 10);
+      } else {
+        setAverageRating(0);
+      }
+    } catch (err) {
+      console.error('Erreur lors de la modification de l\'avis:', err);
+      alert('Erreur lors de la modification de l\'avis');
+    } finally {
+      // Retirer l'ID de la liste des reviews en cours de modification
+      setTogglingReviews(prev => {
+        const next = new Set(prev);
+        next.delete(reviewId);
+        return next;
+      });
+    }
   };
 
   if (isLoading) {
@@ -178,11 +236,11 @@ export default function ServiceDetailPage() {
         <div className="absolute bottom-0 left-0 right-0 p-6 md:p-12">
           <div className="max-w-5xl mx-auto">
             {/* Rating */}
-            {reviews.length > 0 && (
+            {reviews.filter(r => r.isPublished).length > 0 && (
               <div className="flex items-center gap-3 mb-4">
                 <StarRating rating={averageRating} size="lg" />
                 <span className="text-white font-medium text-lg">{averageRating}/5</span>
-                <span className="text-white/80">({reviews.length} avis)</span>
+                <span className="text-white/80">({reviews.filter(r => r.isPublished).length} avis)</span>
               </div>
             )}
 
@@ -195,9 +253,6 @@ export default function ServiceDetailPage() {
                 <Clock className="w-5 h-5 text-amber-400" />
                 <span className="text-white font-medium">{service.duration} minutes</span>
               </div>
-              {/* <div className="bg-amber-500 text-white font-bold text-2xl px-6 py-2 rounded-full shadow-lg">
-                {service.price}€
-              </div> */}
             </div>
           </div>
         </div>
@@ -235,7 +290,7 @@ export default function ServiceDetailPage() {
                     <span className="text-stone-600">Prix</span>
                     <span className="font-bold text-2xl text-amber-800">{service.price}€</span>
                   </div>
-                  {reviews.length > 0 && (
+                  {reviews.filter(r => r.isPublished).length > 0 && (
                     <div className="flex items-center justify-between py-3">
                       <span className="text-stone-600">Note</span>
                       <div className="flex items-center gap-2">
@@ -249,8 +304,8 @@ export default function ServiceDetailPage() {
                 <Button
                   onClick={handleBooking}
                   size="lg"
-                  className="w-full"                >
-                  {/* <Calendar className="w-5 h-5 mr-2" /> */}
+                  className="w-full"
+                >
                   Trouver un créneau
                 </Button>
 
@@ -270,13 +325,13 @@ export default function ServiceDetailPage() {
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between mb-8">
             <h2 className="heading-serif text-2xl md:text-3xl font-semibold text-stone-800">
-              Vos avis
+              {user?.role === 'PRO' || user?.role === 'ADMIN' ? 'Avis clients' : 'Vos avis'}
             </h2>
-            {reviews.length > 0 && (
+            {reviews.filter(r => r.isPublished).length > 0 && (
               <div className="flex items-center gap-2">
                 <StarRating rating={averageRating} />
                 <span className="font-semibold text-stone-800">{averageRating}/5</span>
-                <span className="text-stone-500">({reviews.length} avis)</span>
+                <span className="text-stone-500">({reviews.filter(r => r.isPublished).length} avis)</span>
               </div>
             )}
           </div>
@@ -292,7 +347,10 @@ export default function ServiceDetailPage() {
                 Aucun avis pour le moment
               </p>
               <p className="text-stone-400 mt-2">
-                Soyez le premier à partager votre expérience !
+                {user?.role === 'PRO' || user?.role === 'ADMIN'
+                  ? 'Les avis apparaîtront ici une fois approuvés'
+                  : 'Soyez le premier à partager votre expérience !'
+                }
               </p>
             </div>
           ) : (
@@ -311,7 +369,21 @@ export default function ServiceDetailPage() {
                         <span className="font-semibold text-stone-800">
                           {review.user?.firstName} {review.user?.lastName?.charAt(0)}.
                         </span>
-                        <StarRating rating={review.rating} size="sm" />
+                        <div className="flex items-center gap-3">
+                          <StarRating rating={review.rating} size="sm" />
+                          {(user?.role === 'PRO' || user?.role === 'ADMIN') && (
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs text-stone-500">
+                                {review.isPublished ? 'Publié' : 'Masqué'}
+                              </span>
+                              <ToggleSwitch
+                                enabled={review.isPublished}
+                                onChange={() => handleToggleReview(review.id, review.isPublished)}
+                                disabled={togglingReviews.has(review.id)}
+                              />
+                            </div>
+                          )}
+                        </div>
                       </div>
                       {review.comment && (
                         <p className="text-stone-600 leading-relaxed">
