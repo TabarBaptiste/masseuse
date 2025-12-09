@@ -86,6 +86,7 @@ export interface Booking {
   updatedAt: string;
   service?: Service;
   user?: User;
+  reviews?: Review[];
 }
 
 export interface Review {

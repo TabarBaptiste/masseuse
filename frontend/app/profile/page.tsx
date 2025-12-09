@@ -8,6 +8,7 @@ import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { Booking, BookingStatus } from '@/types';
 import api from '@/lib/api';
 import Link from 'next/link';
+import { LeaveReviewModal } from '@/components/ui/LeaveReviewModal';
 
 export default function ProfilePage() {
   return (
@@ -21,6 +22,7 @@ function ProfileContent() {
   const { user } = useAuthStore();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
+  const [reviewModal, setReviewModal] = useState<{ bookingId: string; serviceName: string } | null>(null);
 
   useEffect(() => {
     // Force scroll to top on page load
@@ -197,9 +199,6 @@ function ProfileContent() {
                       <p><strong>Heure:</strong> {booking.startTime} - {booking.endTime}</p>
                       <p><strong>Durée:</strong> {booking.service?.duration} minutes</p>
                       <p><strong>Prix:</strong> {booking.priceAtBooking}€</p>
-                      {booking.notes && (
-                        <p><strong>Notes:</strong> {booking.notes}</p>
-                      )}
                     </div>
                     {canCancelBooking(booking) && (
                       <div className="mt-4 pt-4 border-t border-gray-200">
@@ -211,6 +210,16 @@ function ProfileContent() {
                         </button>
                       </div>
                     )}
+                    {booking.status === BookingStatus.COMPLETED && (!booking.reviews || booking.reviews.length === 0) && (
+                      <div className="mt-4 pt-4 border-t border-gray-200">
+                        <button
+                          onClick={() => setReviewModal({ bookingId: booking.id, serviceName: booking.service?.name || 'Service' })}
+                          className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-sm font-medium transition-colors"
+                        >
+                          Laisser un avis
+                        </button>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
@@ -218,6 +227,19 @@ function ProfileContent() {
           </Card>
         </div>
       </div>
+
+      {/* Review Modal */}
+      {reviewModal && (
+        <LeaveReviewModal
+          bookingId={reviewModal.bookingId}
+          serviceName={reviewModal.serviceName}
+          onClose={() => setReviewModal(null)}
+          onReviewSubmitted={() => {
+            setReviewModal(null);
+            // Optionally refresh bookings or show success message
+          }}
+        />
+      )}
     </div>
   );
 }

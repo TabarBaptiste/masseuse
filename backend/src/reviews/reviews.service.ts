@@ -86,6 +86,34 @@ export class ReviewsService {
     });
   }
 
+  async findByService(serviceId: string, publishedOnly = true) {
+    return this.prisma.review.findMany({
+      where: {
+        booking: {
+          serviceId,
+        },
+        ...(publishedOnly && { isPublished: true }),
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+          },
+        },
+        booking: {
+          include: {
+            service: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+  }
+
   async findOne(id: string) {
     const review = await this.prisma.review.findUnique({
       where: { id },

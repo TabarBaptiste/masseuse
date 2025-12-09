@@ -32,6 +32,17 @@ export class ReviewsController {
     return this.reviewsService.findAll(publishedOnly !== 'false');
   }
 
+  @Get('service/:serviceId')
+  findByService(
+    @Param('serviceId') serviceId: string,
+    @Query('publishedOnly') publishedOnly?: string,
+  ) {
+    return this.reviewsService.findByService(
+      serviceId,
+      publishedOnly !== 'false',
+    );
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.reviewsService.findOne(id);

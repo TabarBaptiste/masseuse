@@ -94,22 +94,17 @@ export default function ServiceDetailPage() {
     }
   }, [params.id, services]);
 
-  // Fetch reviews pour ce service (simulé pour l'instant)
+  // Fetch reviews pour ce service
   useEffect(() => {
     const fetchReviews = async () => {
       setIsLoadingReviews(true);
       try {
-        // TODO: Implémenter l'API pour récupérer les avis par service
-        // const response = await api.get<Review[]>(`/reviews/service/${params.id}`);
-        // setReviews(response.data);
-
-        // Données simulées pour l'interface
-        const mockReviews: Review[] = [];
-        setReviews(mockReviews);
+        const response = await api.get<Review[]>(`/reviews/service/${params.id}`);
+        setReviews(response.data);
 
         // Calculer la moyenne
-        if (mockReviews.length > 0) {
-          const avg = mockReviews.reduce((sum, r) => sum + r.rating, 0) / mockReviews.length;
+        if (response.data.length > 0) {
+          const avg = response.data.reduce((sum, r) => sum + r.rating, 0) / response.data.length;
           setAverageRating(Math.round(avg * 10) / 10);
         }
       } catch (err) {
@@ -275,7 +270,7 @@ export default function ServiceDetailPage() {
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between mb-8">
             <h2 className="heading-serif text-2xl md:text-3xl font-semibold text-stone-800">
-              Ce que disent mes clients
+              Vos avis
             </h2>
             {reviews.length > 0 && (
               <div className="flex items-center gap-2">
