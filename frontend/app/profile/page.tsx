@@ -103,6 +103,22 @@ function ProfileContent() {
     }
   };
 
+  const canCancelBooking = (booking: Booking) => {
+    // Vérifier si la réservation peut être annulée (statut et délai de 24h)
+    if (booking.status !== BookingStatus.PENDING && booking.status !== BookingStatus.CONFIRMED) {
+      return false;
+    }
+
+    // Calculer la date et heure de la réservation
+    const datePart = booking.date.split('T')[0];
+    const bookingDateTime = new Date(`${datePart}T${booking.startTime}`);
+    const now = new Date();
+    const hoursUntilBooking = (bookingDateTime.getTime() - now.getTime()) / (1000 * 60 * 60);
+
+    // Ne permettre l'annulation que si plus de 24h avant le rendez-vous
+    return hoursUntilBooking > 24;
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -185,7 +201,7 @@ function ProfileContent() {
                         <p><strong>Notes:</strong> {booking.notes}</p>
                       )}
                     </div>
-                    {(booking.status === BookingStatus.PENDING || booking.status === BookingStatus.CONFIRMED) && (
+                    {canCancelBooking(booking) && (
                       <div className="mt-4 pt-4 border-t border-gray-200">
                         <button
                           onClick={() => handleCancelBooking(booking.id)}

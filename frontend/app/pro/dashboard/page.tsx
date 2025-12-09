@@ -54,7 +54,6 @@ function DashboardContent() {
                 if (filter !== 'ALL') params.status = filter;
                 if (dateFilter) params.date = dateFilter;
                 if (nameFilter) params.name = nameFilter;
-                console.log('Fetching bookings with params:', params, 'User role:', user.role);
                 const response = await api.get('/bookings', { params });
                 setBookings(response.data);
             } catch (error: unknown) {
