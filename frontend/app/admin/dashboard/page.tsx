@@ -18,6 +18,7 @@ import {
     Plus,
     TrendingUp,
     Activity,
+    MessageSquare,
     PenLine,
     CircleOff
 } from 'lucide-react';
@@ -155,6 +156,12 @@ function DashboardContent() {
                                 <button className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg text-sm font-medium transition-colors">
                                     <Users className="w-4 h-4" />
                                     Utilisateurs
+                                </button>
+                            </Link>
+                            <Link href="/admin/reviews" className="block">
+                                <button className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-sm font-medium transition-colors">
+                                    <MessageSquare className="w-4 h-4" />
+                                    Avis clients
                                 </button>
                             </Link>
                             <Link href="/services" className="block">
