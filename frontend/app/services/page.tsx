@@ -114,7 +114,7 @@ export default function ServicesPage() {
   return (
     <div className="min-h-screen bg-neutral-50">
       {/* Hero Section */}
-      <section className="relative py-20 bg-linear-to-br from-amber-50 via-stone-50 to-neutral-100">
+      <section className="relative py-20 pb-5 bg-linear-to-br from-amber-50 via-stone-50 to-neutral-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <span className="text-amber-700 text-sm font-medium tracking-[0.3em] uppercase">

@@ -19,6 +19,7 @@ function ManageServiceContent() {
     const [service, setService] = useState<Service | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [saving, setSaving] = useState(false);
+    const [imageUploading, setImageUploading] = useState(false);
 
     const serviceId = searchParams.get('id');
     const isEdit = !!serviceId;
@@ -195,6 +196,7 @@ function ManageServiceContent() {
                                     hiddenInput.value = url;
                                 }
                             }}
+                            onUploadingChange={setImageUploading}
                         />
 
                         <div className="flex items-center">
@@ -219,7 +221,7 @@ function ManageServiceContent() {
                             </Link>
                             <button
                                 type="submit"
-                                disabled={saving}
+                                disabled={saving || imageUploading}
                                 className="flex-1 px-4 py-2 bg-amber-800 hover:bg-amber-900 text-white rounded-lg font-medium transition-colors disabled:opacity-50"
                             >
                                 {saving ? 'Enregistrement...' : isEdit ? 'Modifier' : 'Créer'}

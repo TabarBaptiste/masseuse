@@ -47,10 +47,10 @@ const StarRating = ({ rating, size = 'md' }: { rating: number; size?: 'sm' | 'md
         <Star
           key={star}
           className={`${sizes[size]} ${star <= rating
-              ? 'text-amber-400 fill-amber-400'
-              : star <= rating + 0.5
-                ? 'text-amber-400 fill-amber-200'
-                : 'text-stone-300'
+            ? 'text-amber-400 fill-amber-400'
+            : star <= rating + 0.5
+              ? 'text-amber-400 fill-amber-200'
+              : 'text-stone-300'
             }`}
         />
       ))}
@@ -256,7 +256,7 @@ export default function ServiceDetailPage() {
                   size="lg"
                   className="w-full"                >
                   {/* <Calendar className="w-5 h-5 mr-2" /> */}
-                  Réserver maintenant
+                  Trouver un créneau
                 </Button>
 
                 {!isAuthenticated && (
