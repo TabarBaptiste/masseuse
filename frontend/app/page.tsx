@@ -56,7 +56,7 @@ export default function Home() {
       </section>
 
       {/* Philosophy Section */}
-      <section className="py-24 bg-white">
+      <section className="pt-24 pb-6 bg-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <span className="text-amber-700 text-sm font-medium tracking-[0.3em] uppercase">Notre Philosophie</span>
@@ -72,7 +72,7 @@ export default function Home() {
       </section>
 
       {/* Features Section */}
-      <section className="py-24 bg-linear-to-b from-white to-neutral-50">
+      <section className="py-24 pt-6 bg-linear-to-b from-white to-neutral-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
             <div className="text-center group">
