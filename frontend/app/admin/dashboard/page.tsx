@@ -158,18 +158,18 @@ function DashboardContent() {
                                     Utilisateurs
                                 </button>
                             </Link>
-                            <Link href="/admin/reviews" className="block">
+                            <Link href="/pro/reviews" className="block">
                                 <button className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-sm font-medium transition-colors">
                                     <MessageSquare className="w-4 h-4" />
                                     Avis clients
                                 </button>
                             </Link>
-                            <Link href="/services" className="block">
+                            {/* <Link href="/services" className="block">
                                 <button className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-sm font-medium transition-colors">
                                     <Wrench className="w-4 h-4" />
                                     Services
                                 </button>
-                            </Link>
+                            </Link> */}
                         </div>
                     </Card>
 
@@ -217,7 +217,7 @@ function DashboardContent() {
                                 </button>
                             </Link>
                             <Link href="/pro/conflicts" className="block">
-                                <button className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium transition-colors">
+                                <button className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-sm font-medium transition-colors">
                                     <CircleOff className="w-4 h-4" />
                                     Conflits
                                 </button>

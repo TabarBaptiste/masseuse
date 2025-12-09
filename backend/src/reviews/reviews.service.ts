@@ -23,11 +23,11 @@ export class ReviewsService {
     }
 
     if (booking.userId !== userId) {
-      throw new ForbiddenException('You can only review your own bookings');
+      throw new ForbiddenException('Tu ne peux laisser un avis que pour tes propres réservations');
     }
 
     if (booking.status !== BookingStatus.COMPLETED) {
-      throw new BadRequestException('You can only review completed bookings');
+      throw new BadRequestException('Tu ne peux laisser un avis que pour des réservations terminées');
     }
 
     // Check if review already exists for this booking
@@ -36,7 +36,7 @@ export class ReviewsService {
     });
 
     if (existingReview) {
-      throw new BadRequestException('You have already reviewed this booking');
+      throw new BadRequestException('Tu as déjà noté cette réservation');
     }
 
     return this.prisma.review.create({

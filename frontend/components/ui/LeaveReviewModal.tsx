@@ -98,11 +98,6 @@ export const LeaveReviewModal: React.FC<LeaveReviewModalProps> = ({
                                 </button>
                             ))}
                         </div>
-                        {rating > 0 && (
-                            <p className="text-sm text-gray-600 mt-2">
-                                {rating} étoile{rating > 1 ? 's' : ''} sur 5
-                            </p>
-                        )}
                     </div>
 
                     {/* Comment */}
