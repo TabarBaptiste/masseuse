@@ -6,6 +6,7 @@ import { UserRole, SiteSettings } from '@/types';
 import { Card } from '@/components/ui/Card';
 import { Loading } from '@/components/ui/Loading';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
+import { Button } from '@/components/ui/Button';
 import api from '@/lib/api';
 import { ArrowLeft, Save } from 'lucide-react';
 import Link from 'next/link';
@@ -421,14 +422,14 @@ function SettingsContent() {
                         >
                             Annuler
                         </Link>
-                        <button
+                        <Button
                             type="submit"
                             disabled={saving}
-                            className="flex-1 px-6 py-3 bg-amber-800 hover:bg-amber-900 text-white rounded-lg font-medium transition-colors disabled:opacity-50 flex items-center justify-center space-x-2"
+                            className="flex-1 flex items-center justify-center space-x-2"
                         >
                             <Save className="w-5 h-5" />
                             <span>{saving ? 'Enregistrement...' : 'Enregistrer'}</span>
-                        </button>
+                        </Button>
                     </div>
                 </form>
             </div>

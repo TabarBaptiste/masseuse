@@ -8,6 +8,7 @@ import { useAuthStore } from '@/store/auth';
 import { Card } from '@/components/ui/Card';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { FormField } from '@/components/ui/FormField';
+import { Button } from '@/components/ui/Button';
 import api from '@/lib/api';
 
 export default function EditProfilePage() {
@@ -114,13 +115,13 @@ function EditProfileContent() {
                             >
                                 Annuler
                             </Link>
-                            <button
+                            <Button
                                 type="submit"
                                 disabled={saving}
-                                className="flex-1 px-4 py-2 bg-amber-800 hover:bg-amber-900 text-white rounded-lg font-medium transition-colors disabled:opacity-50"
+                                className="flex-1"
                             >
                                 {saving ? 'Enregistrement...' : 'Enregistrer les modifications'}
-                            </button>
+                            </Button>
                         </div>
                     </form>
                 </Card>
