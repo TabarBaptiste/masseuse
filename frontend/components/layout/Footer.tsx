@@ -5,7 +5,27 @@ import api from '@/lib/api';
 import { SiteSettings } from '@/types';
 
 export const Footer: React.FC = () => {
-  const [settings, setSettings] = useState<SiteSettings | null>(null);
+  const [settings, setSettings] = useState<SiteSettings | null>({
+    id: '',
+    salonName: "Aly Dous'heure",
+    salonDescription: "Votre havre de paix et de relaxation.",
+    salonAddress: "Le Robert, Martinique",
+    salonPhone: "+596 596 XX XX XX",
+    salonEmail: "",
+    logoUrl: "",
+    heroImageUrl: "",
+    defaultOpenTime: "09:00",
+    defaultCloseTime: "18:00",
+    bookingAdvanceMinDays: 1,
+    bookingAdvanceMaxDays: 30,
+    cancellationDeadlineHours: 24,
+    emailNotificationsEnabled: true,
+    reminderDaysBefore: 1,
+    facebookUrl: "",
+    instagramUrl: "",
+    createdAt: "",
+    updatedAt: "",
+  });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -15,28 +35,7 @@ export const Footer: React.FC = () => {
         setSettings(response.data);
       } catch (error) {
         console.error('Erreur lors de la récupération des paramètres du site:', error);
-        // Valeurs par défaut en cas d'erreur
-        setSettings({
-          id: '',
-          salonName: "Aly Dous'heure",
-          salonDescription: "Votre havre de paix et de relaxation.",
-          salonAddress: "Le Robert, Martinique",
-          salonPhone: "+596 596 XX XX XX",
-          salonEmail: "",
-          logoUrl: "",
-          heroImageUrl: "",
-          defaultOpenTime: "09:00",
-          defaultCloseTime: "18:00",
-          bookingAdvanceMinDays: 1,
-          bookingAdvanceMaxDays: 30,
-          cancellationDeadlineHours: 24,
-          emailNotificationsEnabled: true,
-          reminderDaysBefore: 1,
-          facebookUrl: "",
-          instagramUrl: "",
-          createdAt: "",
-          updatedAt: "",
-        });
+        // Garder les valeurs par défaut en cas d'erreur
       } finally {
         setLoading(false);
       }
@@ -47,16 +46,8 @@ export const Footer: React.FC = () => {
 
   const currentYear = new Date().getFullYear();
 
-  if (loading || !settings) {
-    return (
-      <footer className="bg-gray-800 text-white mt-auto">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="text-center text-gray-400">
-            Chargement...
-          </div>
-        </div>
-      </footer>
-    );
+  if (!settings) {
+    return null; // Cas improbable puisque settings est initialisé
   }
 
   return (

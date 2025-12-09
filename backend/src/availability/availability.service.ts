@@ -69,16 +69,13 @@ export class AvailabilityService {
 
   async getWorkingDays() {
     try {
-      console.log('Fetching working days...');
       const availabilities = await this.prisma.weeklyAvailability.findMany({
         where: { isActive: true },
         select: { dayOfWeek: true },
         distinct: ['dayOfWeek'],
       });
 
-      console.log('Found availabilities:', availabilities);
-      const workingDays = availabilities.map(a => a.dayOfWeek);
-      console.log('Working days:', workingDays);
+      const workingDays = availabilities.map((a) => a.dayOfWeek);
 
       return workingDays;
     } catch (error) {

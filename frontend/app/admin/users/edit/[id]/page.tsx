@@ -9,6 +9,7 @@ import { Loading } from '@/components/ui/Loading';
 import { useAuthStore } from '@/store/auth';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { FormField } from '@/components/ui/FormField';
+import { PhoneInput } from '@/components/ui/PhoneInput';
 import { Button } from '@/components/ui/Button';
 
 function EditUserContent() {
@@ -19,6 +20,8 @@ function EditUserContent() {
     const [isLoading, setIsLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [completedBookingsCount, setCompletedBookingsCount] = useState(0);
+    const [phonePrefix, setPhonePrefix] = useState('+596');
+    const [phoneNumber, setPhoneNumber] = useState('');
 
     const userId = params.id as string;
     const canManageUsers = isAuthenticated && currentUser?.role === UserRole.ADMIN;
@@ -40,6 +43,14 @@ function EditUserContent() {
         try {
             const response = await api.get<User>(`/users/${userId}`);
             setEditingUser(response.data);
+            // Initialiser les valeurs du téléphone
+            if (response.data.phone) {
+                const parts = response.data.phone.split(' ');
+                if (parts.length > 1) {
+                    setPhonePrefix(parts[0]);
+                    setPhoneNumber(parts.slice(1).join(' '));
+                }
+            }
             // Récupérer les réservations terminées
             await fetchCompletedBookings();
         } catch (error) {
@@ -70,7 +81,7 @@ function EditUserContent() {
                 firstName: formData.get('firstName') as string,
                 lastName: formData.get('lastName') as string,
                 email: formData.get('email') as string,
-                phone: formData.get('phone') as string,
+                phone: phoneNumber ? `${phonePrefix} ${phoneNumber}` : '',
             };
 
             await api.patch(`/users/${editingUser.id}`, data);
@@ -145,11 +156,12 @@ function EditUserContent() {
                             required
                         />
 
-                        <FormField
+                        <PhoneInput
                             label="Téléphone"
-                            name="phone"
-                            type="tel"
-                            defaultValue={editingUser.phone || ''}
+                            prefixValue={phonePrefix}
+                            numberValue={phoneNumber}
+                            onPrefixChange={setPhonePrefix}
+                            onNumberChange={setPhoneNumber}
                         />
                         <hr />
                         <div className="bg-gray-50 rounded-lg p-4">

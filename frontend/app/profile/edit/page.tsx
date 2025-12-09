@@ -8,6 +8,7 @@ import { useAuthStore } from '@/store/auth';
 import { Card } from '@/components/ui/Card';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { FormField } from '@/components/ui/FormField';
+import { PhoneInput } from '@/components/ui/PhoneInput';
 import { Button } from '@/components/ui/Button';
 import api from '@/lib/api';
 
@@ -23,11 +24,22 @@ function EditProfileContent() {
     const router = useRouter();
     const { user, setUser } = useAuthStore();
     const [saving, setSaving] = useState(false);
+    const [phonePrefix, setPhonePrefix] = useState('+596');
+    const [phoneNumber, setPhoneNumber] = useState('');
 
     useEffect(() => {
         // Force scroll to top on page load
         window.scrollTo(0, 0);
-    }, []);
+        
+        // Initialiser les valeurs du téléphone
+        if (user?.phone) {
+            const parts = user.phone.split(' ');
+            if (parts.length > 1) {
+                setPhonePrefix(parts[0]);
+                setPhoneNumber(parts.slice(1).join(' '));
+            }
+        }
+    }, [user]);
 
     const handleSubmit = async (formData: FormData) => {
         if (!user) return;
@@ -38,7 +50,7 @@ function EditProfileContent() {
             const data = {
                 firstName: formData.get('firstName') as string,
                 lastName: formData.get('lastName') as string,
-                phone: formData.get('phone') as string,
+                phone: phoneNumber ? `${phonePrefix} ${phoneNumber}` : '',
             };
 
             const response = await api.patch(`/users/${user.id}`, data);
@@ -91,11 +103,12 @@ function EditProfileContent() {
                             required
                         />
 
-                        <FormField
+                        <PhoneInput
                             label="Téléphone"
-                            name="phone"
-                            type="tel"
-                            defaultValue={user.phone || ''}
+                            prefixValue={phonePrefix}
+                            numberValue={phoneNumber}
+                            onPrefixChange={setPhonePrefix}
+                            onNumberChange={setPhoneNumber}
                         />
 
                         <div className="bg-gray-50 rounded-lg p-4">

@@ -19,7 +19,7 @@ const countryCodes = [
 ];
 
 const formatPhoneNumber = (prefix: string, rawNumber: string): string => {
-    const digits = rawNumber.replace(/\D/g, ''); // Remove non-digits
+    const digits = rawNumber.replace(/\s/g, ''); // Remove spaces for formatting
 
     switch (prefix) {
         case '+596':
@@ -48,7 +48,7 @@ const formatPhoneNumber = (prefix: string, rawNumber: string): string => {
 };
 
 const validatePhoneNumber = (prefix: string, rawNumber: string): string | null => {
-    const digits = rawNumber.replace(/\D/g, '');
+    const digits = rawNumber.replace(/\s/g, ''); // Remove spaces for validation
     if (digits.length > 9) {
         return 'Le numéro ne peut pas dépasser 9 chiffres';
     }
@@ -77,8 +77,8 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({
 
     const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const input = e.target.value;
-        // const rawDigits = input.replace(/\D/g, ''); // Keep only digits
-        onNumberChange?.(input);
+        const cleanedInput = input.replace(/[^0-9\s]/g, ''); // Keep only digits and spaces
+        onNumberChange?.(cleanedInput);
     };
 
     return (
