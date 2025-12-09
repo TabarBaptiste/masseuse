@@ -1,7 +1,7 @@
 import React from 'react';
 import { User, UserRole } from '@/types';
 import { Card } from '@/components/ui/Card';
-import { Edit, Trash2, UserCheck, UserX } from 'lucide-react';
+import { Edit, Trash2, UserCheck, UserX, Mail, Phone, Calendar, Shield } from 'lucide-react';
 
 interface UsersTableProps {
     users: User[];
@@ -19,9 +19,10 @@ export const UsersTable: React.FC<UsersTableProps> = ({
     onDeleteUser,
 }) => {
     // Trier les utilisateurs par date d'inscription croissante (plus ancien en premier)
-    const sortedUsers = [...users].sort((a, b) => 
+    const sortedUsers = [...users].sort((a, b) =>
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
+
     const getRoleBadgeColor = (role: UserRole) => {
         switch (role) {
             case UserRole.ADMIN:
@@ -35,7 +36,139 @@ export const UsersTable: React.FC<UsersTableProps> = ({
         }
     };
 
-    return (
+    const getRoleIcon = (role: UserRole) => {
+        switch (role) {
+            case UserRole.ADMIN:
+                return <Shield className="w-4 h-4" />;
+            case UserRole.PRO:
+                return <UserCheck className="w-4 h-4" />;
+            case UserRole.USER:
+                return <UserCheck className="w-4 h-4" />;
+            default:
+                return <UserCheck className="w-4 h-4" />;
+        }
+    };
+
+    const getRoleLabel = (role: UserRole) => {
+        switch (role) {
+            case UserRole.ADMIN:
+                return 'Administrateur';
+            case UserRole.PRO:
+                return 'Professionnel';
+            case UserRole.USER:
+                return 'Client';
+            default:
+                return 'Client';
+        }
+    };
+
+    // Version mobile avec cartes
+    const MobileCards = () => (
+        <div className="space-y-4">
+            {sortedUsers.length === 0 ? (
+                <Card>
+                    <div className="text-center py-8 text-gray-500">
+                        Aucun utilisateur trouvé
+                    </div>
+                </Card>
+            ) : (
+                sortedUsers.map((user) => (
+                    <Card key={user.id} className="p-4">
+                        <div className="flex items-start justify-between mb-4">
+                            <div className="flex items-center">
+                                <div className="shrink-0 h-12 w-12 bg-amber-100 rounded-full flex items-center justify-center mr-3">
+                                    <span className="text-amber-800 font-medium text-lg">
+                                        {user.firstName[0]}{user.lastName[0]}
+                                    </span>
+                                </div>
+                                <div>
+                                    <h3 className="text-lg font-medium text-gray-900">
+                                        {user.firstName} {user.lastName}
+                                    </h3>
+                                    <div className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getRoleBadgeColor(user.role)} mt-1`}>
+                                        {getRoleIcon(user.role)}
+                                        <span className="ml-1">{getRoleLabel(user.role)}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <button
+                                onClick={() => onToggleStatus(user.id, user.isActive)}
+                                className={`inline-flex items-center px-3 py-1 text-xs font-medium rounded-full ${
+                                    user.isActive
+                                        ? 'bg-green-100 text-green-800'
+                                        : 'bg-red-100 text-red-800'
+                                }`}
+                            >
+                                {user.isActive ? (
+                                    <>
+                                        <UserCheck className="w-3 h-3 mr-1" />
+                                        Actif
+                                    </>
+                                ) : (
+                                    <>
+                                        <UserX className="w-3 h-3 mr-1" />
+                                        Inactif
+                                    </>
+                                )}
+                            </button>
+                        </div>
+
+                        <div className="space-y-2 mb-4">
+                            <div className="flex items-center text-sm text-gray-600">
+                                <Mail className="w-4 h-4 mr-2" />
+                                {user.email}
+                            </div>
+                            {user.phone && (
+                                <div className="flex items-center text-sm text-gray-600">
+                                    <Phone className="w-4 h-4 mr-2" />
+                                    {user.phone}
+                                </div>
+                            )}
+                            <div className="flex items-center text-sm text-gray-600">
+                                <Calendar className="w-4 h-4 mr-2" />
+                                Inscrit le {new Date(user.createdAt).toLocaleDateString('fr-FR')}
+                            </div>
+                        </div>
+
+                        <div className="flex items-center justify-between pt-4 border-t border-gray-200">
+                            <div className="flex items-center space-x-2">
+                                <span className="text-sm text-gray-600">Rôle:</span>
+                                <select
+                                    value={user.role}
+                                    onChange={(e) => onChangeRole(user.id, e.target.value as UserRole)}
+                                    className={`px-3 py-1 text-sm font-medium rounded-lg ${getRoleBadgeColor(user.role)} border-0 cursor-pointer`}
+                                >
+                                    <option value={UserRole.USER}>Client</option>
+                                    <option value={UserRole.PRO}>Professionnel</option>
+                                    <option value={UserRole.ADMIN}>Administrateur</option>
+                                </select>
+                            </div>
+
+                            <div className="flex items-center space-x-2">
+                                <button
+                                    onClick={() => onEditUser(user)}
+                                    className="p-2 text-blue-600 hover:text-blue-900 hover:bg-blue-50 rounded-lg transition-colors"
+                                    title="Modifier"
+                                >
+                                    <Edit className="w-5 h-5" />
+                                </button>
+                                <button
+                                    onClick={() => onDeleteUser(user.id)}
+                                    className="p-2 text-red-600 hover:text-red-900 hover:bg-red-50 rounded-lg transition-colors"
+                                    title="Supprimer"
+                                >
+                                    <Trash2 className="w-5 h-5" />
+                                </button>
+                            </div>
+                        </div>
+                    </Card>
+                ))
+            )}
+        </div>
+    );
+
+    // Version desktop avec tableau
+    const DesktopTable = () => (
         <Card>
             <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
@@ -152,5 +285,19 @@ export const UsersTable: React.FC<UsersTableProps> = ({
                 </table>
             </div>
         </Card>
+    );
+
+    return (
+        <>
+            {/* Version mobile */}
+            <div className="block md:hidden">
+                <MobileCards />
+            </div>
+
+            {/* Version desktop */}
+            <div className="hidden md:block">
+                <DesktopTable />
+            </div>
+        </>
     );
 };
