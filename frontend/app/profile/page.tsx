@@ -7,6 +7,7 @@ import { Card } from '@/components/ui/Card';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { Booking } from '@/types';
 import api from '@/lib/api';
+import Link from 'next/link';
 
 export default function ProfilePage() {
   return (
@@ -123,6 +124,14 @@ function ProfileContent() {
                   <p className="font-medium">{user.role}</p>
                 </div>
               )}
+            </div>
+            <div className="mt-6">
+              <Link
+                href="/profile/edit"
+                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-amber-800 hover:bg-amber-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 transition-colors"
+              >
+                Modifier mes informations
+              </Link>
             </div>
           </Card>
 

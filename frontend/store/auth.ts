@@ -14,6 +14,7 @@ interface AuthState {
   register: (data: RegisterData) => Promise<void>;
   logout: () => void;
   loadUser: () => void;
+  setUser: (user: User) => void;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
@@ -77,5 +78,10 @@ export const useAuthStore = create<AuthState>((set) => ({
     } else {
       set({ isInitialized: true });
     }
+  },
+
+  setUser: (user: User) => {
+    localStorage.setItem('user', JSON.stringify(user));
+    set({ user });
   },
 }));
