@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { UserRole, Booking, BookingStatus } from '@/types';
 import { Card } from '@/components/ui/Card';
@@ -45,18 +45,7 @@ function StatsContent() {
     const [loading, setLoading] = useState(true);
     const [selectedPeriod, setSelectedPeriod] = useState<'all' | 'month' | 'year'>('all');
 
-    useEffect(() => {
-        window.scrollTo(0, 0);
-        fetchBookings();
-    }, []);
-
-    useEffect(() => {
-        if (bookings.length > 0) {
-            calculateStats();
-        }
-    }, [bookings, selectedPeriod]);
-
-    const fetchBookings = async () => {
+    const fetchBookings = useCallback(async () => {
         try {
             const response = await api.get<Booking[]>('/bookings');
             setBookings(response.data);
@@ -65,9 +54,9 @@ function StatsContent() {
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
 
-    const calculateStats = () => {
+    const calculateStats = useCallback(() => {
         const now = new Date();
         const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
         const currentMonth = now.getMonth();
@@ -178,7 +167,18 @@ function StatsContent() {
             topServices,
             recentBookings,
         });
-    };
+    }, [bookings, selectedPeriod]);
+
+    useEffect(() => {
+        window.scrollTo(0, 0);
+        fetchBookings();
+    }, [fetchBookings]);
+
+    useEffect(() => {
+        if (bookings.length > 0) {
+            calculateStats();
+        }
+    }, [bookings, selectedPeriod, calculateStats]);
 
     if (loading) {
         return <Loading />;

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { UserRole, User } from '@/types';
@@ -27,16 +27,7 @@ function UsersContent() {
     const [roleFilter, setRoleFilter] = useState<'ALL' | UserRole>('ALL');
     const [statusFilter, setStatusFilter] = useState<'ALL' | 'ACTIVE' | 'INACTIVE'>('ALL');
 
-    useEffect(() => {
-        window.scrollTo(0, 0);
-        fetchUsers();
-    }, []);
-
-    useEffect(() => {
-        filterUsers();
-    }, [users, searchTerm, roleFilter, statusFilter]);
-
-    const fetchUsers = async () => {
+    const fetchUsers = useCallback(async () => {
         try {
             const response = await api.get('/users');
             setUsers(response.data);
@@ -45,9 +36,9 @@ function UsersContent() {
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
 
-    const filterUsers = () => {
+    const filterUsers = useCallback(() => {
         let filtered = [...users];
 
         // Filter by search term
@@ -74,7 +65,16 @@ function UsersContent() {
         }
 
         setFilteredUsers(filtered);
-    };
+    }, [users, searchTerm, roleFilter, statusFilter]);
+
+    useEffect(() => {
+        window.scrollTo(0, 0);
+        fetchUsers();
+    }, [fetchUsers]);
+
+    useEffect(() => {
+        filterUsers();
+    }, [filterUsers]);
 
     const handleToggleStatus = async (userId: string, currentStatus: boolean) => {
         try {

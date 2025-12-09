@@ -33,7 +33,7 @@ export default function AdminDashboardPage() {
 function DashboardContent() {
     const [users, setUsers] = useState<User[]>([]);
     const [services, setServices] = useState<Service[]>([]);
-    const [settings, setSettings] = useState<SiteSettings | null>(null);
+    const [_settings, setSettings] = useState<SiteSettings | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {

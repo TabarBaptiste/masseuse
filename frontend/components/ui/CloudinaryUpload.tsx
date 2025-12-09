@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import Image from 'next/image';
 import { X, Image as ImageIcon } from 'lucide-react';
 
 interface CloudinaryUploadProps {
@@ -113,9 +114,11 @@ export const CloudinaryUpload: React.FC<CloudinaryUploadProps> = ({
         <div className="text-center">
           {preview ? (
             <div className="relative inline-block">
-              <img
+              <Image
                 src={getCloudinaryUrl(preview) || preview}
                 alt="Aperçu"
+                width={128}
+                height={128}
                 className="max-w-full h-32 object-cover rounded-lg mx-auto"
               />
               <button

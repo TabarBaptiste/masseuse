@@ -26,7 +26,7 @@ export const Footer: React.FC = () => {
     createdAt: "",
     updatedAt: "",
   });
-  const [loading, setLoading] = useState(true);
+  const [_loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchSettings = async () => {

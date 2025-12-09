@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Service } from '@/types';
 import { Button } from '@/components/ui/Button';
@@ -45,9 +46,11 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ service }) => {
     <div className="bg-white rounded-lg shadow-md overflow-hidden">
       {imageUrl && (
         <div className="w-full h-48">
-          <img
+          <Image
             src={imageUrl}
             alt={service.name}
+            width={400}
+            height={192}
             className="w-full h-full object-cover"
           />
         </div>

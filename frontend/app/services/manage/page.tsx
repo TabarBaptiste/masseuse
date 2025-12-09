@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, Suspense } from 'react';
+import React, { useEffect, useState, Suspense, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import api from '@/lib/api';
@@ -25,20 +25,7 @@ function ManageServiceContent() {
 
     const canManageServices = isAuthenticated && (user?.role === UserRole.ADMIN || user?.role === UserRole.PRO);
 
-    useEffect(() => {
-        if (!canManageServices) {
-            router.push('/services');
-            return;
-        }
-
-        if (isEdit && serviceId) {
-            fetchService();
-        } else {
-            setIsLoading(false);
-        }
-    }, [canManageServices, isEdit, serviceId, router]);
-
-    const fetchService = async () => {
+    const fetchService = useCallback(async () => {
         // Vérifier d'abord dans le store
         const cachedService = services.find((s: Service) => s.id === serviceId);
         if (cachedService) {
@@ -57,7 +44,20 @@ function ManageServiceContent() {
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [services, serviceId, router]);
+
+    useEffect(() => {
+        if (!canManageServices) {
+            router.push('/services');
+            return;
+        }
+
+        if (isEdit && serviceId) {
+            fetchService();
+        } else {
+            setIsLoading(false);
+        }
+    }, [canManageServices, isEdit, serviceId, router, fetchService]);
 
     const handleSubmit = async (formData: FormData) => {
         setSaving(true);

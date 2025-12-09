@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
-import { UserRole } from '@/types';
+import { UserRole, Conflict } from '@/types';
 import { Card } from '@/components/ui/Card';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { Loading } from '@/components/ui/Loading';
@@ -19,19 +19,6 @@ import {
     Ban,
     RefreshCw
 } from 'lucide-react';
-
-interface Conflict {
-    id: string;
-    type: 'OVERLAPPING_BOOKINGS' | 'BOOKING_BLOCKED_SLOT' | 'BOOKING_NO_AVAILABILITY' | 'DOUBLE_BOOKING';
-    severity: 'HIGH' | 'MEDIUM' | 'LOW';
-    date: string;
-    startTime: string;
-    endTime: string;
-    description: string;
-    affectedBookings?: any[];
-    blockedSlot?: any;
-    details?: any;
-}
 
 interface ConflictsSummary {
     total: number;
@@ -290,11 +277,11 @@ function ConflictsContent() {
                                                                 <div className="flex items-center space-x-2">
                                                                     <User className="w-4 h-4 text-gray-500" />
                                                                     <span className="font-medium">
-                                                                        {booking.user.firstName} {booking.user.lastName}
+                                                                        {booking.user?.firstName} {booking.user?.lastName}
                                                                     </span>
                                                                 </div>
                                                                 <div className="text-sm text-gray-600">
-                                                                    {booking.service.name}
+                                                                    {booking.service?.name}
                                                                 </div>
                                                             </div>
                                                             <div className="text-xs text-gray-500 mt-1">

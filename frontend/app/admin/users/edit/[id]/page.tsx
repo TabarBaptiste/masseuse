@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, Suspense } from 'react';
+import React, { useEffect, useState, Suspense, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import api from '@/lib/api';
@@ -26,20 +26,17 @@ function EditUserContent() {
     const userId = params.id as string;
     const canManageUsers = isAuthenticated && currentUser?.role === UserRole.ADMIN;
 
-    useEffect(() => {
-        if (!canManageUsers) {
-            router.push('/admin/users');
-            return;
+    const fetchCompletedBookings = useCallback(async () => {
+        try {
+            const response = await api.get(`/bookings?userId=${userId}&status=COMPLETED`);
+            setCompletedBookingsCount(response.data.length || 0);
+        } catch (error) {
+            console.error('Erreur lors du chargement des réservations:', error);
+            setCompletedBookingsCount(0);
         }
+    }, [userId]);
 
-        if (userId) {
-            fetchUser();
-        } else {
-            setIsLoading(false);
-        }
-    }, [canManageUsers, userId, router]);
-
-    const fetchUser = async () => {
+    const fetchUser = useCallback(async () => {
         try {
             const response = await api.get<User>(`/users/${userId}`);
             setEditingUser(response.data);
@@ -59,17 +56,20 @@ function EditUserContent() {
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [userId, router, fetchCompletedBookings]);
 
-    const fetchCompletedBookings = async () => {
-        try {
-            const response = await api.get(`/bookings?userId=${userId}&status=COMPLETED`);
-            setCompletedBookingsCount(response.data.length || 0);
-        } catch (error) {
-            console.error('Erreur lors du chargement des réservations:', error);
-            setCompletedBookingsCount(0);
+    useEffect(() => {
+        if (!canManageUsers) {
+            router.push('/admin/users');
+            return;
         }
-    };
+
+        if (userId) {
+            fetchUser();
+        } else {
+            setIsLoading(false);
+        }
+    }, [canManageUsers, userId, router, fetchUser]);
 
     const handleSubmit = async (formData: FormData) => {
         if (!editingUser) return;

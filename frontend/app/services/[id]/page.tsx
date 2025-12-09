@@ -2,6 +2,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import Image from 'next/image';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import api from '@/lib/api';
@@ -104,9 +105,11 @@ export default function ServiceDetailPage() {
 
         <Card>
           {service.imageUrl && getCloudinaryUrl(service.imageUrl) && (
-            <img
+            <Image
               src={getCloudinaryUrl(service.imageUrl)!}
               alt={service.name}
+              width={800}
+              height={256}
               className="w-full h-64 object-cover rounded-lg mb-6"
             />
           )}
