@@ -162,6 +162,12 @@ function DashboardContent() {
                                     Disponibilités
                                 </button>
                             </Link>
+                            <Link href="/pro/blocked-slots" className="block">
+                                <button className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium transition-colors">
+                                    <Shield className="w-4 h-4" />
+                                    Créneaux bloqués
+                                </button>
+                            </Link>
                             <Link href="/services" className="block">
                                 <button className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-sm font-medium transition-colors">
                                     <Wrench className="w-4 h-4" />
