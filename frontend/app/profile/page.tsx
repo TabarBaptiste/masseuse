@@ -9,7 +9,7 @@ import { Booking, BookingStatus } from '@/types';
 import api from '@/lib/api';
 import Link from 'next/link';
 import { LeaveReviewModal } from '@/components/ui/LeaveReviewModal';
-import { Star } from 'lucide-react';
+import { Star, User, Calendar, Edit, X, MessageSquare, RotateCcw, Mail, Phone, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 
 export default function ProfilePage() {
@@ -155,41 +155,49 @@ function ProfileContent() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Card>
-            <h2 className="text-xl font-semibold mb-4">Informations personnelles</h2>
+            <div className="flex items-center gap-3 mb-4">
+              <User className="w-5 h-5 text-amber-600" />
+              <h2 className="text-xl font-semibold">Informations personnelles</h2>
+            </div>
             <div className="space-y-3">
               <div>
-                <p className="text-sm text-gray-600">Nom complet</p>
+
+                <p className="text-sm text-gray-600"><User className="w-4 h-4 inline-block mr-2" />Nom complet</p>
                 <p className="font-medium">{user.firstName} {user.lastName}</p>
               </div>
               <div>
-                <p className="text-sm text-gray-600">Email</p>
+                <p className="text-sm text-gray-600"><Mail className="w-4 h-4 inline-block mr-2" />Email</p>
                 <p className="font-medium">{user.email}</p>
               </div>
               {user.phone && (
                 <div>
-                  <p className="text-sm text-gray-600">Téléphone</p>
+                  <p className="text-sm text-gray-600"><Phone className="w-4 h-4 inline-block mr-2" />Téléphone</p>
                   <p className="font-medium">{user.phone}</p>
                 </div>
               )}
-              {user.role === 'ADMIN' && (
+              {user.role === 'ADMIN' || user.role === 'PRO' ? (
                 <div>
-                  <p className="text-sm text-gray-600">Rôle</p>
+                  <p className="text-sm text-gray-600"><Shield className="w-4 h-4 inline-block mr-2" />Rôle</p>
                   <p className="font-medium">{user.role}</p>
                 </div>
-              )}
+              ) : null}
             </div>
             <div className="mt-6">
               <Link
                 href="/profile/edit"
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-amber-800 hover:bg-amber-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 transition-colors"
+                className="inline-flex items-center gap-2 px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-amber-800 hover:bg-amber-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 transition-colors"
               >
+                <Edit className="w-4 h-4" />
                 Modifier mes informations
               </Link>
             </div>
           </Card>
 
           <Card>
-            <h2 className="text-xl font-semibold mb-4">Mes réservations{loading ? '' : ` (${bookings.length})`}</h2>
+            <div className="flex items-center gap-3 mb-4">
+              <Calendar className="w-5 h-5 text-amber-600" />
+              <h2 className="text-xl font-semibold">Mes réservations{loading ? '' : ` (${bookings.length})`}</h2>
+            </div>
             {loading ? (
               <div className="space-y-4">
                 <div className="border rounded-lg p-4 bg-white animate-pulse">
@@ -225,8 +233,9 @@ function ProfileContent() {
                       <div className="mt-4 pt-4 border-t border-gray-200">
                         <button
                           onClick={() => handleCancelBooking(booking.id)}
-                          className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium transition-colors"
+                          className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium transition-colors inline-flex items-center gap-2"
                         >
+                          <X className="w-4 h-4" />
                           Annuler la réservation
                         </button>
                       </div>
@@ -241,7 +250,10 @@ function ProfileContent() {
                           </div>
                           <div className="mt-4 pt-0">
                             <Link href={`/services/${booking.serviceId}`}>
-                              <Button>Réserver à nouveau</Button>
+                              <Button className="inline-flex items-center gap-2">
+                                <RotateCcw className="w-4 h-4" />
+                                Réserver à nouveau
+                              </Button>
                             </Link>
                           </div>
                         </div>
@@ -250,8 +262,9 @@ function ProfileContent() {
                         <div className="mt-4 pt-4 border-t border-gray-200">
                           <button
                             onClick={() => setReviewModal({ bookingId: booking.id, serviceName: booking.service?.name || 'Service' })}
-                            className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-sm font-medium transition-colors"
+                            className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-sm font-medium transition-colors inline-flex items-center gap-2"
                           >
+                            <MessageSquare className="w-4 h-4" />
                             Laisser un avis
                           </button>
                         </div>
