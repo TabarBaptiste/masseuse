@@ -4,8 +4,4 @@ export class UpdateReviewDto {
   @IsBoolean()
   @IsOptional()
   isApproved?: boolean;
-
-  @IsBoolean()
-  @IsOptional()
-  isPublished?: boolean;
 }

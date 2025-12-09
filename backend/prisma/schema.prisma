@@ -19,11 +19,11 @@ enum UserRole {
 }
 
 enum BookingStatus {
-  PENDING      // En attente de confirmation
-  CONFIRMED    // Confirmée
-  COMPLETED    // Effectuée
-  CANCELLED    // Annulée par le client
-  NO_SHOW      // Client absent
+  PENDING // En attente de confirmation
+  CONFIRMED // Confirmée
+  COMPLETED // Effectuée
+  CANCELLED // Annulée par le client
+  NO_SHOW // Client absent
 }
 
 enum DayOfWeek {
@@ -41,24 +41,24 @@ enum DayOfWeek {
 // ========================================
 
 model User {
-  id            String    @id @default(cuid())
-  email         String    @unique
-  password      String    // Hash bcrypt
-  firstName     String
-  lastName      String
-  phone         String?
-  role          UserRole  @default(USER)
-  
-  emailVerified Boolean   @default(false)
-  isActive      Boolean   @default(true)
-  
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String // Hash bcrypt
+  firstName String
+  lastName  String
+  phone     String?
+  role      UserRole @default(USER)
+
+  emailVerified Boolean @default(false)
+  isActive      Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   // Relations
-  bookings      Booking[]
-  reviews       Review[]
-  
+  bookings Booking[]
+  reviews  Review[]
+
   @@index([email])
   @@index([role])
 }
@@ -68,23 +68,23 @@ model User {
 // ========================================
 
 model Service {
-  id          String   @id @default(cuid())
+  id          String  @id @default(cuid())
   name        String
-  description String   @db.Text
-  duration    Int      // Durée en minutes
-  price       Decimal  @db.Decimal(10, 2)
-  
-  isActive    Boolean  @default(true)
+  description String  @db.Text
+  duration    Int // Durée en minutes
+  price       Decimal @db.Decimal(10, 2)
+
+  isActive     Boolean @default(true)
   displayOrder Int     @default(0) // Pour trier l'affichage
-  
-  imageUrl    String?  // URL de l'image (optionnel)
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
+
+  imageUrl String? // URL de l'image (optionnel)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   // Relations
-  bookings    Booking[]
-  
+  bookings Booking[]
+
   @@index([isActive, displayOrder])
 }
 
@@ -93,16 +93,16 @@ model Service {
 // ========================================
 
 model WeeklyAvailability {
-  id          String    @id @default(cuid())
-  dayOfWeek   DayOfWeek
-  startTime   String    // Format "HH:mm" ex: "09:00"
-  endTime     String    // Format "HH:mm" ex: "18:00"
-  
-  isActive    Boolean   @default(true)
-  
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  
+  id        String    @id @default(cuid())
+  dayOfWeek DayOfWeek
+  startTime String // Format "HH:mm" ex: "09:00"
+  endTime   String // Format "HH:mm" ex: "18:00"
+
+  isActive Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@unique([dayOfWeek, startTime, endTime])
   @@index([dayOfWeek, isActive])
 }
@@ -112,15 +112,15 @@ model WeeklyAvailability {
 // ========================================
 
 model BlockedSlot {
-  id          String   @id @default(cuid())
-  date        DateTime @db.Date
-  startTime   String   // Format "HH:mm"
-  endTime     String   // Format "HH:mm"
-  reason      String?  // Raison du blocage (congés, rdv perso...)
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
+  id        String   @id @default(cuid())
+  date      DateTime @db.Date
+  startTime String // Format "HH:mm"
+  endTime   String // Format "HH:mm"
+  reason    String? // Raison du blocage (congés, rdv perso...)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@index([date])
 }
 
@@ -129,44 +129,44 @@ model BlockedSlot {
 // ========================================
 
 model Booking {
-  id          String        @id @default(cuid())
-  
+  id String @id @default(cuid())
+
   // Client
-  userId      String
-  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   // Prestation
-  serviceId   String
-  service     Service       @relation(fields: [serviceId], references: [id], onDelete: Restrict)
-  
+  serviceId String
+  service   Service @relation(fields: [serviceId], references: [id], onDelete: Restrict)
+
   // Date et heure
-  date        DateTime      @db.Date
-  startTime   String        // Format "HH:mm"
-  endTime     String        // Format "HH:mm"
-  
+  date      DateTime @db.Date
+  startTime String // Format "HH:mm"
+  endTime   String // Format "HH:mm"
+
   // Statut
-  status      BookingStatus @default(PENDING)
-  
+  status BookingStatus @default(PENDING)
+
   // Informations supplémentaires
-  notes       String?       @db.Text // Notes du client
-  proNotes    String?       @db.Text // Notes privées de la masseuse
-  
+  notes    String? @db.Text // Notes du client
+  proNotes String? @db.Text // Notes privées de la masseuse
+
   // Prix au moment de la réservation (au cas où le prix change)
-  priceAtBooking Decimal    @db.Decimal(10, 2)
-  
+  priceAtBooking Decimal @db.Decimal(10, 2)
+
   // Annulation
-  cancelledAt DateTime?
-  cancelReason String?      @db.Text
-  
+  cancelledAt  DateTime?
+  cancelReason String?   @db.Text
+
   // Rappels
   reminderSentAt DateTime?
-  
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   // Relations
-  reviews     Review[]
-  
+  reviews Review[]
+
   @@index([userId])
   @@index([serviceId])
   @@index([date, startTime])
@@ -178,29 +178,27 @@ model Booking {
 // ========================================
 
 model Review {
-  id          String   @id @default(cuid())
-  
+  id String @id @default(cuid())
+
   // Client
-  userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   // Réservation associée
-  bookingId   String   @unique
-  booking     Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
-  
+  bookingId String  @unique
+  booking   Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
   // Évaluation
-  rating      Int      // Note sur 5
-  comment     String?  @db.Text
-  
+  rating  Int // Note sur 5
+  comment String? @db.Text
+
   // Modération
-  isApproved  Boolean  @default(false)
-  isPublished Boolean  @default(false)
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
+  isApproved  Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@index([userId])
-  @@index([isPublished])
   @@index([rating])
 }
 
@@ -209,38 +207,38 @@ model Review {
 // ========================================
 
 model SiteSettings {
-  id                    String   @id @default(cuid())
-  
+  id String @id @default(cuid())
+
   // Informations du salon
-  salonName             String   @default("Mon Salon")
-  salonDescription      String   @db.Text
-  salonAddress          String?
-  salonPhone            String?
-  salonEmail            String?
-  
+  salonName        String  @default("Mon Salon")
+  salonDescription String  @db.Text
+  salonAddress     String?
+  salonPhone       String?
+  salonEmail       String?
+
   // Images
-  logoUrl               String?
-  heroImageUrl          String?
-  
+  logoUrl      String?
+  heroImageUrl String?
+
   // Horaires par défaut (affichage)
-  defaultOpenTime       String   @default("09:00")
-  defaultCloseTime      String   @default("18:00")
-  
+  defaultOpenTime  String @default("09:00")
+  defaultCloseTime String @default("18:00")
+
   // Paramètres de réservation
-  bookingAdvanceMinDays Int      @default(0)    // Nb jours min avant réservation
-  bookingAdvanceMaxDays Int      @default(60)   // Nb jours max avant réservation
-  cancellationDeadlineHours Int  @default(24)   // Délai annulation (en heures)
-  
+  bookingAdvanceMinDays     Int @default(0) // Nb jours min avant réservation
+  bookingAdvanceMaxDays     Int @default(60) // Nb jours max avant réservation
+  cancellationDeadlineHours Int @default(24) // Délai annulation (en heures)
+
   // Notifications
   emailNotificationsEnabled Boolean @default(true)
   reminderDaysBefore        Int     @default(1) // J-1 par défaut
-  
+
   // Réseaux sociaux
-  facebookUrl           String?
-  instagramUrl          String?
-  
-  createdAt             DateTime @default(now())
-  updatedAt             DateTime @updatedAt
-  
+  facebookUrl  String?
+  instagramUrl String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@map("site_settings")
 }

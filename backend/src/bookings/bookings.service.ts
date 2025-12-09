@@ -235,6 +235,7 @@ export class BookingsService {
             phone: true,
           },
         },
+        reviews: true,
       },
       orderBy: [{ date: 'asc' }, { startTime: 'asc' }],
     });

@@ -43,6 +43,18 @@ export class ReviewsController {
     );
   }
 
+  @Get('service/:serviceId/user-bookings')
+  @UseGuards(JwtAuthGuard)
+  getUserCompletedBookingsForService(
+    @CurrentUser() user: any,
+    @Param('serviceId') serviceId: string,
+  ) {
+    return this.reviewsService.getUserCompletedBookingsForService(
+      user.id,
+      serviceId,
+    );
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.reviewsService.findOne(id);
@@ -53,6 +65,22 @@ export class ReviewsController {
   @Roles(UserRole.PRO, UserRole.ADMIN)
   update(@Param('id') id: string, @Body() updateReviewDto: UpdateReviewDto) {
     return this.reviewsService.update(id, updateReviewDto);
+  }
+
+  @Patch(':id/user-update')
+  @UseGuards(JwtAuthGuard)
+  updateByUser(
+    @CurrentUser() user: any,
+    @Param('id') id: string,
+    @Body() updateReviewDto: { comment?: string },
+  ) {
+    return this.reviewsService.updateByUser(user.id, id, updateReviewDto);
+  }
+
+  @Delete(':id/user-delete')
+  @UseGuards(JwtAuthGuard)
+  removeByUser(@CurrentUser() user: any, @Param('id') id: string) {
+    return this.reviewsService.removeByUser(user.id, id);
   }
 
   @Post(':id/approve')
