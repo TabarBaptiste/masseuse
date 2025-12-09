@@ -144,16 +144,16 @@ function DashboardContent() {
                             </h2>
                         </div>
                         <div className="space-y-3">
-                            <Link href="/admin/users" className="block">
+                            <Link href="/pro/dashboard" className="block">
                                 <button className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors">
-                                    <Users className="w-4 h-4" />
-                                    Utilisateurs
+                                    <Calendar className="w-4 h-4" />
+                                    Réservations
                                 </button>
                             </Link>
-                            <Link href="/services" className="block">
-                                <button className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-sm font-medium transition-colors">
-                                    <Wrench className="w-4 h-4" />
-                                    Services
+                            <Link href="/admin/users" className="block">
+                                <button className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg text-sm font-medium transition-colors">
+                                    <Users className="w-4 h-4" />
+                                    Utilisateurs
                                 </button>
                             </Link>
                             <Link href="/pro/availability" className="block">
@@ -162,10 +162,10 @@ function DashboardContent() {
                                     Disponibilités
                                 </button>
                             </Link>
-                            <Link href="/pro/dashboard" className="block">
-                                <button className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg text-sm font-medium transition-colors">
-                                    <Calendar className="w-4 h-4" />
-                                    Réservations
+                            <Link href="/services" className="block">
+                                <button className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-sm font-medium transition-colors">
+                                    <Wrench className="w-4 h-4" />
+                                    Services
                                 </button>
                             </Link>
                         </div>

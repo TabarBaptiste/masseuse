@@ -5,7 +5,7 @@ import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { useAuthStore } from '@/store/auth';
 import { Card } from '@/components/ui/Card';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
-import { Booking } from '@/types';
+import { Booking, BookingStatus } from '@/types';
 import api from '@/lib/api';
 import Link from 'next/link';
 
@@ -86,6 +86,20 @@ function ProfileContent() {
         return 'Absent';
       default:
         return status;
+    }
+  };
+
+  const handleCancelBooking = async (bookingId: string) => {
+    if (!confirm('Êtes-vous sûr de vouloir annuler cette réservation ?')) {
+      return;
+    }
+
+    try {
+      await api.patch(`/bookings/${bookingId}`, { status: BookingStatus.CANCELLED });
+      setBookings(bookings.map(b => b.id === bookingId ? { ...b, status: BookingStatus.CANCELLED } : b));
+    } catch (error) {
+      console.error('Erreur lors de l\'annulation de la réservation:', error);
+      alert('Erreur lors de l\'annulation de la réservation');
     }
   };
 
@@ -171,6 +185,16 @@ function ProfileContent() {
                         <p><strong>Notes:</strong> {booking.notes}</p>
                       )}
                     </div>
+                    {(booking.status === BookingStatus.PENDING || booking.status === BookingStatus.CONFIRMED) && (
+                      <div className="mt-4 pt-4 border-t border-gray-200">
+                        <button
+                          onClick={() => handleCancelBooking(booking.id)}
+                          className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium transition-colors"
+                        >
+                          Annuler la réservation
+                        </button>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>

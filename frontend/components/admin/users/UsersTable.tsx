@@ -18,6 +18,10 @@ export const UsersTable: React.FC<UsersTableProps> = ({
     onEditUser,
     onDeleteUser,
 }) => {
+    // Trier les utilisateurs par date d'inscription croissante (plus ancien en premier)
+    const sortedUsers = [...users].sort((a, b) => 
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
     const getRoleBadgeColor = (role: UserRole) => {
         switch (role) {
             case UserRole.ADMIN:
@@ -58,14 +62,14 @@ export const UsersTable: React.FC<UsersTableProps> = ({
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                        {users.length === 0 ? (
+                        {sortedUsers.length === 0 ? (
                             <tr>
                                 <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
                                     Aucun utilisateur trouvé
                                 </td>
                             </tr>
                         ) : (
-                            users.map((user) => (
+                            sortedUsers.map((user) => (
                                 <tr key={user.id} className="hover:bg-gray-50">
                                     <td className="px-6 py-4 whitespace-nowrap">
                                         <div className="flex items-center">
