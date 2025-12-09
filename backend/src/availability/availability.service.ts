@@ -66,4 +66,21 @@ export class AvailabilityService {
       where: { id },
     });
   }
+
+  async getWorkingDays() {
+    try {
+      const availabilities = await this.prisma.weeklyAvailability.findMany({
+        where: { isActive: true },
+        select: { dayOfWeek: true },
+        distinct: ['dayOfWeek'],
+      });
+
+      const workingDays = availabilities.map((a) => a.dayOfWeek);
+
+      return workingDays;
+    } catch (error) {
+      console.error('Error in getWorkingDays:', error);
+      throw error;
+    }
+  }
 }

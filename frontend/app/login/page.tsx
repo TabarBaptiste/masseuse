@@ -24,6 +24,7 @@ export default function LoginPage() {
     register,
     handleSubmit,
     formState: { errors },
+    setValue,
   } = useForm<LoginFormData>();
 
   const onSubmit = async (data: LoginFormData) => {
@@ -32,10 +33,16 @@ export default function LoginPage() {
     
     try {
       await login(data);
-      router.push('/profile');
+      
+      // Redirect to stored URL or default to profile
+      const redirectUrl = localStorage.getItem('redirectAfterLogin') || '/profile';
+      localStorage.removeItem('redirectAfterLogin'); // Clean up
+      router.push(redirectUrl);
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } };
       setError(error.response?.data?.message || 'Identifiants invalides');
+      // Clear password field on error
+      setValue('password', '');
     } finally {
       setIsLoading(false);
     }
@@ -55,7 +62,7 @@ export default function LoginPage() {
         </div>
 
         <Card>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-6">
             {error && (
               <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
                 {error}

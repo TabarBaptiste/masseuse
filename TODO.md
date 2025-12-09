@@ -102,6 +102,25 @@ Page dédiée affichant :
 ## ✅ Checklist rapide - Résumé
 
 ### 🔧 Corrections urgentes
+- [x] Redirection après déconnexion
+- [x] Boutons défectueux
+- [x] Icônes manquantes
+- [ ] Icônes manquantes calendrier
+- [x] Règle des 8 caractères login
+- [x] Statistiques Dashboard Admin
+
+### 🚮 Suppressions
+- [x] Bouton "Gérer les rôles"
+- [x] Bouton "Ajouter un utilisateur"
+- [x] Bouton "Ajouter un service"
+- [x] Bouton "Modifier les prix"
+
+### 🏗️ Réorganisation
+- [x] CRUD complet sur "Voir tous les utilisateurs"
+- [x] CRUD complet sur "Voir tous les services"
+- [x] Nouvelle page Statistiques
+- [x] Clarifier page Réservations
+=======
 - [ ] Redirection après déconnexion
 - [ ] Boutons défectueux
 - [ ] Icônes manquantes
@@ -118,7 +137,6 @@ Page dédiée affichant :
 - [ ] CRUD complet sur "Voir tous les utilisateurs"
 - [ ] CRUD complet sur "Voir tous les services"
 - [ ] Nouvelle page Statistiques
-- [ ] Clarifier page Réservations
 - [ ] Clarifier page Notifications
 
 ### 🧑‍💻 Définition boutons avancés

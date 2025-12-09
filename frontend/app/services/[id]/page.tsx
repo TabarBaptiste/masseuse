@@ -2,6 +2,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import Image from 'next/image';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import api from '@/lib/api';
@@ -9,18 +10,48 @@ import { Service } from '@/types';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Loading } from '@/components/ui/Loading';
+import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { useAuthStore } from '@/store/auth';
+import { useServicesStore } from '@/store/services';
+
+const getCloudinaryUrl = (imageUrl: string | null | undefined) => {
+  if (!imageUrl) return null;
+
+  // Si c'est déjà une URL Cloudinary, la retourner telle quelle
+  if (imageUrl.includes('cloudinary.com')) {
+    return imageUrl;
+  }
+
+  // Si c'est un public_id Cloudinary, construire l'URL
+  const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+  if (cloudName && imageUrl) {
+    return `https://res.cloudinary.com/${cloudName}/image/upload/c_fill,w_800,h_400,f_auto,q_auto/${imageUrl}`;
+  }
+
+  // Fallback vers l'URL originale
+  return imageUrl;
+};
 
 export default function ServiceDetailPage() {
   const params = useParams();
   const router = useRouter();
   const { isAuthenticated } = useAuthStore();
+  const { services } = useServicesStore();
   const [service, setService] = useState<Service | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
 
   useEffect(() => {
     const fetchService = async () => {
+      // Vérifier d'abord dans le store
+      const cachedService = services.find((s: Service) => s.id === params.id);
+      if (cachedService) {
+        setService(cachedService);
+        setIsLoading(false);
+        return;
+      }
+
+      // Sinon, charger depuis l'API
       try {
         const response = await api.get<Service>(`/services/${params.id}`);
         setService(response.data);
@@ -34,7 +65,7 @@ export default function ServiceDetailPage() {
     if (params.id) {
       fetchService();
     }
-  }, [params.id]);
+  }, [params.id, services]);
 
   const handleBooking = () => {
     if (!isAuthenticated) {
@@ -64,15 +95,21 @@ export default function ServiceDetailPage() {
   return (
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <Link href="/services" className="text-blue-600 hover:text-blue-700 mb-6 inline-block">
-          ← Retour aux services
-        </Link>
+        <Breadcrumb
+          items={[
+            { label: 'Services', href: '/services' },
+            { label: service.name }
+          ]}
+          className="mb-6"
+        />
 
         <Card>
-          {service.imageUrl && (
-            <img
-              src={service.imageUrl}
+          {service.imageUrl && getCloudinaryUrl(service.imageUrl) && (
+            <Image
+              src={getCloudinaryUrl(service.imageUrl)!}
               alt={service.name}
+              width={800}
+              height={256}
               className="w-full h-64 object-cover rounded-lg mb-6"
             />
           )}

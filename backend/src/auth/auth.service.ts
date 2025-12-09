@@ -23,7 +23,7 @@ export class AuthService {
     });
 
     if (existingUser) {
-      throw new ConflictException('Email already in use');
+      throw new ConflictException('Email déjà utilisé');
     }
 
     // Hash password
@@ -68,7 +68,7 @@ export class AuthService {
     });
 
     if (!user) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedException('Aucun compte n\'est associé à cette adresse e-mail.');
     }
 
     // Check if user is active
@@ -83,7 +83,7 @@ export class AuthService {
     );
 
     if (!isPasswordValid) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedException('Mot de passe incorrect.');
     }
 
     // Generate JWT token
@@ -93,15 +93,21 @@ export class AuthService {
       role: user.role,
     };
 
-    return {
-      user: {
-        id: user.id,
-        email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        role: user.role,
-      },
-      access_token: this.jwtService.sign(payload),
-    };
+    try {
+      const token = this.jwtService.sign(payload);
+      return {
+        user: {
+          id: user.id,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          role: user.role,
+        },
+        access_token: token,
+      };
+    } catch (error) {
+      console.error('💥 JWT generation failed:', error.message);
+      throw error;
+    }
   }
 }

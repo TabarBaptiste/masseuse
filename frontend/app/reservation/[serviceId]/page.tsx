@@ -14,6 +14,9 @@ import { TimeSlotPicker } from '@/components/booking/TimeSlotPicker';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Loading } from '@/components/ui/Loading';
+import { Breadcrumb } from '@/components/ui/Breadcrumb';
+import { useWorkingDaysStore } from '@/store/working-days';
+import { useServicesStore } from '@/store/services';
 
 interface BookingFormData {
   notes?: string;
@@ -30,19 +33,65 @@ export default function ReservationPage() {
 function ReservationContent() {
   const router = useRouter();
   const params = useParams();
-  const [service, setService] = useState<Service | null>(null);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
   const [availableSlots, setAvailableSlots] = useState<string[]>([]);
-  const [isLoadingService, setIsLoadingService] = useState(true);
   const [isLoadingSlots, setIsLoadingSlots] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
 
   const { register, handleSubmit } = useForm<BookingFormData>();
 
+  // Utiliser les stores pour les données cachées
+  const {
+    workingDays,
+    isLoading: isLoadingWorkingDays,
+    isCacheValid: isWorkingDaysCacheValid,
+    setWorkingDays,
+    setLoading: setLoadingWorkingDays,
+    updateLastFetched: updateWorkingDaysLastFetched
+  } = useWorkingDaysStore();
+
+  const { services } = useServicesStore();
+
+  // Récupérer le service depuis le store ou l'état local
+  const [service, setService] = useState<Service | null>(null);
+  const [isLoadingService, setIsLoadingService] = useState(true);
+
+  // Fetch working days avec cache
+  useEffect(() => {
+    const fetchWorkingDays = async () => {
+      if (isWorkingDaysCacheValid()) {
+        return; // Utiliser le cache
+      }
+
+      setLoadingWorkingDays(true);
+      try {
+        const response = await api.get<string[]>('/availability/working-days');
+        setWorkingDays(response.data);
+        updateWorkingDaysLastFetched();
+      } catch (err) {
+        console.error('Error fetching working days:', err);
+      } finally {
+        setLoadingWorkingDays(false);
+      }
+    };
+
+    fetchWorkingDays();
+  }, [isWorkingDaysCacheValid, setWorkingDays, setLoadingWorkingDays, updateWorkingDaysLastFetched]);
+
+  // Fetch service avec possibilité d'utiliser le cache
   useEffect(() => {
     const fetchService = async () => {
+      // Vérifier d'abord dans le store
+      const cachedService = services.find((s: Service) => s.id === params.serviceId);
+      if (cachedService) {
+        setService(cachedService);
+        setIsLoadingService(false);
+        return;
+      }
+
+      // Sinon, charger depuis l'API
       try {
         const response = await api.get<Service>(`/services/${params.serviceId}`);
         setService(response.data);
@@ -56,7 +105,7 @@ function ReservationContent() {
     if (params.serviceId) {
       fetchService();
     }
-  }, [params.serviceId]);
+  }, [params.serviceId, services]);
 
   useEffect(() => {
     const fetchAvailableSlots = async () => {
@@ -64,7 +113,7 @@ function ReservationContent() {
 
       setIsLoadingSlots(true);
       setSelectedSlot(null);
-      
+
       try {
         const dateStr = format(selectedDate, 'yyyy-MM-dd');
         const response = await api.get<string[]>('/bookings/available-slots', {
@@ -103,14 +152,14 @@ function ReservationContent() {
       };
 
       await api.post('/bookings', bookingData);
-      
+
       // Redirect to profile/bookings page
       router.push('/profile?tab=bookings');
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } };
       setError(
         error.response?.data?.message ||
-          'Erreur lors de la réservation. Veuillez réessayer.'
+        'Erreur lors de la réservation. Veuillez réessayer.'
       );
     } finally {
       setIsSubmitting(false);
@@ -136,6 +185,14 @@ function ReservationContent() {
   return (
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <Breadcrumb
+          items={[
+            { label: 'Services', href: '/services' },
+            { label: service.name, href: `/services/${service.id}` },
+            { label: 'Réservation' }
+          ]}
+          className="mb-8"
+        />
         <h1 className="text-3xl font-bold text-gray-900 mb-8">
           Réserver : {service.name}
         </h1>
@@ -151,6 +208,7 @@ function ReservationContent() {
               <Calendar
                 selectedDate={selectedDate}
                 onSelectDate={setSelectedDate}
+                workingDays={workingDays}
               />
             </div>
 
@@ -175,44 +233,41 @@ function ReservationContent() {
               </div>
             )}
 
-            {/* Step 3: Add Notes & Confirm */}
+            {/* Optional Notes */}
             {selectedSlot && (
+              <div>
+                <h2 className="text-xl font-semibold mb-4">
+                  3. Notes (optionnel)
+                </h2>
+                <Card>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Informations complémentaires
+                    </label>
+                    <textarea
+                      {...register('notes')}
+                      rows={4}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Préférences, informations spéciales..."
+                    />
+                  </div>
+                </Card>
+              </div>
+            )}
+
+            {/* Step 3: Confirm */}
+            {/* {selectedSlot && (
               <div>
                 <h2 className="text-xl font-semibold mb-4">
                   3. Confirmez votre réservation
                 </h2>
                 <Card>
-                  <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                    {error && (
-                      <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-                        {error}
-                      </div>
-                    )}
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Notes (optionnel)
-                      </label>
-                      <textarea
-                        {...register('notes')}
-                        rows={4}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="Informations complémentaires, préférences..."
-                      />
-                    </div>
-
-                    <Button
-                      type="submit"
-                      className="w-full"
-                      size="lg"
-                      disabled={isSubmitting}
-                    >
-                      {isSubmitting ? 'Réservation en cours...' : 'Confirmer la réservation'}
-                    </Button>
-                  </form>
+                  <p className="text-sm text-gray-600">
+                    Vérifiez les informations ci-dessous et confirmez votre réservation.
+                  </p>
                 </Card>
               </div>
-            )}
+            )} */}
           </div>
 
           {/* Booking Summary */}
@@ -249,6 +304,28 @@ function ReservationContent() {
                   </div>
                 )}
               </div>
+
+              {/* Confirm Button */}
+              {selectedSlot && (
+                <div className="mt-6 pt-6 border-t border-gray-200">
+                  <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                    {error && (
+                      <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+                        {error}
+                      </div>
+                    )}
+
+                    <Button
+                      type="submit"
+                      className="w-full"
+                      size="lg"
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? 'Réservation en cours...' : 'Confirmer la réservation'}
+                    </Button>
+                  </form>
+                </div>
+              )}
             </Card>
           </div>
         </div>

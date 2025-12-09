@@ -4,8 +4,10 @@ import React, { useEffect, useState } from 'react';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { useAuthStore } from '@/store/auth';
 import { Card } from '@/components/ui/Card';
-import { Booking } from '@/types';
+import { Breadcrumb } from '@/components/ui/Breadcrumb';
+import { Booking, BookingStatus } from '@/types';
 import api from '@/lib/api';
+import Link from 'next/link';
 
 export default function ProfilePage() {
   return (
@@ -87,9 +89,43 @@ function ProfileContent() {
     }
   };
 
+  const handleCancelBooking = async (bookingId: string) => {
+    if (!confirm('Êtes-vous sûr de vouloir annuler cette réservation ?')) {
+      return;
+    }
+
+    try {
+      await api.patch(`/bookings/${bookingId}`, { status: BookingStatus.CANCELLED });
+      setBookings(bookings.map(b => b.id === bookingId ? { ...b, status: BookingStatus.CANCELLED } : b));
+    } catch (error) {
+      console.error('Erreur lors de l\'annulation de la réservation:', error);
+      alert('Erreur lors de l\'annulation de la réservation');
+    }
+  };
+
+  const canCancelBooking = (booking: Booking) => {
+    // Vérifier si la réservation peut être annulée (statut et délai de 24h)
+    if (booking.status !== BookingStatus.PENDING && booking.status !== BookingStatus.CONFIRMED) {
+      return false;
+    }
+
+    // Calculer la date et heure de la réservation
+    const datePart = booking.date.split('T')[0];
+    const bookingDateTime = new Date(`${datePart}T${booking.startTime}`);
+    const now = new Date();
+    const hoursUntilBooking = (bookingDateTime.getTime() - now.getTime()) / (1000 * 60 * 60);
+
+    // Ne permettre l'annulation que si plus de 24h avant le rendez-vous
+    return hoursUntilBooking > 24;
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <Breadcrumb
+          items={[{ label: 'Mon Profil' }]}
+          className="mb-8"
+        />
         <h1 className="text-3xl font-bold text-gray-900 mb-8">
           Mon Profil
         </h1>
@@ -119,10 +155,18 @@ function ProfileContent() {
                 </div>
               )}
             </div>
+            <div className="mt-6">
+              <Link
+                href="/profile/edit"
+                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-amber-800 hover:bg-amber-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 transition-colors"
+              >
+                Modifier mes informations
+              </Link>
+            </div>
           </Card>
 
           <Card>
-            <h2 className="text-xl font-semibold mb-4">Mes réservations</h2>
+            <h2 className="text-xl font-semibold mb-4">Mes réservations{loading ? '' : ` (${bookings.length})`}</h2>
             {loading ? (
               <div className="space-y-4">
                 <div className="border rounded-lg p-4 bg-white animate-pulse">
@@ -157,6 +201,16 @@ function ProfileContent() {
                         <p><strong>Notes:</strong> {booking.notes}</p>
                       )}
                     </div>
+                    {canCancelBooking(booking) && (
+                      <div className="mt-4 pt-4 border-t border-gray-200">
+                        <button
+                          onClick={() => handleCancelBooking(booking.id)}
+                          className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium transition-colors"
+                        >
+                          Annuler la réservation
+                        </button>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>

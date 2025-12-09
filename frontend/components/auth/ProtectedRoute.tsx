@@ -20,6 +20,11 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
   useEffect(() => {
     if (isInitialized && !isLoading && !isAuthenticated) {
+      // Store the current URL for redirect after login
+      const currentPath = window.location.pathname + window.location.search;
+      if (currentPath !== '/login' && currentPath !== '/register') {
+        localStorage.setItem('redirectAfterLogin', currentPath);
+      }
       router.push('/login');
     } else if (isInitialized && !isLoading && isAuthenticated && allowedRoles && user) {
       if (!allowedRoles.includes(user.role)) {

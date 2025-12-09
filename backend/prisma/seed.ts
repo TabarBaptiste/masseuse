@@ -141,7 +141,7 @@ async function main() {
     update: {},
     create: {
       salonName: 'Salon Aly Dous\'heure Le Robert Martinique',
-      salonDescription: 'Découvrez nos massages relaxants et toniques dans notre salon au Robert. Tarifs de 25€ à 80€, sur rendez-vous uniquement.',
+      salonDescription: 'Découvrez mes massages relaxants et toniques dans notre salon au Robert. Tarifs de 25€ à 80€, sur rendez-vous uniquement.',
       salonAddress: 'Le Robert, Martinique',
       salonPhone: '+596 596 XX XX XX', // Placeholder for Martinique number
       salonEmail: 'contact@alydousheure.com',

@@ -34,7 +34,7 @@ export default tseslint.config(
             '@typescript-eslint/no-unsafe-member-access': 'off',
             '@typescript-eslint/no-unsafe-return': 'off',
             '@typescript-eslint/require-await': 'warn',
-            '@typescript-eslint/no-unused-vars': ['warn', { 
+            '@typescript-eslint/no-unused-vars': ['warn', {
                 argsIgnorePattern: '^_',
                 varsIgnorePattern: '^_'
             }],

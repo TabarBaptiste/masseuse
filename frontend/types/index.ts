@@ -141,3 +141,16 @@ export interface RegisterData {
   lastName: string;
   phone?: string;
 }
+
+export interface Conflict {
+  id: string;
+  type: 'OVERLAPPING_BOOKINGS' | 'BOOKING_BLOCKED_SLOT' | 'BOOKING_NO_AVAILABILITY' | 'DOUBLE_BOOKING';
+  severity: 'HIGH' | 'MEDIUM' | 'LOW';
+  date: string;
+  startTime: string;
+  endTime: string;
+  description: string;
+  affectedBookings?: Booking[];
+  blockedSlot?: BlockedSlot;
+  details?: Record<string, unknown>;
+}

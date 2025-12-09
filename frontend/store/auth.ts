@@ -14,6 +14,7 @@ interface AuthState {
   register: (data: RegisterData) => Promise<void>;
   logout: () => void;
   loadUser: () => void;
+  setUser: (user: User) => void;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
@@ -69,7 +70,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       try {
         const user = JSON.parse(userStr);
         set({ user, token, isAuthenticated: true, isInitialized: true });
-      } catch (_error) {
+      } catch {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
         set({ isInitialized: true });
@@ -77,5 +78,10 @@ export const useAuthStore = create<AuthState>((set) => ({
     } else {
       set({ isInitialized: true });
     }
+  },
+
+  setUser: (user: User) => {
+    localStorage.setItem('user', JSON.stringify(user));
+    set({ user });
   },
 }));
