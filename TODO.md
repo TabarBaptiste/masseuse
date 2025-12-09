@@ -120,6 +120,23 @@ Page dédiée affichant :
 - [x] CRUD complet sur "Voir tous les services"
 - [x] Nouvelle page Statistiques
 - [x] Clarifier page Réservations
+=======
+- [ ] Redirection après déconnexion
+- [ ] Boutons défectueux
+- [ ] Icônes manquantes
+- [ ] Règle des 8 caractères login
+- [ ] Statistiques Dashboard Admin
+
+### 🚮 Suppressions
+- [ ] Bouton "Gérer les rôles"
+- [ ] Bouton "Ajouter un utilisateur"
+- [ ] Bouton "Ajouter un service"
+- [ ] Bouton "Modifier les prix"
+
+### 🏗️ Réorganisation
+- [ ] CRUD complet sur "Voir tous les utilisateurs"
+- [ ] CRUD complet sur "Voir tous les services"
+- [ ] Nouvelle page Statistiques
 - [ ] Clarifier page Notifications
 
 ### 🧑‍💻 Définition boutons avancés
