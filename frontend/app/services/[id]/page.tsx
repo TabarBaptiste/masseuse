@@ -331,7 +331,7 @@ export default function ServiceDetailPage() {
       </section>
 
       {/* Main Content */}
-      <section className="py-12 md:py-16">
+      <section className="pt-12 md:pt-16 pb-8 md:pb-8">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
             {/* Description */}
@@ -393,7 +393,7 @@ export default function ServiceDetailPage() {
       </section>
 
       {/* Reviews Section */}
-      <section className="py-12 md:py-16 bg-stone-50">
+      <section className="py-12 md:py-8 bg-stone-50">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
             <div className="flex-1">

@@ -9,6 +9,8 @@ import { Booking, BookingStatus } from '@/types';
 import api from '@/lib/api';
 import Link from 'next/link';
 import { LeaveReviewModal } from '@/components/ui/LeaveReviewModal';
+import { Star } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
 
 export default function ProfilePage() {
   return (
@@ -17,6 +19,25 @@ export default function ProfilePage() {
     </ProtectedRoute>
   );
 }
+
+// Composant pour afficher les étoiles
+const StarRating = ({ rating }: { rating: number }) => {
+  return (
+    <div className="flex items-center gap-0.5">
+      {[1, 2, 3, 4, 5].map((star) => (
+        <Star
+          key={star}
+          className={`w-4 h-4 ${star <= rating
+            ? 'text-amber-400 fill-amber-400'
+            : star <= rating + 0.5
+              ? 'text-amber-400 fill-amber-200'
+              : 'text-stone-300'
+            }`}
+        />
+      ))}
+    </div>
+  );
+};
 
 function ProfileContent() {
   const { user } = useAuthStore();
@@ -210,15 +231,31 @@ function ProfileContent() {
                         </button>
                       </div>
                     )}
-                    {booking.status === BookingStatus.COMPLETED && (!booking.reviews || booking.reviews.length === 0) && (
-                      <div className="mt-4 pt-4 border-t border-gray-200">
-                        <button
-                          onClick={() => setReviewModal({ bookingId: booking.id, serviceName: booking.service?.name || 'Service' })}
-                          className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-sm font-medium transition-colors"
-                        >
-                          Laisser un avis
-                        </button>
-                      </div>
+                    {booking.status === BookingStatus.COMPLETED && (
+                      booking.reviews && booking.reviews.length > 0 ? (
+                        <div className="mt-4 pt-4 border-t border-gray-200">
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm text-gray-600">Votre note :</span>
+                            <StarRating rating={booking.reviews[0].rating} />
+                            <span className="text-sm font-medium text-gray-800">{booking.reviews[0].rating}/5</span>
+                          </div>
+                          <div className="mt-4 pt-0">
+                            <Link href={`/services/${booking.serviceId}`}>
+                              <Button>Réserver à nouveau</Button>
+                            </Link>
+                          </div>
+                        </div>
+
+                      ) : (
+                        <div className="mt-4 pt-4 border-t border-gray-200">
+                          <button
+                            onClick={() => setReviewModal({ bookingId: booking.id, serviceName: booking.service?.name || 'Service' })}
+                            className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-sm font-medium transition-colors"
+                          >
+                            Laisser un avis
+                          </button>
+                        </div>
+                      )
                     )}
                   </div>
                 ))}

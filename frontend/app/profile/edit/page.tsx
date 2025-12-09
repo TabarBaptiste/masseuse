@@ -133,7 +133,7 @@ function EditProfileContent() {
                                 disabled={saving}
                                 className="flex-1"
                             >
-                                {saving ? 'Enregistrement...' : 'Enregistrer les modifications'}
+                                {saving ? 'Enregistrement...' : 'Enregistrer'}
                             </Button>
                         </div>
                     </form>

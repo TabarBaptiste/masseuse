@@ -99,7 +99,7 @@ export const Calendar: React.FC<CalendarProps> = ({
               onClick={() => !isDisabled && onSelectDate(day)}
               disabled={isDisabled}
               className={clsx(
-                'p-4 rounded-lg text-center transition-colors',
+                'p-2 rounded-lg text-center transition-colors',
                 isSelected &&
                   'bg-blue-600 text-white ring-2 ring-blue-500 ring-offset-2',
                 !isSelected && !isDisabled && 'bg-gray-100 hover:bg-gray-200',
