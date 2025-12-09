@@ -11,6 +11,7 @@ import { BlockedSlotsModule } from './blocked-slots/blocked-slots.module';
 import { BookingsModule } from './bookings/bookings.module';
 import { ReviewsModule } from './reviews/reviews.module';
 import { SiteSettingsModule } from './site-settings/site-settings.module';
+import { ConflictsModule } from './conflicts/conflicts.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { SiteSettingsModule } from './site-settings/site-settings.module';
     BookingsModule,
     ReviewsModule,
     SiteSettingsModule,
+    ConflictsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

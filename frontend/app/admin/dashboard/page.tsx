@@ -18,7 +18,8 @@ import {
     Plus,
     TrendingUp,
     Activity,
-    PenLine
+    PenLine,
+    CircleOff
 } from 'lucide-react';
 
 export default function AdminDashboardPage() {
@@ -156,18 +157,6 @@ function DashboardContent() {
                                     Utilisateurs
                                 </button>
                             </Link>
-                            <Link href="/pro/availability" className="block">
-                                <button className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-sm font-medium transition-colors">
-                                    <Calendar className="w-4 h-4" />
-                                    Disponibilités
-                                </button>
-                            </Link>
-                            <Link href="/pro/blocked-slots" className="block">
-                                <button className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium transition-colors">
-                                    <Shield className="w-4 h-4" />
-                                    Créneaux bloqués
-                                </button>
-                            </Link>
                             <Link href="/services" className="block">
                                 <button className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-sm font-medium transition-colors">
                                     <Wrench className="w-4 h-4" />
@@ -204,22 +193,28 @@ function DashboardContent() {
                                 <Settings className="w-6 h-6 text-indigo-600" />
                             </div>
                             <h2 className="text-xl font-semibold text-gray-900">
-                                Paramètres du site
+                                Horraires
                             </h2>
                         </div>
                         <div className="space-y-3">
-                            <Link href="/pro/settings" className="block">
-                                <button className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium transition-colors">
-                                    <Settings className="w-4 h-4" />
-                                    Configuration générale
-                                </button>
-                            </Link>
-                            {/* <Link href="/pro/availability" className="block">
+                            <Link href="/pro/availability" className="block">
                                 <button className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-sm font-medium transition-colors">
                                     <Calendar className="w-4 h-4" />
                                     Disponibilités
                                 </button>
-                            </Link> */}
+                            </Link>
+                            <Link href="/pro/blocked-slots" className="block">
+                                <button className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium transition-colors">
+                                    <Shield className="w-4 h-4" />
+                                    Créneaux bloqués
+                                </button>
+                            </Link>
+                            <Link href="/pro/conflicts" className="block">
+                                <button className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium transition-colors">
+                                    <CircleOff className="w-4 h-4" />
+                                    Conflits
+                                </button>
+                            </Link>
                         </div>
                     </Card>
 
@@ -230,20 +225,20 @@ function DashboardContent() {
                                 <BarChart3 className="w-6 h-6 text-cyan-600" />
                             </div>
                             <h2 className="text-xl font-semibold text-gray-900">
-                                Statistiques
+                                Statistiques et paramètres
                             </h2>
                         </div>
                         <div className="space-y-3">
-                            {/* <Link href="/pro/dashboard" className="block">
-                                <button className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg text-sm font-medium transition-colors">
-                                    <Eye className="w-4 h-4" />
-                                    Voir toutes les réservations
-                                </button>
-                            </Link> */}
                             <Link href="/pro/stats" className="block">
                                 <button className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-lime-600 hover:bg-lime-700 text-white rounded-lg text-sm font-medium transition-colors">
                                     <BarChart3 className="w-4 h-4" />
                                     Rapports et statistiques
+                                </button>
+                            </Link>
+                            <Link href="/pro/settings" className="block">
+                                <button className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium transition-colors">
+                                    <Settings className="w-4 h-4" />
+                                    Configuration générale
                                 </button>
                             </Link>
                         </div>

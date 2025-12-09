@@ -51,7 +51,10 @@ export class BookingsService {
     }
 
     // Calculate end time
-    const endTime = this.calculateEndTime(createBookingDto.startTime, service.duration);
+    const endTime = this.calculateEndTime(
+      createBookingDto.startTime,
+      service.duration,
+    );
 
     // Check if slot is available
     const isAvailable = await this.isSlotAvailable(
@@ -108,7 +111,8 @@ export class BookingsService {
     const dayOfWeek = this.getDayOfWeek(requestedDate);
 
     // Get weekly availability for this day
-    const weeklyAvailabilities = await this.getWeeklyAvailabilitiesForDay(dayOfWeek);
+    const weeklyAvailabilities =
+      await this.getWeeklyAvailabilitiesForDay(dayOfWeek);
 
     if (weeklyAvailabilities.length === 0) {
       return [];
@@ -141,10 +145,20 @@ export class BookingsService {
         const slotStartHour = Math.floor(time / 60);
         const slotStartMinute = time % 60;
         const slotStartTime = `${String(slotStartHour).padStart(2, '0')}:${String(slotStartMinute).padStart(2, '0')}`;
-        const slotEndTime = this.calculateEndTime(slotStartTime, service.duration);
+        const slotEndTime = this.calculateEndTime(
+          slotStartTime,
+          service.duration,
+        );
 
         // Check if slot conflicts with blocked slots or existing bookings
-        if (!this.isSlotConflicting(slotStartTime, slotEndTime, blockedSlots, existingBookings)) {
+        if (
+          !this.isSlotConflicting(
+            slotStartTime,
+            slotEndTime,
+            blockedSlots,
+            existingBookings,
+          )
+        ) {
           availableSlots.push(slotStartTime);
         }
       }
@@ -153,7 +167,12 @@ export class BookingsService {
     return availableSlots;
   }
 
-  async findAll(userId?: string, status?: BookingStatus, date?: string, name?: string) {
+  async findAll(
+    userId?: string,
+    status?: BookingStatus,
+    date?: string,
+    name?: string,
+  ) {
     const where: any = {};
     if (userId) {
       where.userId = userId;
@@ -333,7 +352,8 @@ export class BookingsService {
     const dayOfWeek = this.getDayOfWeek(requestedDate);
 
     // Check weekly availability
-    const weeklyAvailabilities = await this.getWeeklyAvailabilitiesForDay(dayOfWeek);
+    const weeklyAvailabilities =
+      await this.getWeeklyAvailabilitiesForDay(dayOfWeek);
 
     if (weeklyAvailabilities.length === 0) {
       return false;
@@ -356,7 +376,12 @@ export class BookingsService {
     ]);
 
     // Check if slot conflicts with blocked slots or existing bookings
-    return !this.isSlotConflicting(startTime, endTime, blockedSlots, existingBookings);
+    return !this.isSlotConflicting(
+      startTime,
+      endTime,
+      blockedSlots,
+      existingBookings,
+    );
   }
 
   private timesOverlap(
