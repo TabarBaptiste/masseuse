@@ -9,6 +9,7 @@ import { Loading } from '@/components/ui/Loading';
 import { useAuthStore } from '@/store/auth';
 import { useServicesStore } from '@/store/services';
 import { Plus, Edit, Trash2, Clock, ArrowRight } from 'lucide-react';
+import { MapEmbed } from '@/components/ui/MapEmbed';
 
 // Fonction pour extraire les mots-clés entre *mot*
 const extractKeywords = (description: string): string[] => {
@@ -255,6 +256,19 @@ export default function ServicesPage() {
           <p className="text-lg text-stone-300 mb-8">
             Choisissez le massage qui vous convient et réservez votre moment de bien-être
           </p>
+
+          {/* Map Section */}
+          <div className="mb-12 max-w-2xl mx-auto">
+            <h3 className="text-xl font-semibold text-amber-400 mb-4">
+              Me Trouver
+            </h3>
+            <div className="bg-white/10 rounded-2xl p-4 backdrop-blur-sm">
+              <MapEmbed width={600} height={300} />
+            </div>
+            <p className="text-stone-300 mt-4 text-sm">
+              21, Rue des goyaviers, Zac Moulin à vent, Le Robert 97231, Martinique
+            </p>
+          </div>
         </div>
       </section>
     </div>

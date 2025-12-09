@@ -17,6 +17,7 @@ import { Loading } from '@/components/ui/Loading';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { useWorkingDaysStore } from '@/store/working-days';
 import { useServicesStore } from '@/store/services';
+import { MapEmbed } from '@/components/ui/MapEmbed';
 
 interface BookingFormData {
   notes?: string;
@@ -326,6 +327,15 @@ function ReservationContent() {
                   </form>
                 </div>
               )}
+
+              {/* Map Section */}
+              <div className="mt-6 pt-6 border-t border-gray-200">
+                <h4 className="text-lg font-semibold mb-4">Emplacement du salon</h4>
+                <MapEmbed width={400} height={250} />
+                <p className="text-sm text-gray-600 mt-2">
+                  21, Rue des goyaviers, Zac Moulin à vent, Le Robert 97231, Martinique
+                </p>
+              </div>
             </Card>
           </div>
         </div>

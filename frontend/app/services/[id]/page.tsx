@@ -14,6 +14,7 @@ import { useServicesStore } from '@/store/services';
 import { SelectBookingForReviewModal } from '@/components/ui/SelectBookingForReviewModal';
 import { EditReviewModal } from '@/components/ui/EditReviewModal';
 import { Clock, Star, ArrowLeft, Calendar, User, Quote, MessageSquare } from 'lucide-react';
+import { MapEmbed } from '@/components/ui/MapEmbed';
 
 const getCloudinaryUrl = (imageUrl: string | null | undefined, width: number = 1200, height: number = 600) => {
   if (!imageUrl) return null;
@@ -505,6 +506,20 @@ export default function ServiceDetailPage() {
           <p className="text-lg text-stone-300 mb-8">
             Réservez dès maintenant et offrez-vous un instant de bien-être
           </p>
+
+          {/* Map Section */}
+          <div className="mb-12 max-w-2xl mx-auto">
+            <h3 className="text-xl font-semibold text-amber-400 mb-4">
+              Me Trouver
+            </h3>
+            <div className="bg-white/10 rounded-2xl p-4 backdrop-blur-sm">
+              <MapEmbed width={600} height={300} />
+            </div>
+            <p className="text-stone-300 mt-4 text-sm">
+              21, Rue des goyaviers, Zac Moulin à vent, Le Robert 97231, Martinique
+            </p>
+          </div>
+
           <Button
             onClick={handleBooking}
             size="lg"

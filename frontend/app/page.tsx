@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
 import { ShieldCheck, Heart, Sparkles } from 'lucide-react';
+import { MapEmbed } from '@/components/ui/MapEmbed';
 
 export default function Home() {
   return (
@@ -169,8 +170,21 @@ export default function Home() {
               <svg className="w-5 h-5 sm:w-6 sm:h-6 text-amber-700 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
               </svg>
-              <span className="text-sm sm:text-base md:text-lg font-medium text-center">ou appelez moi au <strong className="block sm:inline">01 23 45 67 89</strong></span>
+              <span className="text-sm sm:text-base md:text-lg font-medium text-center">ou appelez moi au <strong className="block sm:inline">0596 12 34 56</strong></span>
             </div>
+          </div>
+
+          {/* Map Section */}
+          <div className="mt-16 max-w-4xl mx-auto">
+            <h3 className="heading-serif text-2xl md:text-3xl font-semibold text-stone-800 mb-6 text-center">
+              Me Trouver
+            </h3>
+            <div className="bg-white rounded-2xl shadow-xl p-4">
+              <MapEmbed width={800} height={400} />
+            </div>
+            <p className="text-center text-stone-600 mt-4 text-sm">
+              21, Rue des goyaviers, Zac Moulin à vent, Le Robert 97231, Martinique
+            </p>
           </div>
         </div>
       </section>
