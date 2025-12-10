@@ -9,8 +9,7 @@ import { Button } from '@/components/ui/Button';
 import { Loading } from '@/components/ui/Loading';
 import { FormField } from '@/components/ui/FormField';
 import api from '@/lib/api';
-import Link from 'next/link';
-import { ArrowLeft, Plus, Edit, Trash2, Calendar } from 'lucide-react';
+import { Plus, Edit, Trash2, Calendar } from 'lucide-react';
 
 interface BlockedSlot {
     id: string;

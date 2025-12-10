@@ -6,8 +6,7 @@ import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { UserRole, User } from '@/types';
 import api from '@/lib/api';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
-import { Users, ChevronLeft } from 'lucide-react';
-import Link from 'next/link';
+import { Users } from 'lucide-react';
 import { UsersStats, UsersFilters, UsersTable } from '@/components/pro/users';
 
 export default function AdminUsersPage() {

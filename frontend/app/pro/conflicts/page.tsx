@@ -8,8 +8,7 @@ import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { Loading } from '@/components/ui/Loading';
 import api from '@/lib/api';
 import Link from 'next/link';
-import { 
-    ArrowLeft, 
+import {
     AlertTriangle, 
     AlertCircle, 
     Info,
