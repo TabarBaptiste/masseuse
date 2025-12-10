@@ -166,7 +166,7 @@ function BlockedSlotsContent() {
                                 className="flex items-center space-x-2"
                             >
                                 <Plus className="w-5 h-5" />
-                                <span>Ajouter un blocage</span>
+                                <span>Ajouter</span>
                             </Button>
                         )}
                     </div>
