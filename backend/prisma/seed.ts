@@ -50,7 +50,8 @@ async function main() {
   const services = [
     {
       name: 'Massage tonique',
-      description: 'Le massage tonique prépare et apaise les muscles avant et après l\'effort. Il est également recommandé aux personnes très tendues ou stressées. Ce massage favorise l\'élimination des toxines et relance la circulation sanguine et lymphatique.',
+      description:
+        "Le massage tonique prépare et apaise les muscles avant et après l'effort. Il est également recommandé aux personnes très tendues ou stressées. Ce massage favorise l'élimination des toxines et relance la circulation sanguine et lymphatique.",
       duration: 45,
       price: 80,
       displayOrder: 1,
@@ -58,7 +59,8 @@ async function main() {
     },
     {
       name: 'Massage face postérieure',
-      description: 'Ce massage cible le dos, l\'arrière des jambes et des cuisses. Il inclut également un massage du crâne pour stimuler la circulation sanguine et apaiser le mental. Idéal pour les personnes ressentant une charge mentale ou physique.',
+      description:
+        "Ce massage cible le dos, l'arrière des jambes et des cuisses. Il inclut également un massage du crâne pour stimuler la circulation sanguine et apaiser le mental. Idéal pour les personnes ressentant une charge mentale ou physique.",
       duration: 30,
       price: 35,
       displayOrder: 2,
@@ -66,15 +68,17 @@ async function main() {
     },
     {
       name: 'Massage du dos',
-      description: 'Ce massage permet de dénouer les tensions accumulées, améliorer la posture et soulager les courbatures. Il oxygène le corps, stimule la circulation et favorise un sommeil réparateur. Idéal en fin de journée ou après un effort physique.',
+      description:
+        'Ce massage permet de dénouer les tensions accumulées, améliorer la posture et soulager les courbatures. Il oxygène le corps, stimule la circulation et favorise un sommeil réparateur. Idéal en fin de journée ou après un effort physique.',
       duration: 20,
       price: 25,
       displayOrder: 3,
       isActive: true,
     },
     {
-      name: 'Le massage by N\'J',
-      description: 'Ce massage alliant tonicité, effleurages et relaxation vous transportera vers une détente profonde. Débutant par un massage tonique, votre circulation sanguine et lymphatique sera relancée ce qui permettra de drainer les toxines accumulées. Vos muscles seront détendus. Par la suite, les manipulations du massage relaxant viendront calmer toute cette agitation afin d\'apaiser le mental et le corps. Enfin, des effleurages vous permettront de lacher-prise et de vous relaxer.',
+      name: "Le massage by N'J",
+      description:
+        "Ce massage alliant tonicité, effleurages et relaxation vous transportera vers une détente profonde. Débutant par un massage tonique, votre circulation sanguine et lymphatique sera relancée ce qui permettra de drainer les toxines accumulées. Vos muscles seront détendus. Par la suite, les manipulations du massage relaxant viendront calmer toute cette agitation afin d'apaiser le mental et le corps. Enfin, des effleurages vous permettront de lacher-prise et de vous relaxer.",
       duration: 75,
       price: 25,
       displayOrder: 4,
@@ -82,7 +86,8 @@ async function main() {
     },
     {
       name: 'Massage relaxant',
-      description: 'Le massage relaxant permet d\'éliminer l\'anxiété et le stress accumulés. Il vise à relancer la circulation sanguine et lymphatique et contribue au bien-être du corps et de l\'esprit.',
+      description:
+        "Le massage relaxant permet d'éliminer l'anxiété et le stress accumulés. Il vise à relancer la circulation sanguine et lymphatique et contribue au bien-être du corps et de l'esprit.",
       duration: 60,
       price: 65,
       displayOrder: 5,
@@ -90,7 +95,8 @@ async function main() {
     },
     {
       name: 'Massage prénatal',
-      description: 'Massage spécialement adapté aux femmes enceintes pour soulager les tensions et favoriser le bien-être pendant la grossesse.',
+      description:
+        'Massage spécialement adapté aux femmes enceintes pour soulager les tensions et favoriser le bien-être pendant la grossesse.',
       duration: 40,
       price: 60,
       displayOrder: 6,
@@ -140,8 +146,9 @@ async function main() {
     where: { id: 'default' }, // Using a fixed ID
     update: {},
     create: {
-      salonName: 'Salon Aly Dous\'heure Le Robert Martinique',
-      salonDescription: 'Découvrez mes massages relaxants et toniques dans notre salon au Robert. Tarifs de 25€ à 80€, sur rendez-vous uniquement.',
+      salonName: "Salon Aly Dous'heure Le Robert Martinique",
+      salonDescription:
+        'Découvrez mes massages relaxants et toniques dans mon salon au Robert. Tarifs de 25€ à 80€, sur rendez-vous uniquement.',
       salonAddress: 'Le Robert, Martinique',
       salonPhone: '+596 596 XX XX XX', // Placeholder for Martinique number
       salonEmail: 'contact@alydousheure.com',
