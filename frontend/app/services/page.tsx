@@ -125,7 +125,7 @@ export default function ServicesPage() {
               Services de Massage
             </h1>
             <p className="text-xl text-stone-600 max-w-2xl mx-auto">
-              Découvrez notre gamme complète de massages thérapeutiques et relaxants
+              Découvrez votre gamme complète de massages thérapeutiques et relaxants
             </p>
             {canManageServices && (
               <button

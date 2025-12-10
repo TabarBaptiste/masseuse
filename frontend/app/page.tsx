@@ -28,7 +28,7 @@ export default function Home() {
               Aly Dous'heure
             </h1>
             <p className="text-base sm:text-xl md:text-2xl text-stone-600 max-w-3xl mx-auto font-light leading-relaxed px-4 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-              Offrez-vous un moment de pure relaxation dans notre havre de paix.
+              Offrez-vous un moment de pure relaxation dans votre havre de paix.
               <br className="hidden md:block" />
               Des soins sur mesure pour votre bien-être absolu.
             </p>
@@ -65,7 +65,7 @@ export default function Home() {
       <section className="pt-24 pb-6 bg-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <span className="text-amber-700 text-sm font-medium tracking-[0.3em] uppercase">Notre Philosophie</span>
+            <span className="text-amber-700 text-sm font-medium tracking-[0.3em] uppercase">Ma Philosophie</span>
             <h2 className="heading-serif text-3xl sm:text-4xl md:text-5xl font-bold text-stone-800 mt-4 mb-6">
               L'Art du Massage Authentique
             </h2>
@@ -90,7 +90,7 @@ export default function Home() {
               </div>
               <h3 className="heading-serif text-2xl font-semibold mb-3 text-stone-800">Expertise Certifiée</h3>
               <p className="text-stone-600 leading-relaxed">
-                Mes thérapeutes diplômés possèdent plus de 10 ans d'expérience dans l'art du massage thérapeutique.
+                Thérapeute diplômée possèdant plus de 10 ans d'expérience dans l'art du massage thérapeutique.
               </p>
             </div>
 
@@ -132,7 +132,7 @@ export default function Home() {
               Des Soins d'Exception
             </h2>
             <p className="text-xl text-stone-300 max-w-3xl mx-auto">
-              Découvrez notre gamme de massages authentiques, du suédois traditionnel aux pierres chaudes
+              Découvrez votre gamme de massages authentiques, du suédois traditionnel aux pierres chaudes
             </p>
           </div>
           <div className="text-center mt-12">
