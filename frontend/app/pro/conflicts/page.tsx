@@ -166,13 +166,13 @@ function ConflictsContent() {
                 />
 
                 <div className="mb-8">
-                    <Link
+                    {/* <Link
                         href="/admin/dashboard"
                         className="inline-flex items-center space-x-2 text-amber-800 hover:text-amber-900 mb-4"
                     >
                         <ArrowLeft className="w-5 h-5" />
                         <span>Retour au dashboard</span>
-                    </Link>
+                    </Link> */}
                     <div className="flex justify-between items-center">
                         <div>
                             <h1 className="text-3xl font-bold text-gray-900 mb-2">
@@ -323,7 +323,7 @@ function ConflictsContent() {
 
                                         {/* Action Buttons */}
                                         <div className="flex space-x-3 mt-4">
-                                            <Link href="/pro/dashboard" className="flex-1">
+                                            <Link href="/pro/reservations" className="flex-1">
                                                 <button className="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors">
                                                     Voir les réservations
                                                 </button>
