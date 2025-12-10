@@ -189,7 +189,8 @@ function ReviewsContent() {
         <div className="min-h-screen bg-gray-50 py-8">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <Breadcrumb
-                    items={[{ label: 'Administration' }, { label: 'Avis clients' }]}
+                    items={[{ label: 'Administration', href: '/admin/dashboard' }, 
+                        { label: 'Avis clients' }]}
                     className="mb-8"
                 />
 
@@ -220,7 +221,7 @@ function ReviewsContent() {
                         <div className="text-3xl font-bold text-green-600">{publishedCount}</div>
                     </Card>
                     <Card>
-                        <div className="text-sm text-gray-600 mb-1">Avis en attente</div>
+                        <div className="text-sm text-gray-600 mb-1">Avis masqués</div>
                         <div className="text-3xl font-bold text-amber-600">{unpublishedCount}</div>
                     </Card>
                 </div>
@@ -315,13 +316,13 @@ function ReviewsContent() {
                                     key={review.id}
                                     className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow"
                                 >
-                                    <div className="flex items-start justify-between mb-4">
-                                        <div className="flex items-start gap-4">
+                                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-4">
+                                        <div className="flex items-start gap-4 flex-1">
                                             <div className="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
                                                 <User className="w-6 h-6 text-amber-800" />
                                             </div>
-                                            <div className="flex-1">
-                                                <div className="flex items-center gap-3 mb-2">
+                                            <div className="flex-1 min-w-0">
+                                                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-2">
                                                     <span className="font-semibold text-gray-900">
                                                         {review.user?.firstName} {review.user?.lastName}
                                                     </span>
@@ -329,7 +330,7 @@ function ReviewsContent() {
                                                         {review.user?.email}
                                                     </span>
                                                 </div>
-                                                <div className="flex items-center gap-4 mb-3">
+                                                <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 mb-3">
                                                     <div className="flex items-center gap-2">
                                                         <StarRating rating={review.rating} />
                                                         <span className="font-medium text-gray-900">{review.rating}/5</span>
@@ -338,7 +339,7 @@ function ReviewsContent() {
                                                         <Calendar className="w-4 h-4" />
                                                         {formatDate(review.createdAt)}
                                                     </div>
-                                                    <div className="flex items-center gap-2">
+                                                    <div className="flex items-center gap-2 sm:hidden">
                                                         {review.isApproved ? (
                                                             <div className="flex items-center gap-2 text-green-600">
                                                                 <Eye className="w-4 h-4" />
@@ -362,15 +363,30 @@ function ReviewsContent() {
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className="flex items-center gap-3">
-                                            <span className="text-sm text-gray-500">
-                                                {review.isApproved ? 'Visible' : 'Masqué'}
-                                            </span>
-                                            <ToggleSwitch
-                                                enabled={review.isApproved}
-                                                onChange={() => handleToggleReview(review.id, review.isApproved)}
-                                                disabled={togglingReviews.has(review.id)}
-                                            />
+                                        <div className="flex items-center justify-between sm:justify-end gap-3 sm:flex-col sm:items-end sm:gap-2">
+                                            <div className="hidden sm:flex items-center gap-2">
+                                                {review.isApproved ? (
+                                                    <div className="flex items-center gap-2 text-green-600">
+                                                        <Eye className="w-4 h-4" />
+                                                        <span className="text-sm font-medium">Publié</span>
+                                                    </div>
+                                                ) : (
+                                                    <div className="flex items-center gap-2 text-amber-600">
+                                                        <EyeOff className="w-4 h-4" />
+                                                        <span className="text-sm font-medium">Masqué</span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <div className="flex items-center gap-3">
+                                                <span className="text-sm text-gray-500 sm:hidden">
+                                                    {review.isApproved ? 'Visible' : 'Masqué'}
+                                                </span>
+                                                <ToggleSwitch
+                                                    enabled={review.isApproved}
+                                                    onChange={() => handleToggleReview(review.id, review.isApproved)}
+                                                    disabled={togglingReviews.has(review.id)}
+                                                />
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
