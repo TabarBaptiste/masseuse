@@ -1,0 +1,448 @@
+'use client';
+
+import React, { useEffect, useState } from 'react';
+import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
+import { UserRole, Booking, BookingStatus } from '@/types';
+import { Card } from '@/components/ui/Card';
+import { Breadcrumb } from '@/components/ui/Breadcrumb';
+import { Phone, Mail, X, User, Filter } from 'lucide-react';
+import { useAuthStore } from '@/store/auth';
+import api from '@/lib/api';
+
+export default function ProDashboardPage() {
+    return (
+        <ProtectedRoute allowedRoles={[UserRole.PRO, UserRole.ADMIN]}>
+            <DashboardContent />
+        </ProtectedRoute>
+    );
+}
+
+function DashboardContent() {
+    const [bookings, setBookings] = useState<Booking[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [filter, setFilter] = useState<BookingStatus | 'ALL'>('ALL');
+    const [dateFilter, setDateFilter] = useState<string>('');
+    const [nameFilter, setNameFilter] = useState<string>('');
+    const [showStats, setShowStats] = useState(false);
+
+    const { user, isAuthenticated, isInitialized } = useAuthStore();
+
+    useEffect(() => {
+        // Initialize user data
+        useAuthStore.getState().loadUser();
+    }, []);
+
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
+
+    useEffect(() => {
+        // Only fetch bookings if user is authenticated and has the right role
+        if (!isInitialized || !isAuthenticated || !user) {
+            console.log('Not ready to fetch bookings:', { isInitialized, isAuthenticated, user: user?.role });
+            return;
+        }
+
+        if (user.role !== UserRole.PRO && user.role !== UserRole.ADMIN) {
+            console.error('User does not have permission to access bookings. Role:', user.role);
+            return;
+        }
+
+        const fetchBookings = async () => {
+            try {
+                const params: Record<string, string> = {};
+                if (filter !== 'ALL') params.status = filter;
+                if (dateFilter) params.date = dateFilter;
+                if (nameFilter) params.name = nameFilter;
+                const response = await api.get('/bookings', { params });
+                setBookings(response.data);
+            } catch (error: unknown) {
+                console.error('Erreur lors de la récupération des réservations:', error);
+                const axiosError = error as { response?: { status: number } };
+                if (axiosError.response?.status === 403) {
+                    console.error('403 Forbidden - User role:', user.role, 'User ID:', user.id);
+                    alert('Accès refusé. Vous n\'avez pas les permissions nécessaires pour accéder aux réservations.');
+                }
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchBookings();
+    }, [filter, dateFilter, nameFilter, isAuthenticated, isInitialized, user]);
+
+    const formatDate = (dateString: string) => {
+        return new Date(dateString).toLocaleDateString('fr-FR', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+        });
+    };
+
+    const getStatusColor = (status: string) => {
+        switch (status) {
+            case BookingStatus.PENDING:
+                return 'text-yellow-700 bg-yellow-100 border-yellow-300';
+            case BookingStatus.CONFIRMED:
+                return 'text-green-700 bg-green-100 border-green-300';
+            case BookingStatus.COMPLETED:
+                return 'text-blue-700 bg-blue-100 border-blue-300';
+            case BookingStatus.CANCELLED:
+                return 'text-red-700 bg-red-100 border-red-300';
+            case BookingStatus.NO_SHOW:
+                return 'text-gray-700 bg-gray-100 border-gray-300';
+            default:
+                return 'text-gray-700 bg-gray-100 border-gray-300';
+        }
+    };
+
+    const getStatusText = (status: string) => {
+        switch (status) {
+            case BookingStatus.PENDING:
+                return 'En attente';
+            case BookingStatus.CONFIRMED:
+                return 'Confirmée';
+            case BookingStatus.COMPLETED:
+                return 'Terminée';
+            case BookingStatus.CANCELLED:
+                return 'Refusée';
+            case BookingStatus.NO_SHOW:
+                return 'Absent';
+            default:
+                return status;
+        }
+    };
+
+    const handleStatusChange = async (bookingId: string, newStatus: BookingStatus) => {
+        try {
+            await api.patch(`/bookings/${bookingId}`, { status: newStatus });
+            setBookings(bookings.map(b => b.id === bookingId ? { ...b, status: newStatus } : b));
+        } catch (error) {
+            console.error('Erreur lors de la mise à jour du statut:', error);
+            alert('Erreur lors de la mise à jour du statut');
+        }
+    };
+
+    const renderBookingCard = (booking: Booking, showActions: boolean = true) => (
+        <Card key={booking.id}>
+            <div className="flex flex-col gap-4">
+                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                    <div className="flex-1">
+                        <div className="flex items-center gap-3 mb-2">
+                            <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(booking.status)}`}>
+                                {getStatusText(booking.status)}
+                            </span>
+                        </div>
+                        <div className="text-base font-semibold text-gray-900 mb-1">
+                            {(() => {
+                                const isToday = new Date(booking.date).toDateString() === new Date().toDateString();
+                                return isToday ? `Aujourd'hui à ${booking.startTime}` : formatDate(booking.date);
+                            })()}
+                        </div>
+                        <div className="text-sm text-gray-700 mb-2">
+                            {booking.startTime} - {booking.endTime} • {booking.service?.name}
+                        </div>
+                        <div className="text-sm text-gray-600">
+                            <User className="inline-block mr-1 w-4 h-4" /> {booking.user?.firstName} {booking.user?.lastName}
+                        </div>
+                        {booking.user?.email && (
+                            <div className="text-sm text-gray-600">
+                                <Mail className="inline-block mr-1 w-4 h-4" /> {booking.user.email}
+                            </div>
+                        )}
+                        {booking.user?.phone && (
+                            <div className="text-sm text-gray-600">
+                                <Phone className="inline-block mr-1 w-4 h-4" /> {booking.user.phone}
+                            </div>
+                        )}
+                        <div className="text-sm text-gray-600 mt-2">
+                            <strong>Prix:</strong> {booking.priceAtBooking}€
+                        </div>
+                        {booking.notes && (
+                            <div className="text-sm text-gray-600 mt-2 p-2 bg-blue-50 rounded">
+                                <strong>Note du client:</strong> {booking.notes}
+                            </div>
+                        )}
+                        {booking.proNotes && (
+                            <div className="text-sm text-gray-600 mt-2 p-2 bg-amber-50 rounded">
+                                <strong>Note privée:</strong> {booking.proNotes}
+                            </div>
+                        )}
+                    </div>
+                    {showActions && (
+                        <div className="flex flex-wrap gap-2">
+                            {booking.status === BookingStatus.PENDING && (
+                                <>
+                                    <button
+                                        onClick={() => handleStatusChange(booking.id, BookingStatus.CONFIRMED)}
+                                        className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium transition-colors"
+                                    >
+                                        {getStatusText(BookingStatus.CONFIRMED)}
+                                    </button>
+                                    <button
+                                        onClick={() => handleStatusChange(booking.id, BookingStatus.CANCELLED)}
+                                        className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium transition-colors"
+                                    >
+                                        {getStatusText(BookingStatus.CANCELLED)}
+                                    </button>
+                                </>
+                            )}
+                            {booking.status === BookingStatus.CONFIRMED && (
+                                <>
+                                    <button
+                                        onClick={() => handleStatusChange(booking.id, BookingStatus.COMPLETED)}
+                                        className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors"
+                                    >
+                                        {getStatusText(BookingStatus.COMPLETED)}
+                                    </button>
+                                    <button
+                                        onClick={() => handleStatusChange(booking.id, BookingStatus.NO_SHOW)}
+                                        className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg text-sm font-medium transition-colors"
+                                    >
+                                        {getStatusText(BookingStatus.NO_SHOW)}
+                                    </button>
+                                </>
+                            )}
+                        </div>
+                    )}
+                </div>
+            </div>
+        </Card>
+    );
+
+    // const upcomingBookings = bookings.filter(b => {
+    //     const bookingDate = new Date(b.date);
+    //     const today = new Date();
+    //     today.setHours(0, 0, 0, 0);
+    //     return bookingDate > today && (b.status === BookingStatus.PENDING || b.status === BookingStatus.CONFIRMED);
+    // });
+
+    const stats = {
+        total: bookings.length,
+        pending: bookings.filter(b => b.status === BookingStatus.PENDING).length,
+        confirmed: bookings.filter(b => b.status === BookingStatus.CONFIRMED).length,
+        completed: bookings.filter(b => b.status === BookingStatus.COMPLETED).length,
+        no_show: bookings.filter(b => b.status === BookingStatus.NO_SHOW).length,
+        today: bookings.filter(b => {
+            const bookingDate = new Date(b.date).toDateString();
+            const today = new Date().toDateString();
+            return bookingDate === today && (b.status === BookingStatus.PENDING || b.status === BookingStatus.CONFIRMED);
+        }).length,
+    };
+
+    // Séparer et trier les réservations
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const upcomingBookings = bookings
+        .filter(b => new Date(b.date) > today)
+        .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+    const pastBookings = bookings
+        .filter(b => new Date(b.date) <= today)
+        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+    return (
+        <div className="min-h-screen bg-gray-50 py-8">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <Breadcrumb
+                    items={[
+                        { label: 'Administration', href: '/admin/dashboard' },
+                        { label: 'Réservations' }]
+                    }
+                    className="mb-8"
+                />
+                <div className="mb-8">
+                    <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                        Réservations
+                    </h1>
+                    <p className="text-gray-600">
+                        Gérez vos réservations
+                    </p>
+                    <button
+                        onClick={() => setShowStats(!showStats)}
+                        className="mt-4 px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-sm font-medium transition-colors sm:hidden"
+                    >
+                        {showStats ? 'Masquer les statistiques' : 'Afficher les statistiques'}
+                    </button>
+                </div>
+
+                {/* Stats Cards */}
+                <div className={`${showStats ? 'block' : 'hidden'} grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-6 gap-4 mb-8`}>
+                    <Card>
+                        <div className="text-sm text-gray-600 mb-1">Aujourd'hui</div>
+                        <div className="text-3xl font-bold text-amber-800">{stats.today}</div>
+                    </Card>
+                    <Card>
+                        <div className="text-sm text-gray-600 mb-1">{getStatusText(BookingStatus.PENDING)}</div>
+                        <div className="text-3xl font-bold text-yellow-600">{stats.pending}</div>
+                    </Card>
+                    <Card>
+                        <div className="text-sm text-gray-600 mb-1">{getStatusText(BookingStatus.CONFIRMED)}</div>
+                        <div className="text-3xl font-bold text-green-600">{stats.confirmed}</div>
+                    </Card>
+                    <Card>
+                        <div className="text-sm text-gray-600 mb-1">{getStatusText(BookingStatus.COMPLETED)}</div>
+                        <div className="text-3xl font-bold text-blue-600">{stats.completed}</div>
+                    </Card>
+                    <Card>
+                        <div className="text-sm text-gray-600 mb-1">{getStatusText(BookingStatus.NO_SHOW)}</div>
+                        <div className="text-3xl font-bold text-gray-700">{stats.no_show}</div>
+                    </Card>
+                    <Card>
+                        <div className="text-sm text-gray-600 mb-1">Total</div>
+                        <div className="text-3xl font-bold text-gray-900">{stats.total}</div>
+                    </Card>
+                </div>
+
+                {/* All Bookings */}
+                <div>
+                    <div className="mb-4">
+                        <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                            Toutes les réservations
+                        </h2>
+                    </div>
+
+                    {/* Filters */}
+                    <Card className="mb-6">
+                        <div className="flex items-center gap-3 mb-4">
+                            <Filter className="w-5 h-5 text-gray-600" />
+                            <h3 className="text-lg font-semibold text-gray-900">Filtres</h3>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            {/* Filter by status */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Statut
+                                </label>
+                                <div className="flex flex-wrap gap-2">
+                                    <button
+                                        onClick={() => setFilter('ALL')}
+                                        className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${filter === 'ALL'
+                                            ? 'bg-amber-800 text-white'
+                                            : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300'
+                                            }`}
+                                    >
+                                        Toutes
+                                    </button>
+                                    <button
+                                        onClick={() => setFilter(BookingStatus.PENDING)}
+                                        className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${filter === BookingStatus.PENDING
+                                            ? 'bg-yellow-600 text-white'
+                                            : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300'
+                                            }`}
+                                    >
+                                        En attente
+                                    </button>
+                                    <button
+                                        onClick={() => setFilter(BookingStatus.CONFIRMED)}
+                                        className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${filter === BookingStatus.CONFIRMED
+                                            ? 'bg-green-600 text-white'
+                                            : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300'
+                                            }`}
+                                    >
+                                        Confirmées
+                                    </button>
+                                    <button
+                                        onClick={() => setFilter(BookingStatus.COMPLETED)}
+                                        className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${filter === BookingStatus.COMPLETED
+                                            ? 'bg-blue-600 text-white'
+                                            : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300'
+                                            }`}
+                                    >
+                                        Terminées
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Filter by date */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Date
+                                </label>
+                                <input
+                                    type="date"
+                                    value={dateFilter}
+                                    onChange={(e) => setDateFilter(e.target.value)}
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                />
+                            </div>
+
+                            {/* Search by name */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Rechercher par nom
+                                </label>
+                                <div className="flex gap-2">
+                                    <input
+                                        type="text"
+                                        value={nameFilter}
+                                        onChange={(e) => setNameFilter(e.target.value)}
+                                        className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        placeholder="Nom, prénom..."
+                                    />
+                                    <button
+                                        onClick={() => { setDateFilter(''); setNameFilter(''); }}
+                                        className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg text-sm font-medium transition-colors"
+                                        title="Effacer les filtres"
+                                    >
+                                        <X className="w-4 h-4" />
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </Card>
+
+                    {loading ? (
+                        <div className="space-y-4">
+                            {[1, 2, 3].map((i) => (
+                                <div key={i} className="border rounded-lg p-6 bg-white animate-pulse">
+                                    <div className="h-6 bg-gray-200 rounded w-3/4 mb-3"></div>
+                                    <div className="space-y-2">
+                                        <div className="h-4 bg-gray-200 rounded w-full"></div>
+                                        <div className="h-4 bg-gray-200 rounded w-5/6"></div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="space-y-8">
+                            {/* Section À venir */}
+                            {upcomingBookings.length > 0 && (
+                                <div>
+                                    <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                                        À venir
+                                    </h2>
+                                    <div className="space-y-4">
+                                        {upcomingBookings.map((booking) => renderBookingCard(booking, true))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Section Passé */}
+                            {pastBookings.length > 0 && (
+                                <div>
+                                    <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                                        Passé
+                                    </h2>
+                                    <div className="space-y-4">
+                                        {pastBookings.map((booking) => renderBookingCard(booking, false))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {upcomingBookings.length === 0 && pastBookings.length === 0 && (
+                                <Card>
+                                    <p className="text-gray-600 text-center py-8">
+                                        Aucune réservation trouvée.
+                                    </p>
+                                </Card>
+                            )}
+                        </div>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+}
