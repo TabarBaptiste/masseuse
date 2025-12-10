@@ -231,9 +231,9 @@ export const UsersTable: React.FC<UsersTableProps> = ({
                                             onChange={(e) => onChangeRole(user.id, e.target.value as UserRole)}
                                             className={`px-2 py-1 text-xs font-semibold rounded-full ${getRoleBadgeColor(user.role)} border-0 cursor-pointer`}
                                         >
-                                            <option value={UserRole.USER}>Client</option>
-                                            <option value={UserRole.PRO}>Professionnel</option>
-                                            <option value={UserRole.ADMIN}>Administrateur</option>
+                                            <option value={UserRole.USER}>{getRoleLabel(UserRole.USER)}</option>
+                                            <option value={UserRole.PRO}>{getRoleLabel(UserRole.PRO)}</option>
+                                            <option value={UserRole.ADMIN}>{getRoleLabel(UserRole.ADMIN)}</option>
                                         </select>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">

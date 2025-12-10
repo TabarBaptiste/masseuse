@@ -1,5 +1,7 @@
+import { NextRouter } from 'next/router';
+
 // Utility function to handle authenticated navigation
-export const navigateWithAuth = (router: any, path: string, isAuthenticated: boolean) => {
+export const navigateWithAuth = (router: NextRouter, path: string, isAuthenticated: boolean) => {
     if (!isAuthenticated) {
         localStorage.setItem('redirectAfterLogin', path);
         router.push('/login');
