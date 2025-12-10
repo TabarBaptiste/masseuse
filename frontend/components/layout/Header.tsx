@@ -49,7 +49,7 @@ export const Header: React.FC = () => {
                   {user?.firstName}
                 </span> */}
                 {user?.role === UserRole.PRO && (
-                  <Link href="/pro/dashboard" className="flex items-center space-x-2 text-stone-700 hover:text-amber-800 text-sm font-medium transition-colors">
+                  <Link href="/pro/reservations" className="flex items-center space-x-2 text-stone-700 hover:text-amber-800 text-sm font-medium transition-colors">
                     <Settings className="w-4 h-4" /><span>Dashboard PRO</span>
                   </Link>
                 )}
@@ -141,7 +141,7 @@ export const Header: React.FC = () => {
 
                   {user?.role === UserRole.PRO && (
                     <Link
-                      href="/pro/dashboard"
+                      href="/pro/reservations"
                       className="flex items-center space-x-3 px-3 py-2 rounded-lg text-base font-medium text-stone-700 hover:text-amber-800 hover:bg-stone-50 transition-colors"
                       onClick={() => setMobileMenuOpen(false)}
                     >
