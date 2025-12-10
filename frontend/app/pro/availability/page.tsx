@@ -8,8 +8,7 @@ import { Card } from '@/components/ui/Card';
 import { Loading } from '@/components/ui/Loading';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import api from '@/lib/api';
-import { ArrowLeft, Plus, Edit2, Trash2, Save, X } from 'lucide-react';
-import Link from 'next/link';
+import { Plus, Edit2, Trash2, Save, X } from 'lucide-react';
 
 export default function AvailabilityPage() {
     return (
