@@ -23,11 +23,15 @@ export class ReviewsService {
     }
 
     if (booking.userId !== userId) {
-      throw new ForbiddenException('Tu ne peux laisser un avis que pour tes propres réservations');
+      throw new ForbiddenException(
+        'Tu ne peux laisser un avis que pour tes propres réservations',
+      );
     }
 
     if (booking.status !== BookingStatus.COMPLETED) {
-      throw new BadRequestException('Tu ne peux laisser un avis que pour des réservations terminées');
+      throw new BadRequestException(
+        'Tu ne peux laisser un avis que pour des réservations terminées',
+      );
     }
 
     // Check if review already exists for this booking
@@ -187,9 +191,7 @@ export class ReviewsService {
     const review = await this.findOne(reviewId);
 
     if (review.userId !== userId) {
-      throw new ForbiddenException(
-        'Tu ne peux modifier que tes propres avis',
-      );
+      throw new ForbiddenException('Tu ne peux modifier que tes propres avis');
     }
 
     return this.prisma.review.update({
@@ -216,9 +218,7 @@ export class ReviewsService {
     const review = await this.findOne(reviewId);
 
     if (review.userId !== userId) {
-      throw new ForbiddenException(
-        'Tu ne peux supprimer que tes propres avis',
-      );
+      throw new ForbiddenException('Tu ne peux supprimer que tes propres avis');
     }
 
     return this.prisma.review.delete({
@@ -226,10 +226,7 @@ export class ReviewsService {
     });
   }
 
-  async getUserCompletedBookingsForService(
-    userId: string,
-    serviceId: string,
-  ) {
+  async getUserCompletedBookingsForService(userId: string, serviceId: string) {
     return this.prisma.booking.findMany({
       where: {
         userId,
