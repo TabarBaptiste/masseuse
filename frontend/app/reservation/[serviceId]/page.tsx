@@ -221,7 +221,7 @@ function ReservationContent() {
                 </h2>
                 <Card>
                   <p className="text-sm text-gray-600 mb-4">
-                    Créneaux disponibles pour le{' '}
+                    Créneaux pour le{' '}
                     {format(selectedDate, 'EEEE d MMMM yyyy', { locale: fr })}
                   </p>
                   <TimeSlotPicker

@@ -72,7 +72,7 @@ export const Calendar: React.FC<CalendarProps> = ({
   };
 
   const canGoPrev = new Date(currentMonthStart.getFullYear(), currentMonthStart.getMonth() - 1, 1) >= new Date(minDate.getFullYear(), minDate.getMonth(), 1);
-  const canGoNext = new Date(currentMonthStart.getFullYear(), currentMonthStart.getMonth() + 2, 0) <= maxDate;
+  const canGoNext = new Date(currentMonthStart.getFullYear(), currentMonthStart.getMonth() + 1, 1) <= maxDate;
 
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
