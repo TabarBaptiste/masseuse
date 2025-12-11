@@ -450,7 +450,7 @@ export class StripeService {
    *
    * @param session - Session Checkout Stripe expirée
    */
-  async handleSessionExpired(session: Stripe.Checkout.Session): Promise<void> {
+  handleSessionExpired(session: Stripe.Checkout.Session): void {
     const bookingId = session.metadata?.bookingId;
 
     if (!bookingId) {

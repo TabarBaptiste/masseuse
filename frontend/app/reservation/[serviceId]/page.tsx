@@ -196,21 +196,21 @@ function ReservationContent() {
     requestAnimationFrame(animation);
   };
 
-  // Scroll vers les créneaux quand une date est sélectionnée
+  // Scroll vers les créneaux quand une date est sélectionnée (uniquement sur mobile)
   useEffect(() => {
-    if (selectedDate) {
+    if (selectedDate && window.innerWidth < 1024) {
       setTimeout(() => {
         smoothScrollToElement('time-slots-section');
-      }, 200); // Délai réduit car l'animation est maintenant fluide
+      }, 200);
     }
   }, [selectedDate]);
 
-  // Scroll vers les notes quand un créneau est sélectionné
+  // Scroll vers le récapitulatif quand un créneau est sélectionné (uniquement sur mobile)
   useEffect(() => {
-    if (selectedSlot) {
+    if (selectedSlot && window.innerWidth < 1024) {
       setTimeout(() => {
-        smoothScrollToElement('notes-section');
-      }, 200); // Délai réduit car l'animation est maintenant fluide
+        smoothScrollToElement('summary-section');
+      }, 200);
     }
   }, [selectedSlot]);
 
@@ -341,26 +341,12 @@ function ReservationContent() {
                 </Card>
               </div>
             )}
-
-            {/* Step 3: Confirm */}
-            {/* {selectedSlot && (
-              <div>
-                <h2 className="text-xl font-semibold mb-4">
-                  3. Confirmez votre réservation
-                </h2>
-                <Card>
-                  <p className="text-sm text-gray-600">
-                    Vérifiez les informations ci-dessous et confirmez votre réservation.
-                  </p>
-                </Card>
-              </div>
-            )} */}
           </div>
 
           {/* Booking Summary */}
           <div className="lg:col-span-1">
             <Card className="sticky top-6">
-              <h3 className="text-lg font-semibold mb-4">Récapitulatif</h3>
+              <h3 className="text-lg font-semibold mb-4" id="summary-section">Récapitulatif</h3>
               <div className="space-y-3">
                 <div>
                   <p className="text-sm text-gray-600">Service</p>
