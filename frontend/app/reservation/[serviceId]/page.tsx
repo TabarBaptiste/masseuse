@@ -3,7 +3,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { format } from 'date-fns';
+import { format, addDays } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { useForm } from 'react-hook-form';
 import api from '@/lib/api';
@@ -40,6 +40,7 @@ function ReservationContent() {
   const [isLoadingSlots, setIsLoadingSlots] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const [siteSettings, setSiteSettings] = useState<{ bookingAdvanceMinDays: number; bookingAdvanceMaxDays: number } | null>(null);
 
   const { register, handleSubmit } = useForm<BookingFormData>();
 
@@ -58,6 +59,28 @@ function ReservationContent() {
   // Récupérer le service depuis le store ou l'état local
   const [service, setService] = useState<Service | null>(null);
   const [isLoadingService, setIsLoadingService] = useState(true);
+
+  // Fetch site settings
+  useEffect(() => {
+    const fetchSiteSettings = async () => {
+      try {
+        const response = await api.get('/site-settings');
+        setSiteSettings({
+          bookingAdvanceMinDays: response.data.bookingAdvanceMinDays,
+          bookingAdvanceMaxDays: response.data.bookingAdvanceMaxDays
+        });
+      } catch (err) {
+        console.error('Error fetching site settings:', err);
+        // Valeurs par défaut en cas d'erreur
+        setSiteSettings({
+          bookingAdvanceMinDays: 0,
+          bookingAdvanceMaxDays: 60
+        });
+      }
+    };
+
+    fetchSiteSettings();
+  }, []);
 
   // Fetch working days avec cache
   useEffect(() => {
@@ -266,6 +289,8 @@ function ReservationContent() {
                 selectedDate={selectedDate}
                 onSelectDate={setSelectedDate}
                 workingDays={workingDays}
+                minDate={siteSettings ? addDays(new Date(), siteSettings.bookingAdvanceMinDays - 1) : new Date()}
+                maxDate={siteSettings ? addDays(new Date(), siteSettings.bookingAdvanceMaxDays) : addDays(new Date(), 60)}
               />
             </div>
 

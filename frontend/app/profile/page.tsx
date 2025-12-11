@@ -44,10 +44,24 @@ function ProfileContent() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [reviewModal, setReviewModal] = useState<{ bookingId: string; serviceName: string } | null>(null);
+  const [cancellationDeadlineHours, setCancellationDeadlineHours] = useState<number>(24);
 
   useEffect(() => {
     // Force scroll to top on page load
     window.scrollTo(0, 0);
+  }, []);
+
+  useEffect(() => {
+    const fetchSiteSettings = async () => {
+      try {
+        const response = await api.get('/site-settings');
+        setCancellationDeadlineHours(response.data.cancellationDeadlineHours || 24);
+      } catch (error) {
+        console.error('Erreur lors de la récupération des paramètres:', error);
+      }
+    };
+
+    fetchSiteSettings();
   }, []);
 
   useEffect(() => {
@@ -127,7 +141,7 @@ function ProfileContent() {
   };
 
   const canCancelBooking = (booking: Booking) => {
-    // Vérifier si la réservation peut être annulée (statut et délai de 24h)
+    // Vérifier si la réservation peut être annulée (statut et délai configuré)
     if (booking.status !== BookingStatus.PENDING && booking.status !== BookingStatus.CONFIRMED) {
       return false;
     }
@@ -138,8 +152,8 @@ function ProfileContent() {
     const now = new Date();
     const hoursUntilBooking = (bookingDateTime.getTime() - now.getTime()) / (1000 * 60 * 60);
 
-    // Ne permettre l'annulation que si plus de 24h avant le rendez-vous
-    return hoursUntilBooking > 24;
+    // Ne permettre l'annulation que si plus de X heures avant le rendez-vous (selon paramètres)
+    return hoursUntilBooking > cancellationDeadlineHours;
   };
 
   return (
