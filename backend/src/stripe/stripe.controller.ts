@@ -7,25 +7,13 @@
  * - GET /stripe/verify-payment - Vérifie un paiement
  */
 
-import {
-  Controller,
-  Post,
-  Get,
-  Body,
-  Headers,
-  Param,
-  Query,
-  UseGuards,
-  RawBodyRequest,
-  Req,
-  BadRequestException,
-} from '@nestjs/common';
+import * as common from '@nestjs/common';
 import type { Request } from 'express';
 import { StripeService } from './stripe.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 
-@Controller('stripe')
+@common.Controller('stripe')
 export class StripeController {
   constructor(private readonly stripeService: StripeService) {}
 
@@ -42,14 +30,14 @@ export class StripeController {
    *
    * Réponse : { "url": "https://checkout.stripe.com/..." }
    */
-  @Post('create-checkout-session')
-  @UseGuards(JwtAuthGuard)
+  @common.Post('create-checkout-session')
+  @common.UseGuards(JwtAuthGuard)
   async createCheckoutSession(
     @CurrentUser() user: any,
-    @Body('bookingId') bookingId: string,
+    @common.Body('bookingId') bookingId: string,
   ) {
     if (!bookingId) {
-      throw new BadRequestException('bookingId est requis');
+      throw new common.BadRequestException('bookingId est requis');
     }
 
     return this.stripeService.createCheckoutSession(bookingId, user.id);
@@ -69,15 +57,15 @@ export class StripeController {
    * - checkout.session.completed : Paiement réussi
    * - checkout.session.expired : Session expirée
    */
-  @Post('webhook')
+  @common.Post('webhook')
   async handleWebhook(
-    @Req() req: RawBodyRequest<Request>,
-    @Headers('stripe-signature') signature: string,
+    @common.Req() req: common.RawBodyRequest<Request>,
+    @common.Headers('stripe-signature') signature: string,
   ) {
     // Vérifier que le raw body est disponible
     const rawBody = req.rawBody;
     if (!rawBody) {
-      throw new BadRequestException(
+      throw new common.BadRequestException(
         'Raw body non disponible. Vérifiez la configuration du middleware.',
       );
     }
@@ -126,15 +114,15 @@ export class StripeController {
    * @param sessionId - ID de la session Stripe
    * @returns { valid: boolean, booking?: ... }
    */
-  @Get('verify-payment/:bookingId')
-  @UseGuards(JwtAuthGuard)
+  @common.Get('verify-payment/:bookingId')
+  @common.UseGuards(JwtAuthGuard)
   async verifyPayment(
-    @Param('bookingId') bookingId: string,
-    @Query('session_id') sessionId: string,
+    @common.Param('bookingId') bookingId: string,
+    @common.Query('session_id') sessionId: string,
     @CurrentUser() _user: unknown,
   ) {
     if (!sessionId) {
-      throw new BadRequestException('session_id est requis');
+      throw new common.BadRequestException('session_id est requis');
     }
 
     const isValid = await this.stripeService.verifyPayment(

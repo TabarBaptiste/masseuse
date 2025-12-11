@@ -28,7 +28,7 @@ export class StripeService {
     // Initialisation du client Stripe avec la clé secrète
     // La clé est stockée dans les variables d'environnement pour la sécurité
     this.stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-      apiVersion: '2025-04-30.basil', // Version stable de l'API Stripe
+      apiVersion: '2025-11-17.clover',
     });
   }
 
@@ -96,7 +96,12 @@ export class StripeService {
       ? Number(settings.depositAmount)
       : 20;
 
-    // 4. Formater la date pour l'affichage
+    // 4. Déterminer l'URL du frontend (prendre la première si plusieurs sont configurées)
+    const frontendUrl =
+      process.env.FRONTEND_URL?.split(',')[0]?.trim() ||
+      'http://localhost:3000';
+
+    // 5. Formater la date pour l'affichage
     const bookingDate = new Date(booking.date);
     const formattedDate = bookingDate.toLocaleDateString('fr-FR', {
       weekday: 'long',
@@ -105,14 +110,14 @@ export class StripeService {
       day: 'numeric',
     });
 
-    // 5. Créer la session Stripe Checkout
+    // 6. Créer la session Stripe Checkout
     const session = await this.stripe.checkout.sessions.create({
       // Mode paiement unique (pas d'abonnement)
       mode: 'payment',
 
       // URLs de redirection après paiement
-      success_url: `${process.env.FRONTEND_URL}/reservation/success?session_id={CHECKOUT_SESSION_ID}&booking_id=${bookingId}`,
-      cancel_url: `${process.env.FRONTEND_URL}/reservation/cancel?booking_id=${bookingId}`,
+      success_url: `${frontendUrl}/reservation/success?session_id={CHECKOUT_SESSION_ID}&booking_id=${bookingId}`,
+      cancel_url: `${frontendUrl}/reservation/cancel?booking_id=${bookingId}`,
 
       // Email du client pré-rempli
       customer_email: booking.user.email,
@@ -157,7 +162,7 @@ export class StripeService {
       },
     });
 
-    // 6. Mettre à jour la réservation avec l'ID de session Stripe
+    // 7. Mettre à jour la réservation avec l'ID de session Stripe
     await this.prisma.booking.update({
       where: { id: bookingId },
       data: {
@@ -170,7 +175,7 @@ export class StripeService {
       `Session Checkout créée pour la réservation ${bookingId}: ${session.id}`,
     );
 
-    // 7. Retourner l'URL de redirection
+    // 8. Retourner l'URL de redirection
     return { url: session.url! };
   }
 
