@@ -34,6 +34,135 @@ export class StripeService {
 
   /**
    * Crée une session Stripe Checkout pour le paiement de l'acompte
+   * AVANT la création de la réservation (réservation créée seulement après paiement)
+   *
+   * @param userId - ID de l'utilisateur
+   * @param bookingData - Données de la réservation
+   * @returns L'URL de redirection vers Stripe Checkout
+   */
+  async createCheckoutSessionForBooking(
+    userId: string,
+    bookingData: {
+      serviceId: string;
+      date: string;
+      startTime: string;
+      notes?: string;
+    },
+  ): Promise<{ url: string }> {
+    // 1. Récupérer le service et l'utilisateur
+    const [service, user] = await Promise.all([
+      this.prisma.service.findUnique({
+        where: { id: bookingData.serviceId },
+      }),
+      this.prisma.user.findUnique({
+        where: { id: userId },
+      }),
+    ]);
+
+    if (!service) {
+      throw new NotFoundException('Service introuvable');
+    }
+
+    if (!user) {
+      throw new NotFoundException('Utilisateur introuvable');
+    }
+
+    // 2. Récupérer les paramètres du site pour le montant de l'acompte
+    const settings = await this.prisma.siteSettings.findFirst();
+    const depositAmount = settings?.depositAmount
+      ? Number(settings.depositAmount)
+      : 20;
+
+    // 3. Déterminer l'URL du frontend (prendre la première si plusieurs sont configurées)
+    const frontendUrl =
+      process.env.FRONTEND_URL?.split(',')[0]?.trim() ||
+      'http://localhost:3000';
+
+    // 4. Calculer l'heure de fin pour les métadonnées
+    const [startHour, startMinute] = bookingData.startTime
+      .split(':')
+      .map(Number);
+    const endMinutes = startHour * 60 + startMinute + service.duration;
+    const endHour = Math.floor(endMinutes / 60);
+    const endMinute = endMinutes % 60;
+    const endTime = `${String(endHour).padStart(2, '0')}:${String(endMinute).padStart(2, '0')}`;
+
+    // 5. Formater la date pour l'affichage
+    const bookingDate = new Date(bookingData.date);
+    const formattedDate = bookingDate.toLocaleDateString('fr-FR', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+
+    // 6. Créer la session Stripe Checkout
+    const session = await this.stripe.checkout.sessions.create({
+      // Mode paiement unique (pas d'abonnement)
+      mode: 'payment',
+
+      // URLs de redirection après paiement
+      success_url: `${frontendUrl}/reservation/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${frontendUrl}/reservation/cancel?service_id=${bookingData.serviceId}`,
+
+      // Email du client pré-rempli
+      customer_email: user.email,
+
+      // Métadonnées pour créer la réservation dans le webhook
+      metadata: {
+        userId: user.id,
+        serviceId: service.id,
+        date: bookingData.date,
+        startTime: bookingData.startTime,
+        endTime: endTime,
+        notes: bookingData.notes || '',
+        depositAmount: depositAmount.toString(),
+      },
+
+      // Produit : l'acompte pour la réservation
+      line_items: [
+        {
+          price_data: {
+            currency: 'eur',
+            unit_amount: Math.round(depositAmount * 100), // Stripe utilise les centimes
+            product_data: {
+              name: `Acompte - ${service.name}`,
+              description: `Réservation du ${formattedDate} à ${bookingData.startTime}`,
+              // Image du service si disponible
+              ...(service.imageUrl && {
+                images: [service.imageUrl],
+              }),
+            },
+          },
+          quantity: 1,
+        },
+      ],
+
+      // Options de paiement
+      payment_method_types: ['card'],
+
+      // Expiration de la session (30 minutes)
+      expires_at: Math.floor(Date.now() / 1000) + 30 * 60,
+
+      // Message personnalisé
+      custom_text: {
+        submit: {
+          message: `Acompte non remboursable en cas d'annulation tardive (moins de ${settings?.cancellationDeadlineHours || 24}h avant le RDV).`,
+        },
+      },
+    });
+
+    this.logger.log(
+      `Session Checkout créée pour ${user.email} - Service: ${service.name} - Session: ${session.id}`,
+    );
+
+    // 7. Retourner l'URL de redirection
+    return { url: session.url! };
+  }
+
+  /**
+   * Crée une session Stripe Checkout pour le paiement de l'acompte
+   * DEPRECATED - Utiliser createCheckoutSessionForBooking à la place
    *
    * @param bookingId - ID de la réservation
    * @param userId - ID de l'utilisateur (pour vérification de propriété)
@@ -203,13 +332,23 @@ export class StripeService {
 
   /**
    * Gère l'événement de paiement réussi
-   * Met à jour la réservation avec les informations de paiement
+   * Crée la réservation si elle n'existe pas encore (nouveau flow)
+   * Ou met à jour une réservation existante (ancien flow)
    *
    * @param session - Session Checkout Stripe
    */
   async handlePaymentSuccess(session: Stripe.Checkout.Session): Promise<void> {
     const bookingId = session.metadata?.bookingId;
+    const userId = session.metadata?.userId;
+    const serviceId = session.metadata?.serviceId;
 
+    // Nouveau flow : créer la réservation après paiement
+    if (!bookingId && userId && serviceId) {
+      await this.createBookingFromPayment(session);
+      return;
+    }
+
+    // Ancien flow : mettre à jour une réservation existante
     if (!bookingId) {
       this.logger.error('Webhook reçu sans bookingId dans les métadonnées');
       return;
@@ -242,6 +381,67 @@ export class StripeService {
     });
 
     this.logger.log(`Paiement confirmé pour la réservation ${bookingId}`);
+  }
+
+  /**
+   * Crée une réservation après paiement réussi
+   * Utilisé dans le nouveau flow où la réservation est créée seulement après paiement
+   *
+   * @param session - Session Checkout Stripe
+   */
+  private async createBookingFromPayment(
+    session: Stripe.Checkout.Session,
+  ): Promise<void> {
+    const {
+      userId,
+      serviceId,
+      date,
+      startTime,
+      endTime,
+      notes,
+      depositAmount,
+    } = session.metadata!;
+
+    try {
+      // Récupérer le prix du service
+      const service = await this.prisma.service.findUnique({
+        where: { id: serviceId },
+      });
+
+      if (!service) {
+        this.logger.error(
+          `Service ${serviceId} introuvable lors de la création de réservation`,
+        );
+        return;
+      }
+
+      // Créer la réservation avec statut PENDING
+      const booking = await this.prisma.booking.create({
+        data: {
+          userId,
+          serviceId,
+          date: new Date(date),
+          startTime,
+          endTime,
+          notes: notes || null,
+          status: BookingStatus.PENDING,
+          priceAtBooking: service.price,
+          stripeSessionId: session.id,
+          stripePaymentIntentId: session.payment_intent as string,
+          depositAmount: depositAmount ? Number(depositAmount) : null,
+          isDepositPaid: true,
+          depositPaidAt: new Date(),
+        },
+      });
+
+      this.logger.log(`Réservation créée après paiement réussi: ${booking.id}`);
+    } catch (error) {
+      this.logger.error(
+        'Erreur lors de la création de la réservation après paiement:',
+        error,
+      );
+      throw error;
+    }
   }
 
   /**

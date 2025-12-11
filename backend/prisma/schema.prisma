@@ -146,7 +146,7 @@ model Booking {
   endTime   String // Format "HH:mm"
 
   // Statut
-  status BookingStatus @default(PENDING_PAYMENT)
+  status BookingStatus @default(PENDING)
 
   // Informations supplémentaires
   notes    String? @db.Text // Notes du client

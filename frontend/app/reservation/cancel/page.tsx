@@ -12,7 +12,8 @@ function CancelContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const bookingId = searchParams.get('booking_id');
+  const serviceId = searchParams.get('service_id');
+  console.log('serviceId :', serviceId);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-gray-50 to-slate-100">
@@ -41,22 +42,42 @@ function CancelContent() {
           </p>
         </div>
 
+        {/* Actions */}
+        <div className="space-y-3 rounded-lg mb-6">
+          {serviceId && (
+            <Button
+              onClick={() => router.push(serviceId ? `/reservation/${serviceId}` : '/services')}
+              className="flex items-center justify-center gap-2 px-3 py-2 w-full"
+            >
+              <RefreshCw className="w-4 h-4 mr-2" />
+              Changer de créneau
+            </Button>
+          )}
+
+          <Link href="/services" className="block">
+            <Button variant="outline" className="flex items-center justify-center gap-2 px-3 py-2 w-full">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Voir les autres services
+            </Button>
+          </Link>
+        </div>
+
         {/* Options */}
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+        {/* <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
           <h3 className="font-medium text-blue-800 mb-2">
             Que souhaitez-vous faire ?
           </h3>
           <ul className="text-sm text-blue-700 space-y-2">
             <li className="flex items-start gap-2">
               <RefreshCw className="w-4 h-4 mt-0.5 shrink-0" />
-              <span>Réessayer le paiement depuis votre profil si la réservation est toujours valide</span>
+              <span>Changer de créneau</span>
             </li>
             <li className="flex items-start gap-2">
               <ArrowLeft className="w-4 h-4 mt-0.5 shrink-0" />
-              <span>Créer une nouvelle réservation avec un autre créneau</span>
+              <span>Réserver un autre service</span>
             </li>
           </ul>
-        </div>
+        </div> */}
 
         {/* Aide */}
         <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
@@ -64,41 +85,8 @@ function CancelContent() {
             <strong>Besoin d&apos;aide ?</strong>
             <br />
             Si vous rencontrez des difficultés avec le paiement, n&apos;hésitez pas
-            à nous contacter.
+            à me contacter.
           </div>
-        </div>
-
-        {/* Actions */}
-        <div className="space-y-3">
-          {bookingId ? (
-            <Button
-              onClick={() => router.push('/profile?tab=bookings')}
-              className="w-full"
-            >
-              <RefreshCw className="w-4 h-4 mr-2" />
-              Voir mes réservations
-            </Button>
-          ) : (
-            <Button
-              onClick={() => router.push('/services')}
-              className="w-full"
-            >
-              Nouvelle réservation
-            </Button>
-          )}
-
-          <Link href="/services" className="block">
-            <Button variant="outline" className="w-full">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Voir les services
-            </Button>
-          </Link>
-
-          <Link href="/" className="block">
-            <Button variant="ghost" className="w-full text-gray-600">
-              Retour à l&apos;accueil
-            </Button>
-          </Link>
         </div>
       </Card>
     </div>

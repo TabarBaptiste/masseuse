@@ -7,6 +7,7 @@ import {
   Param,
   UseGuards,
   Query,
+  BadRequestException,
 } from '@nestjs/common';
 import { BookingsService } from './bookings.service';
 import { CreateBookingDto, UpdateBookingDto } from './dto';
@@ -26,17 +27,31 @@ export class BookingsController {
   ) {}
 
   @Post()
-  async create(@CurrentUser() user: any, @Body() createBookingDto: CreateBookingDto) {
-    // 1. Créer la réservation (en statut PENDING_PAYMENT par défaut)
-    const booking = await this.bookingsService.create(user.id, createBookingDto);
-    
-    // 2. Créer automatiquement la session Stripe Checkout
-    const { url } = await this.stripeService.createCheckoutSession(booking.id, user.id);
-    
-    // 3. Retourner la réservation avec l'URL de paiement
+  async create(
+    @CurrentUser() user: any,
+    @Body() createBookingDto: CreateBookingDto,
+  ) {
+    // 1. Vérifier la disponibilité du créneau avant de créer la session de paiement
+    const isAvailable = await this.bookingsService.checkSlotAvailability(
+      createBookingDto.serviceId,
+      createBookingDto.date,
+      createBookingDto.startTime,
+    );
+
+    if (!isAvailable) {
+      throw new BadRequestException("Ce créneau n'est plus disponible");
+    }
+
+    // 2. Créer la session Stripe Checkout avec les données de réservation
+    const { url } = await this.stripeService.createCheckoutSessionForBooking(
+      user.id,
+      createBookingDto,
+    );
+
+    // 3. Retourner l'URL de paiement (pas de réservation créée encore)
     return {
-      ...booking,
       checkoutUrl: url,
+      message: 'Redirection vers le paiement en cours...',
     };
   }
 

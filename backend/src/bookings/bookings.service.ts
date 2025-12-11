@@ -374,6 +374,35 @@ export class BookingsService {
     });
   }
 
+  /**
+   * Vérifie la disponibilité d'un créneau pour un service donné
+   * Méthode publique utilisée avant de créer une session de paiement
+   */
+  async checkSlotAvailability(
+    serviceId: string,
+    date: string,
+    startTime: string,
+  ): Promise<boolean> {
+    // Récupérer le service pour connaître la durée
+    const service = await this.prisma.service.findUnique({
+      where: { id: serviceId },
+    });
+
+    if (!service) {
+      throw new NotFoundException('Service not found');
+    }
+
+    // Calculer l'heure de fin
+    const [startHour, startMinute] = startTime.split(':').map(Number);
+    const endMinutes = startHour * 60 + startMinute + service.duration;
+    const endHour = Math.floor(endMinutes / 60);
+    const endMinute = endMinutes % 60;
+    const endTime = `${String(endHour).padStart(2, '0')}:${String(endMinute).padStart(2, '0')}`;
+
+    // Vérifier la disponibilité
+    return this.isSlotAvailable(date, startTime, endTime);
+  }
+
   private async isSlotAvailable(
     date: string,
     startTime: string,
