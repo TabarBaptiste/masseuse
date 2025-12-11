@@ -12,6 +12,7 @@ import { BookingsModule } from './bookings/bookings.module';
 import { ReviewsModule } from './reviews/reviews.module';
 import { SiteSettingsModule } from './site-settings/site-settings.module';
 import { ConflictsModule } from './conflicts/conflicts.module';
+import { StripeModule } from './stripe/stripe.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { ConflictsModule } from './conflicts/conflicts.module';
     ReviewsModule,
     SiteSettingsModule,
     ConflictsModule,
+    StripeModule,
   ],
   controllers: [AppController],
   providers: [AppService],

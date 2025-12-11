@@ -5,6 +5,7 @@ export enum UserRole {
 }
 
 export enum BookingStatus {
+  PENDING_PAYMENT = 'PENDING_PAYMENT',
   PENDING = 'PENDING',
   CONFIRMED = 'CONFIRMED',
   COMPLETED = 'COMPLETED',
@@ -82,11 +83,20 @@ export interface Booking {
   cancelledAt?: string;
   cancelReason?: string;
   reminderSentAt?: string;
+  // Champs Stripe
+  stripeSessionId?: string;
+  stripePaymentIntentId?: string;
+  depositAmount?: number;
+  depositPaidAt?: string;
+  isDepositPaid?: boolean;
+  // Relations
   createdAt: string;
   updatedAt: string;
   service?: Service;
   user?: User;
   reviews?: Review[];
+  // URL de paiement (retournée lors de la création)
+  checkoutUrl?: string;
 }
 
 export interface Review {

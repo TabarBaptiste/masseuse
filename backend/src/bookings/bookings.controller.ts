@@ -15,15 +15,29 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { UserRole, BookingStatus } from '@prisma/client';
+import { StripeService } from '../stripe/stripe.service';
 
 @Controller('bookings')
 @UseGuards(JwtAuthGuard)
 export class BookingsController {
-  constructor(private readonly bookingsService: BookingsService) {}
+  constructor(
+    private readonly bookingsService: BookingsService,
+    private readonly stripeService: StripeService,
+  ) {}
 
   @Post()
-  create(@CurrentUser() user: any, @Body() createBookingDto: CreateBookingDto) {
-    return this.bookingsService.create(user.id, createBookingDto);
+  async create(@CurrentUser() user: any, @Body() createBookingDto: CreateBookingDto) {
+    // 1. Créer la réservation (en statut PENDING_PAYMENT par défaut)
+    const booking = await this.bookingsService.create(user.id, createBookingDto);
+    
+    // 2. Créer automatiquement la session Stripe Checkout
+    const { url } = await this.stripeService.createCheckoutSession(booking.id, user.id);
+    
+    // 3. Retourner la réservation avec l'URL de paiement
+    return {
+      ...booking,
+      checkoutUrl: url,
+    };
   }
 
   @Get('available-slots')

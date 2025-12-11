@@ -7,7 +7,10 @@ import { AppModule } from './app.module';
 import 'dotenv/config';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  // Créer l'application avec rawBody activé pour les webhooks Stripe
+  const app = await NestFactory.create(AppModule, {
+    rawBody: true,
+  });
 
   // Enable CORS for frontend
   const allowedOrigins = process.env.FRONTEND_URL

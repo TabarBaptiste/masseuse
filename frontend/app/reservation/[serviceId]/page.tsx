@@ -231,10 +231,15 @@ function ReservationContent() {
         notes: data.notes,
       };
 
-      await api.post('/bookings', bookingData);
+      const response = await api.post('/bookings', bookingData);
 
-      // Redirect to profile/bookings page
-      router.push('/profile?tab=bookings');
+      // Rediriger vers Stripe Checkout pour le paiement de l'acompte
+      if (response.data.checkoutUrl) {
+        window.location.href = response.data.checkoutUrl;
+      } else {
+        // Fallback si pas d'URL de checkout (ne devrait pas arriver)
+        router.push('/profile?tab=bookings');
+      }
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } };
       setError(
