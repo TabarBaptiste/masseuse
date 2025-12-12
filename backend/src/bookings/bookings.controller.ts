@@ -42,6 +42,16 @@ export class BookingsController {
       throw new BadRequestException("Ce créneau n'est plus disponible");
     }
 
+    // TODO : DOIT ÊTRE SUPPRIMÉ APRÈS TESTS
+    // ! DOIT ÊTRE SUPPRIMÉ APRÈS TESTS
+    // Créer la réservation avec statut PENDING_PAYMENT
+    await this.bookingsService.create(
+      user.id,
+      createBookingDto,
+    );
+    // TODO : DOIT ÊTRE SUPPRIMÉ APRÈS TESTS
+    // ! DOIT ÊTRE SUPPRIMÉ APRÈS TESTS
+  
     // 2. Créer la session Stripe Checkout avec les données de réservation
     const { url } = await this.stripeService.createCheckoutSessionForBooking(
       user.id,

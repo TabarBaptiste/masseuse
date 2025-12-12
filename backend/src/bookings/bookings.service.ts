@@ -78,6 +78,7 @@ export class BookingsService {
         date: new Date(createBookingDto.date),
         startTime: createBookingDto.startTime,
         endTime,
+        // status: BookingStatus.PENDING_PAYMENT,
         notes: createBookingDto.notes,
         priceAtBooking: service.price,
       },
