@@ -18,6 +18,7 @@ import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { useWorkingDaysStore } from '@/store/working-days';
 import { useServicesStore } from '@/store/services';
 import { MapEmbed } from '@/components/ui/MapEmbed';
+import { TriangleAlert } from 'lucide-react';
 
 interface BookingFormData {
   notes?: string;
@@ -40,7 +41,7 @@ function ReservationContent() {
   const [isLoadingSlots, setIsLoadingSlots] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
-  const [siteSettings, setSiteSettings] = useState<{ bookingAdvanceMinDays: number; bookingAdvanceMaxDays: number } | null>(null);
+  const [siteSettings, setSiteSettings] = useState<{ bookingAdvanceMinDays: number; bookingAdvanceMaxDays: number; cancellationDeadlineHours: number } | null>(null);
 
   const { register, handleSubmit } = useForm<BookingFormData>();
 
@@ -67,14 +68,16 @@ function ReservationContent() {
         const response = await api.get('/site-settings');
         setSiteSettings({
           bookingAdvanceMinDays: response.data.bookingAdvanceMinDays,
-          bookingAdvanceMaxDays: response.data.bookingAdvanceMaxDays
+          bookingAdvanceMaxDays: response.data.bookingAdvanceMaxDays,
+          cancellationDeadlineHours: response.data.cancellationDeadlineHours
         });
       } catch (err) {
         console.error('Error fetching site settings:', err);
         // Valeurs par défaut en cas d'erreur
         setSiteSettings({
           bookingAdvanceMinDays: 0,
-          bookingAdvanceMaxDays: 60
+          bookingAdvanceMaxDays: 60,
+          cancellationDeadlineHours: 24
         });
       }
     };
@@ -333,7 +336,7 @@ function ReservationContent() {
                     </label>
                     <textarea
                       {...register('notes')}
-                      rows={3}
+                      rows={2}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                       placeholder="Préférences, informations spéciales..."
                     />
@@ -357,23 +360,27 @@ function ReservationContent() {
                   <p className="font-medium">{service.duration} minutes</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600">Prix</p>
+                  <p className="text-sm text-gray-600">Prix total</p>
                   <p className="font-medium text-xl text-blue-600">
                     {service.price}€
                   </p>
+                  <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-blue-800 font-medium">À payer maintenant :</span>
+                      <span className="text-blue-800 font-bold">20€</span>
+                    </div>
+                    <div className="flex justify-between items-center text-sm mt-1">
+                      <span className="text-gray-600">À payer sur place :</span>
+                      <span className="text-gray-600 font-medium">{service.price - 20}€</span>
+                    </div>
+                  </div>
                 </div>
                 {selectedDate && (
                   <div>
                     <p className="text-sm text-gray-600">Date</p>
                     <p className="font-medium">
-                      {format(selectedDate, 'EEEE d MMMM yyyy', { locale: fr })}
+                      {format(selectedDate, 'EEEE d MMMM yyyy', { locale: fr })} <br />à {selectedSlot && (selectedSlot)}
                     </p>
-                  </div>
-                )}
-                {selectedSlot && (
-                  <div>
-                    <p className="text-sm text-gray-600">Heure</p>
-                    <p className="font-medium">{selectedSlot}</p>
                   </div>
                 )}
               </div>
@@ -402,6 +409,21 @@ function ReservationContent() {
 
               {/* Map Section */}
               <div className="mt-6 pt-6 border-t border-gray-200">
+                {siteSettings && (
+                  <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                    <div className="flex items-start space-x-2">
+                      <div className="shrink-0">
+                        <TriangleAlert className="w-5 h-5 text-amber-600" />
+                      </div>
+                      <div className="text-sm">
+                        <p className="text-amber-800 font-medium">Conditions d'annulation</p>
+                        <p className="text-amber-700 mt-1">
+                          L'acompte de 20€ est remboursable uniquement si vous annulez au moins {siteSettings.cancellationDeadlineHours}h avant le rendez-vous.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
                 <h4 className="text-lg font-semibold mb-4">Emplacement du salon</h4>
                 <MapEmbed width={400} height={250} />
                 <p className="text-sm text-gray-600 mt-2">
