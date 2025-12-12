@@ -227,6 +227,11 @@ model SiteSettings {
   salonPhone       String?
   salonEmail       String?
 
+  // Informations légales
+  legalForm        String? // Forme juridique (EI, SARL, etc.)
+  siret            String? // Numéro SIRET
+  vatNumber        String? // Numéro TVA intracommunautaire
+
   // Images
   logoUrl      String?
   heroImageUrl String?
