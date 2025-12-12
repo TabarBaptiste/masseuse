@@ -13,7 +13,6 @@ function CancelContent() {
   const searchParams = useSearchParams();
 
   const serviceId = searchParams.get('service_id');
-  console.log('serviceId :', serviceId);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-gray-50 to-slate-100">

@@ -13,6 +13,7 @@ import { ReviewsModule } from './reviews/reviews.module';
 import { SiteSettingsModule } from './site-settings/site-settings.module';
 import { ConflictsModule } from './conflicts/conflicts.module';
 import { StripeModule } from './stripe/stripe.module';
+import { EmailModule } from './email/email.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { StripeModule } from './stripe/stripe.module';
     SiteSettingsModule,
     ConflictsModule,
     StripeModule,
+    EmailModule,
   ],
   controllers: [AppController],
   providers: [AppService],
