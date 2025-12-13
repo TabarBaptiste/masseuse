@@ -65,18 +65,18 @@ function ProfileContent() {
     fetchSiteSettings();
   }, []);
 
-  useEffect(() => {
-    const fetchBookings = async () => {
-      try {
-        const response = await api.get('/bookings/my-bookings');
-        setBookings(response.data);
-      } catch (error) {
-        console.error('Erreur lors de la récupération des réservations:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchBookings = async () => {
+    try {
+      const response = await api.get('/bookings/my-bookings');
+      setBookings(response.data);
+    } catch (error) {
+      console.error('Erreur lors de la récupération des réservations:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     if (user) {
       fetchBookings();
     }
@@ -300,7 +300,7 @@ function ProfileContent() {
           onClose={() => setReviewModal(null)}
           onReviewSubmitted={() => {
             setReviewModal(null);
-            // Optionally refresh bookings or show success message
+            fetchBookings();
           }}
         />
       )}
