@@ -145,13 +145,13 @@ function DashboardContent() {
                             </h2>
                         </div>
                         <div className="space-y-3">
-                            <Link href="/pro/dashboard" className="block">
+                            <Link href="/pro/reservations" className="block">
                                 <button className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors">
                                     <Calendar className="w-4 h-4" />
                                     Réservations
                                 </button>
                             </Link>
-                            <Link href="/admin/users" className="block">
+                            <Link href="/pro/users" className="block">
                                 <button className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg text-sm font-medium transition-colors">
                                     <Users className="w-4 h-4" />
                                     Utilisateurs

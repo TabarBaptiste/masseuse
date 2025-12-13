@@ -6,9 +6,8 @@ import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { UserRole, User } from '@/types';
 import api from '@/lib/api';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
-import { Users, ChevronLeft } from 'lucide-react';
-import Link from 'next/link';
-import { UsersStats, UsersFilters, UsersTable } from '@/components/admin/users';
+import { Users } from 'lucide-react';
+import { UsersStats, UsersFilters, UsersTable } from '@/components/pro/users';
 
 export default function AdminUsersPage() {
     return (
@@ -111,7 +110,7 @@ function UsersContent() {
     };
 
     const handleEditUser = (user: User) => {
-        router.push(`/admin/users/edit/${user.id}`);
+        router.push(`/pro/users/edit/${user.id}`);
     };
 
     const stats = {
@@ -146,10 +145,13 @@ function UsersContent() {
                 />
                 {/* Header */}
                 <div className="mb-8">
-                    <Link href="/admin/dashboard" className="inline-flex items-center text-sm text-gray-600 hover:text-amber-800 mb-4">
-                        <ChevronLeft className="w-4 h-4 mr-1" />
-                        Retour au dashboard
-                    </Link>
+                    {/* <Link
+                        href="/admin/dashboard"
+                        className="inline-flex items-center space-x-2 text-amber-800 hover:text-amber-900 mb-4"
+                    >
+                        <ArrowLeft className="w-5 h-5" />
+                        <span>Retour au dashboard</span>
+                    </Link> */}
                     <div className="flex items-center justify-between">
                         <div>
                             <h1 className="text-3xl font-bold text-gray-900 flex items-center">

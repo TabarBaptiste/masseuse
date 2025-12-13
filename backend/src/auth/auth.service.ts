@@ -68,12 +68,14 @@ export class AuthService {
     });
 
     if (!user) {
-      throw new UnauthorizedException('Aucun compte n\'est associé à cette adresse e-mail.');
+      throw new UnauthorizedException(
+        "Aucun compte n'est associé à cette adresse e-mail.",
+      );
     }
 
     // Check if user is active
     if (!user.isActive) {
-      throw new UnauthorizedException('Account is inactive');
+      throw new UnauthorizedException('Compte désactivé.');
     }
 
     // Verify password
@@ -93,21 +95,21 @@ export class AuthService {
       role: user.role,
     };
 
-    try {
-      const token = this.jwtService.sign(payload);
-      return {
-        user: {
-          id: user.id,
-          email: user.email,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          role: user.role,
-        },
-        access_token: token,
-      };
-    } catch (error) {
-      console.error('💥 JWT generation failed:', error.message);
-      throw error;
-    }
+    // try {
+    const token = this.jwtService.sign(payload);
+    return {
+      user: {
+        id: user.id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        role: user.role,
+      },
+      access_token: token,
+    };
+    // } catch (error) {
+    //   console.error('💥 JWT generation failed:', error.message);
+    //   throw error;
+    // }
   }
 }

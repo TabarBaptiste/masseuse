@@ -8,8 +8,7 @@ import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { Loading } from '@/components/ui/Loading';
 import api from '@/lib/api';
 import Link from 'next/link';
-import { 
-    ArrowLeft, 
+import {
     AlertTriangle, 
     AlertCircle, 
     Info,
@@ -160,19 +159,19 @@ function ConflictsContent() {
                 <Breadcrumb
                     items={[
                         { label: 'Administration', href: '/admin/dashboard' },
-                        { label: 'Gestion des conflits' }
+                        { label: 'Gestion conflits' }
                     ]}
                     className="mb-8"
                 />
 
                 <div className="mb-8">
-                    <Link
+                    {/* <Link
                         href="/admin/dashboard"
                         className="inline-flex items-center space-x-2 text-amber-800 hover:text-amber-900 mb-4"
                     >
                         <ArrowLeft className="w-5 h-5" />
                         <span>Retour au dashboard</span>
-                    </Link>
+                    </Link> */}
                     <div className="flex justify-between items-center">
                         <div>
                             <h1 className="text-3xl font-bold text-gray-900 mb-2">
@@ -188,14 +187,13 @@ function ConflictsContent() {
                             className="flex items-center space-x-2 px-4 py-2 bg-amber-800 hover:bg-amber-900 text-white rounded-lg font-medium transition-colors disabled:opacity-50"
                         >
                             <RefreshCw className={`w-5 h-5 ${refreshing ? 'animate-spin' : ''}`} />
-                            <span>Actualiser</span>
                         </button>
                     </div>
                 </div>
 
                 {/* Summary Cards */}
                 {summary && (
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                         <Card>
                             <div className="text-sm text-gray-600 mb-1">Total des conflits</div>
                             <div className="text-3xl font-bold text-gray-900">{summary.total}</div>
@@ -252,13 +250,13 @@ function ConflictsContent() {
                                             {conflict.description}
                                         </h3>
 
-                                        <div className="flex items-center space-x-4 text-sm text-gray-700 mb-4">
+                                        <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 text-sm text-gray-700 mb-4">
                                             <div className="flex items-center space-x-1">
-                                                <Calendar className="w-4 h-4" />
+                                                <Calendar className="w-4 h-4 shrink-0" />
                                                 <span>{formatDate(conflict.date)}</span>
                                             </div>
                                             <div className="flex items-center space-x-1">
-                                                <Clock className="w-4 h-4" />
+                                                <Clock className="w-4 h-4 shrink-0" />
                                                 <span>{conflict.startTime} - {conflict.endTime}</span>
                                             </div>
                                         </div>
@@ -273,14 +271,14 @@ function ConflictsContent() {
                                                             key={booking.id}
                                                             className="bg-white rounded-lg p-3 border border-gray-200"
                                                         >
-                                                            <div className="flex items-center justify-between">
-                                                                <div className="flex items-center space-x-2">
-                                                                    <User className="w-4 h-4 text-gray-500" />
-                                                                    <span className="font-medium">
+                                                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                                                                <div className="flex items-center space-x-2 min-w-0 flex-1">
+                                                                    <User className="w-4 h-4 text-gray-500 shrink-0" />
+                                                                    <span className="font-medium truncate">
                                                                         {booking.user?.firstName} {booking.user?.lastName}
                                                                     </span>
                                                                 </div>
-                                                                <div className="text-sm text-gray-600">
+                                                                <div className="text-sm text-gray-600 sm:text-right">
                                                                     {booking.service?.name}
                                                                 </div>
                                                             </div>
@@ -322,8 +320,8 @@ function ConflictsContent() {
                                         </div>
 
                                         {/* Action Buttons */}
-                                        <div className="flex space-x-3 mt-4">
-                                            <Link href="/pro/dashboard" className="flex-1">
+                                        <div className="flex flex-col sm:flex-row gap-3 mt-4">
+                                            <Link href="/pro/reservations" className="flex-1">
                                                 <button className="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors">
                                                     Voir les réservations
                                                 </button>
@@ -348,9 +346,9 @@ function ConflictsContent() {
 
                 {/* Help Section */}
                 <Card className="mt-8 bg-blue-50 border-blue-200">
-                    <div className="flex items-start space-x-4">
-                        <Info className="w-6 h-6 text-blue-600 shrink-0 mt-1" />
-                        <div>
+                    <div className="flex flex-col sm:flex-row sm:items-start gap-4">
+                        <Info className="w-6 h-6 text-blue-600 shrink-0" />
+                        <div className="flex-1">
                             <h3 className="font-semibold text-blue-900 mb-2">
                                 À propos de la détection des conflits
                             </h3>

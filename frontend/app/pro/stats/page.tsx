@@ -7,8 +7,7 @@ import { Card } from '@/components/ui/Card';
 import { Loading } from '@/components/ui/Loading';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import api from '@/lib/api';
-import { ArrowLeft, Calendar, Clock, TrendingUp, Euro, Award } from 'lucide-react';
-import Link from 'next/link';
+import { Calendar, Clock, TrendingUp, Euro, Award } from 'lucide-react';
 
 export default function StatsPage() {
     return (
@@ -203,13 +202,13 @@ function StatsContent() {
                     className="mb-8"
                 />
                 <div className="mb-8">
-                    <Link
+                    {/* <Link
                         href="/admin/dashboard"
                         className="inline-flex items-center space-x-2 text-amber-800 hover:text-amber-900 mb-4"
                     >
                         <ArrowLeft className="w-5 h-5" />
                         <span>Retour au dashboard</span>
-                    </Link>
+                    </Link> */}
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                         <div>
                             <h1 className="text-3xl font-bold text-gray-900 mb-2">

@@ -7,7 +7,7 @@ import { Card } from '@/components/ui/Card';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { Loading } from '@/components/ui/Loading';
 import api from '@/lib/api';
-import { MessageSquare, Star, User, Calendar, Eye, EyeOff, Search, Filter } from 'lucide-react';
+import { MessageSquare, Star, User, Calendar, Eye, EyeOff, Search, Filter, ArrowUpDown } from 'lucide-react';
 
 export default function AdminReviewsPage() {
     return (
@@ -28,6 +28,9 @@ function ReviewsContent() {
     const [searchTerm, setSearchTerm] = useState('');
     const [serviceFilter, setServiceFilter] = useState<'ALL' | string>('ALL');
     const [statusFilter, setStatusFilter] = useState<'ALL' | 'PUBLISHED' | 'UNPUBLISHED'>('ALL');
+    const [ratingFilter, setRatingFilter] = useState<'ALL' | number>('ALL');
+    const [sortBy, setSortBy] = useState<'date' | 'rating'>('date');
+    const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -79,8 +82,26 @@ function ReviewsContent() {
             filtered = filtered.filter(review => !review.isApproved);
         }
 
+        // Filter by rating
+        if (ratingFilter !== 'ALL') {
+            filtered = filtered.filter(review => review.rating === ratingFilter);
+        }
+
+        // Sort reviews
+        filtered.sort((a, b) => {
+            let comparison = 0;
+
+            if (sortBy === 'date') {
+                comparison = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+            } else if (sortBy === 'rating') {
+                comparison = a.rating - b.rating;
+            }
+
+            return sortOrder === 'asc' ? comparison : -comparison;
+        });
+
         setFilteredReviews(filtered);
-    }, [reviews, searchTerm, serviceFilter, statusFilter]);
+    }, [reviews, searchTerm, serviceFilter, statusFilter, ratingFilter, sortBy, sortOrder]);
 
     useEffect(() => {
         fetchReviews();
@@ -189,7 +210,8 @@ function ReviewsContent() {
         <div className="min-h-screen bg-gray-50 py-8">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <Breadcrumb
-                    items={[{ label: 'Administration' }, { label: 'Avis clients' }]}
+                    items={[{ label: 'Administration', href: '/admin/dashboard' }, 
+                        { label: 'Avis clients' }]}
                     className="mb-8"
                 />
 
@@ -220,7 +242,7 @@ function ReviewsContent() {
                         <div className="text-3xl font-bold text-green-600">{publishedCount}</div>
                     </Card>
                     <Card>
-                        <div className="text-sm text-gray-600 mb-1">Avis en attente</div>
+                        <div className="text-sm text-gray-600 mb-1">Avis masqués</div>
                         <div className="text-3xl font-bold text-amber-600">{unpublishedCount}</div>
                     </Card>
                 </div>
@@ -231,7 +253,7 @@ function ReviewsContent() {
                         <Filter className="w-5 h-5 text-gray-600" />
                         <h3 className="text-lg font-semibold text-gray-900">Filtres</h3>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
                         {/* Search by user */}
                         <div className="relative">
                             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -283,16 +305,67 @@ function ReviewsContent() {
                                 <option value="UNPUBLISHED">Masqués</option>
                             </select>
                         </div>
+
+                        {/* Filter by rating */}
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                Note
+                            </label>
+                            <select
+                                value={ratingFilter}
+                                onChange={(e) => setRatingFilter(e.target.value === 'ALL' ? 'ALL' : parseInt(e.target.value))}
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            >
+                                <option value="ALL">Toutes les notes</option>
+                                {[5, 4, 3, 2, 1].map((rating) => (
+                                    <option key={rating} value={rating}>
+                                        {'⭐'.repeat(rating)}{'☆'.repeat(5 - rating)} ({rating})
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        {/* Sort options */}
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                Trier par
+                            </label>
+                            <div className="flex gap-2">
+                                <select
+                                    value={sortBy}
+                                    onChange={(e) => setSortBy(e.target.value as 'date' | 'rating')}
+                                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                                >
+                                    <option value="date">Date</option>
+                                    <option value="rating">Note</option>
+                                </select>
+                                <button
+                                    onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+                                    className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    title={sortOrder === 'asc' ? 'Tri croissant' : 'Tri décroissant'}
+                                >
+                                    <ArrowUpDown className={`w-4 h-4 ${sortOrder === 'asc' ? 'rotate-180' : ''} transition-transform`} />
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </Card>
 
                 {/* Reviews List */}
                 <Card>
-                    <div className="flex items-center gap-3 mb-6">
-                        <MessageSquare className="w-6 h-6 text-blue-600" />
-                        <h2 className="text-xl font-semibold text-gray-900">
-                            Avis filtrés ({filteredReviews.length})
-                        </h2>
+                    <div className="flex items-center justify-between mb-6">
+                        <div className="flex items-center gap-3">
+                            <MessageSquare className="w-6 h-6 text-blue-600" />
+                            <h2 className="text-xl font-semibold text-gray-900">
+                                Avis filtrés ({filteredReviews.length})
+                            </h2>
+                        </div>
+                        <div className="text-sm text-gray-600">
+                            Tri: {sortBy === 'date' ? 'Date' : 'Note'} 
+                            <span className="ml-1">
+                                {sortOrder === 'asc' ? '↑' : '↓'}
+                            </span>
+                        </div>
                     </div>
 
                     {filteredReviews.length === 0 ? (
@@ -315,13 +388,13 @@ function ReviewsContent() {
                                     key={review.id}
                                     className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow"
                                 >
-                                    <div className="flex items-start justify-between mb-4">
-                                        <div className="flex items-start gap-4">
+                                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-4">
+                                        <div className="flex items-start gap-4 flex-1">
                                             <div className="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
                                                 <User className="w-6 h-6 text-amber-800" />
                                             </div>
-                                            <div className="flex-1">
-                                                <div className="flex items-center gap-3 mb-2">
+                                            <div className="flex-1 min-w-0">
+                                                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-2">
                                                     <span className="font-semibold text-gray-900">
                                                         {review.user?.firstName} {review.user?.lastName}
                                                     </span>
@@ -329,7 +402,7 @@ function ReviewsContent() {
                                                         {review.user?.email}
                                                     </span>
                                                 </div>
-                                                <div className="flex items-center gap-4 mb-3">
+                                                <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 mb-3">
                                                     <div className="flex items-center gap-2">
                                                         <StarRating rating={review.rating} />
                                                         <span className="font-medium text-gray-900">{review.rating}/5</span>
@@ -338,7 +411,7 @@ function ReviewsContent() {
                                                         <Calendar className="w-4 h-4" />
                                                         {formatDate(review.createdAt)}
                                                     </div>
-                                                    <div className="flex items-center gap-2">
+                                                    <div className="flex items-center gap-2 sm:hidden">
                                                         {review.isApproved ? (
                                                             <div className="flex items-center gap-2 text-green-600">
                                                                 <Eye className="w-4 h-4" />
@@ -362,15 +435,30 @@ function ReviewsContent() {
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className="flex items-center gap-3">
-                                            <span className="text-sm text-gray-500">
-                                                {review.isApproved ? 'Visible' : 'Masqué'}
-                                            </span>
-                                            <ToggleSwitch
-                                                enabled={review.isApproved}
-                                                onChange={() => handleToggleReview(review.id, review.isApproved)}
-                                                disabled={togglingReviews.has(review.id)}
-                                            />
+                                        <div className="flex items-center justify-between sm:justify-end gap-3 sm:flex-col sm:items-end sm:gap-2">
+                                            <div className="hidden sm:flex items-center gap-2">
+                                                {review.isApproved ? (
+                                                    <div className="flex items-center gap-2 text-green-600">
+                                                        <Eye className="w-4 h-4" />
+                                                        <span className="text-sm font-medium">Publié</span>
+                                                    </div>
+                                                ) : (
+                                                    <div className="flex items-center gap-2 text-amber-600">
+                                                        <EyeOff className="w-4 h-4" />
+                                                        <span className="text-sm font-medium">Masqué</span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <div className="flex items-center gap-3">
+                                                <span className="text-sm text-gray-500 sm:hidden">
+                                                    {review.isApproved ? 'Visible' : 'Masqué'}
+                                                </span>
+                                                <ToggleSwitch
+                                                    enabled={review.isApproved}
+                                                    onChange={() => handleToggleReview(review.id, review.isApproved)}
+                                                    disabled={togglingReviews.has(review.id)}
+                                                />
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

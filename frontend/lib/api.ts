@@ -25,10 +25,17 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Clear token and redirect to login
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
+      // Don't redirect if we're already on the login page or if it's a login/register error
       if (typeof window !== 'undefined') {
+        const currentPath = window.location.pathname;
+        if (currentPath === '/login' || currentPath === '/register') {
+          // Don't redirect, just reject the error
+          return Promise.reject(error);
+        }
+        
+        // Clear token and redirect to login for other pages
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
         window.location.href = '/login';
       }
     }

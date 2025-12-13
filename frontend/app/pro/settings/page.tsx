@@ -8,7 +8,7 @@ import { Loading } from '@/components/ui/Loading';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { Button } from '@/components/ui/Button';
 import api from '@/lib/api';
-import { ArrowLeft, Save } from 'lucide-react';
+import { Save } from 'lucide-react';
 import Link from 'next/link';
 
 export default function ProSettingsPage() {
@@ -103,13 +103,6 @@ function SettingsContent() {
                     className="mb-8"
                 />
                 <div className="mb-8">
-                    <Link
-                        href="/admin/dashboard"
-                        className="inline-flex items-center space-x-2 text-amber-800 hover:text-amber-900 mb-4"
-                    >
-                        <ArrowLeft className="w-5 h-5" />
-                        <span>Retour au dashboard</span>
-                    </Link>
                     <h1 className="text-3xl font-bold text-gray-900 mb-2">
                         Configuration du site
                     </h1>

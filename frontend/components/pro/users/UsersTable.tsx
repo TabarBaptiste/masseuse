@@ -1,7 +1,8 @@
+/* eslint-disable react-hooks/static-components */
 import React from 'react';
 import { User, UserRole } from '@/types';
 import { Card } from '@/components/ui/Card';
-import { Edit, Trash2, UserCheck, UserX, Mail, Phone, Calendar, Shield } from 'lucide-react';
+import { Edit, Trash2, UserCheck, UserX, Mail, Phone, Calendar, Shield, UserStar, User as Utilisateur } from 'lucide-react';
 
 interface UsersTableProps {
     users: User[];
@@ -41,11 +42,11 @@ export const UsersTable: React.FC<UsersTableProps> = ({
             case UserRole.ADMIN:
                 return <Shield className="w-4 h-4" />;
             case UserRole.PRO:
-                return <UserCheck className="w-4 h-4" />;
+                return <UserStar className="w-4 h-4" />;
             case UserRole.USER:
-                return <UserCheck className="w-4 h-4" />;
+                return <Utilisateur className="w-4 h-4" />;
             default:
-                return <UserCheck className="w-4 h-4" />;
+                return <Utilisateur className="w-4 h-4" />;
         }
     };
 
@@ -87,7 +88,7 @@ export const UsersTable: React.FC<UsersTableProps> = ({
                                     </h3>
                                     <div className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getRoleBadgeColor(user.role)} mt-1`}>
                                         {getRoleIcon(user.role)}
-                                        <span className="ml-1">{getRoleLabel(user.role)}</span>
+                                        {/* <span className="ml-1">{getRoleLabel(user.role)}</span> */}
                                     </div>
                                 </div>
                             </div>
@@ -230,9 +231,9 @@ export const UsersTable: React.FC<UsersTableProps> = ({
                                             onChange={(e) => onChangeRole(user.id, e.target.value as UserRole)}
                                             className={`px-2 py-1 text-xs font-semibold rounded-full ${getRoleBadgeColor(user.role)} border-0 cursor-pointer`}
                                         >
-                                            <option value={UserRole.USER}>Client</option>
-                                            <option value={UserRole.PRO}>Professionnel</option>
-                                            <option value={UserRole.ADMIN}>Administrateur</option>
+                                            <option value={UserRole.USER}>{getRoleLabel(UserRole.USER)}</option>
+                                            <option value={UserRole.PRO}>{getRoleLabel(UserRole.PRO)}</option>
+                                            <option value={UserRole.ADMIN}>{getRoleLabel(UserRole.ADMIN)}</option>
                                         </select>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">

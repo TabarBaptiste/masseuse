@@ -166,6 +166,8 @@ export default function ServiceDetailPage() {
 
   const handleBooking = () => {
     if (!isAuthenticated) {
+      // Store the destination URL before redirecting to login
+      localStorage.setItem('redirectAfterLogin', `/reservation/${service?.id}`);
       router.push('/login');
       return;
     }
@@ -174,6 +176,8 @@ export default function ServiceDetailPage() {
 
   const handleLeaveReview = () => {
     if (!isAuthenticated) {
+      // Store current page URL for redirect after login
+      localStorage.setItem('redirectAfterLogin', window.location.pathname + window.location.search);
       router.push('/login');
       return;
     }

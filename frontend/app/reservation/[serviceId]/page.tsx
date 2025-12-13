@@ -3,7 +3,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { format } from 'date-fns';
+import { format, addDays } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { useForm } from 'react-hook-form';
 import api from '@/lib/api';
@@ -40,6 +40,7 @@ function ReservationContent() {
   const [isLoadingSlots, setIsLoadingSlots] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const [siteSettings, setSiteSettings] = useState<{ bookingAdvanceMinDays: number; bookingAdvanceMaxDays: number } | null>(null);
 
   const { register, handleSubmit } = useForm<BookingFormData>();
 
@@ -58,6 +59,28 @@ function ReservationContent() {
   // Récupérer le service depuis le store ou l'état local
   const [service, setService] = useState<Service | null>(null);
   const [isLoadingService, setIsLoadingService] = useState(true);
+
+  // Fetch site settings
+  useEffect(() => {
+    const fetchSiteSettings = async () => {
+      try {
+        const response = await api.get('/site-settings');
+        setSiteSettings({
+          bookingAdvanceMinDays: response.data.bookingAdvanceMinDays,
+          bookingAdvanceMaxDays: response.data.bookingAdvanceMaxDays
+        });
+      } catch (err) {
+        console.error('Error fetching site settings:', err);
+        // Valeurs par défaut en cas d'erreur
+        setSiteSettings({
+          bookingAdvanceMinDays: 0,
+          bookingAdvanceMaxDays: 60
+        });
+      }
+    };
+
+    fetchSiteSettings();
+  }, []);
 
   // Fetch working days avec cache
   useEffect(() => {
@@ -135,6 +158,62 @@ function ReservationContent() {
     fetchAvailableSlots();
   }, [selectedDate, service]);
 
+  // Fonction de scroll smooth avec easing personnalisé
+  const smoothScrollToElement = (elementId: string) => {
+    const element = document.getElementById(elementId);
+    if (!element) return;
+
+    const elementRect = element.getBoundingClientRect();
+    const absoluteElementTop = elementRect.top + window.pageYOffset;
+    const middle = absoluteElementTop - (window.innerHeight / 2) + (elementRect.height / 2);
+
+    // Fonction d'easing ease-out (rapide au début, lent à la fin)
+    const easeOutCubic = (t: number): number => {
+      return 1 - Math.pow(1 - t, 3);
+    };
+
+    const startPosition = window.pageYOffset;
+    const distance = middle - startPosition;
+    const duration = 800; // Durée totale en ms
+    let startTime: number | null = null;
+
+    const animation = (currentTime: number) => {
+      if (startTime === null) startTime = currentTime;
+      const timeElapsed = currentTime - startTime;
+      const progress = Math.min(timeElapsed / duration, 1);
+
+      // Appliquer l'easing
+      const easedProgress = easeOutCubic(progress);
+      const currentPosition = startPosition + (distance * easedProgress);
+
+      window.scrollTo(0, currentPosition);
+
+      if (progress < 1) {
+        requestAnimationFrame(animation);
+      }
+    };
+
+    requestAnimationFrame(animation);
+  };
+
+  // Scroll vers les créneaux quand une date est sélectionnée
+  useEffect(() => {
+    if (selectedDate) {
+      setTimeout(() => {
+        smoothScrollToElement('time-slots-section');
+      }, 200); // Délai réduit car l'animation est maintenant fluide
+    }
+  }, [selectedDate]);
+
+  // Scroll vers les notes quand un créneau est sélectionné
+  useEffect(() => {
+    if (selectedSlot) {
+      setTimeout(() => {
+        smoothScrollToElement('notes-section');
+      }, 200); // Délai réduit car l'animation est maintenant fluide
+    }
+  }, [selectedSlot]);
+
   const onSubmit = async (data: BookingFormData) => {
     if (!selectedDate || !selectedSlot || !service) {
       setError('Veuillez sélectionner une date et un créneau horaire');
@@ -185,7 +264,7 @@ function ReservationContent() {
 
   return (
     <div className="min-h-screen bg-gray-50 py-12">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <Breadcrumb
           items={[
             { label: 'Services', href: '/services' },
@@ -210,18 +289,20 @@ function ReservationContent() {
                 selectedDate={selectedDate}
                 onSelectDate={setSelectedDate}
                 workingDays={workingDays}
+                minDate={siteSettings ? addDays(new Date(), siteSettings.bookingAdvanceMinDays - 1) : new Date()}
+                maxDate={siteSettings ? addDays(new Date(), siteSettings.bookingAdvanceMaxDays) : addDays(new Date(), 60)}
               />
             </div>
 
             {/* Step 2: Select Time Slot */}
             {selectedDate && (
-              <div>
+              <div id="time-slots-section">
                 <h2 className="text-xl font-semibold mb-4">
                   2. Choisissez un créneau horaire
                 </h2>
                 <Card>
                   <p className="text-sm text-gray-600 mb-4">
-                    Créneaux disponibles pour le{' '}
+                    Créneaux pour le{' '}
                     {format(selectedDate, 'EEEE d MMMM yyyy', { locale: fr })}
                   </p>
                   <TimeSlotPicker
@@ -236,7 +317,7 @@ function ReservationContent() {
 
             {/* Optional Notes */}
             {selectedSlot && (
-              <div>
+              <div id="notes-section">
                 <h2 className="text-xl font-semibold mb-4">
                   3. Notes (optionnel)
                 </h2>
@@ -247,7 +328,7 @@ function ReservationContent() {
                     </label>
                     <textarea
                       {...register('notes')}
-                      rows={4}
+                      rows={3}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                       placeholder="Préférences, informations spéciales..."
                     />
