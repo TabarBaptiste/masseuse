@@ -14,7 +14,6 @@ import {
     Calendar,
     BarChart3,
     Shield,
-    Wrench,
     Plus,
     TrendingUp,
     Activity,
@@ -164,34 +163,8 @@ function DashboardContent() {
                                     Avis clients
                                 </button>
                             </Link>
-                            {/* <Link href="/services" className="block">
-                                <button className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-sm font-medium transition-colors">
-                                    <Wrench className="w-4 h-4" />
-                                    Services
-                                </button>
-                            </Link> */}
                         </div>
                     </Card>
-
-                    {/* Service Management */}
-                    {/* <Card className="hover:shadow-lg transition-shadow duration-200">
-                        <div className="flex items-center gap-3 mb-6">
-                            <div className="p-2 bg-amber-100 rounded-lg">
-                                <Wrench className="w-6 h-6 text-amber-600" />
-                            </div>
-                            <h2 className="text-xl font-semibold text-gray-900">
-                                Gestion des services
-                            </h2>
-                        </div>
-                        <div className="space-y-3">
-                            <Link href="/services" className="block">
-                                <button className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-sm font-medium transition-colors">
-                                    <Eye className="w-4 h-4" />
-                                    Voir tous les services
-                                </button>
-                            </Link>
-                        </div>
-                    </Card> */}
 
                     {/* Site Settings */}
                     <Card className="hover:shadow-lg transition-shadow duration-200">
