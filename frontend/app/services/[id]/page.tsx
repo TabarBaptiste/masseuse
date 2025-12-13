@@ -9,6 +9,8 @@ import api from '@/lib/api';
 import { Service, Review, Booking } from '@/types';
 import { Button } from '@/components/ui/Button';
 import { Loading } from '@/components/ui/Loading';
+import { ReviewsLoading } from '@/components/ui/Loading/ReviewsLoading';
+import { ServiceDetailLoading } from '@/components/ui/Loading/ServiceDetailLoading';
 import { useAuthStore } from '@/store/auth';
 import { useServicesStore } from '@/store/services';
 import { SelectBookingForReviewModal } from '@/components/ui/SelectBookingForReviewModal';
@@ -263,7 +265,7 @@ export default function ServiceDetailPage() {
   };
 
   if (isLoading) {
-    return <Loading />;
+    return <ServiceDetailLoading />;
   }
 
   if (error || !service) {
@@ -425,9 +427,7 @@ export default function ServiceDetailPage() {
           </div>
 
           {isLoadingReviews ? (
-            <div className="text-center py-12">
-              <Loading />
-            </div>
+            <ReviewsLoading />
           ) : reviews.length === 0 ? (
             <div className="text-center py-16 bg-white rounded-2xl border border-stone-200">
               <Quote className="w-12 h-12 text-stone-300 mx-auto mb-4" />

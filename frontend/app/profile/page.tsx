@@ -5,11 +5,12 @@ import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { useAuthStore } from '@/store/auth';
 import { Card } from '@/components/ui/Card';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
+import { BookingsLoading } from '@/components/ui/Loading/BookingsLoading';
 import { Booking, BookingStatus } from '@/types';
 import api from '@/lib/api';
 import Link from 'next/link';
 import { LeaveReviewModal } from '@/components/ui/LeaveReviewModal';
-import { Star, User, Calendar, Edit, X, MessageSquare, RotateCcw, Mail, Phone, Shield } from 'lucide-react';
+import { Star, User, Calendar, Edit, X, MessageSquare, RotateCcw, Mail, Phone, Shield, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 
 export default function ProfilePage() {
@@ -210,23 +211,22 @@ function ProfileContent() {
           <Card>
             <div className="flex items-center gap-3 mb-4">
               <Calendar className="w-5 h-5 text-amber-600" />
-              <h2 className="text-xl font-semibold">Mes réservations{loading ? '' : ` (${bookings.length})`}</h2>
+              <h2 className="text-xl font-semibold">Mes réservations{loading ? '' : bookings.length > 0 ? ` (${bookings.length})` : ''}</h2>
             </div>
             {loading ? (
-              <div className="space-y-4">
-                <div className="border rounded-lg p-4 bg-white animate-pulse">
-                  <div className="h-6 bg-gray-200 rounded w-3/4 mb-3"></div>
-                  <div className="space-y-2">
-                    <div className="h-4 bg-gray-200 rounded w-full"></div>
-                    <div className="h-4 bg-gray-200 rounded w-5/6"></div>
-                    <div className="h-4 bg-gray-200 rounded w-4/6"></div>
-                  </div>
-                </div>
-              </div>
+              <BookingsLoading />
             ) : bookings.length === 0 ? (
-              <p className="text-gray-600">
-                Vous n'avez pas encore de réservation.
-              </p>
+              <div>
+                <p className="text-gray-600">
+                  Vous n'avez pas encore de réservation.
+                </p>
+                <Link href="/services">
+                  <Button className="inline-flex items-center gap-2">
+                    <ArrowRight className="w-4 h-4" />
+                    Voir les services
+                  </Button>
+                </Link>
+              </div>
             ) : (
               <div className="space-y-4">
                 {bookings.map((booking) => (
