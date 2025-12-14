@@ -28,16 +28,16 @@ export const UsersStats: React.FC<UsersStatsProps> = ({ stats }) => {
                 <div className="text-2xl font-bold text-red-600">{stats.inactive}</div>
             </Card>
             <Card>
+                <div className="text-sm text-gray-600 mb-1">Clients</div>
+                <div className="text-2xl font-bold text-green-600">{stats.clients}</div>
+            </Card>
+            <Card>
                 <div className="text-sm text-gray-600 mb-1">Admins</div>
                 <div className="text-2xl font-bold text-red-800">{stats.admins}</div>
             </Card>
             <Card>
                 <div className="text-sm text-gray-600 mb-1">Pros</div>
                 <div className="text-2xl font-bold text-blue-600">{stats.pros}</div>
-            </Card>
-            <Card>
-                <div className="text-sm text-gray-600 mb-1">Clients</div>
-                <div className="text-2xl font-bold text-green-600">{stats.clients}</div>
             </Card>
         </div>
     );

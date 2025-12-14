@@ -62,7 +62,8 @@ function DashboardContent() {
     }, []);
 
     const stats = {
-        totalUsers: users.length,
+        // totalUsers: users.length,
+        adminUsers: users.filter(u => u.role === UserRole.ADMIN).length,
         proUsers: users.filter(u => u.role === UserRole.PRO).length,
         regularUsers: users.filter(u => u.role === UserRole.USER).length,
         activeServices: services.filter(s => s.isActive).length,
@@ -97,19 +98,19 @@ function DashboardContent() {
                 </div>
 
                 {/* Stats Cards */}
-                <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
-                    <Card>
-                        <div className="text-sm text-gray-600 mb-1">Utilisateurs</div>
-                        <div className="text-3xl font-bold text-blue-600">{stats.totalUsers}</div>
-                    </Card>
-                    <Card>
-                        <div className="text-sm text-gray-600 mb-1">Professionnels</div>
-                        <div className="text-3xl font-bold text-green-600">{stats.proUsers}</div>
-                    </Card>
+                <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                     <Card>
                         <div className="text-sm text-gray-600 mb-1">Clients</div>
                         <div className="text-3xl font-bold text-purple-600">{stats.regularUsers}</div>
                     </Card>
+                    <Card>
+                        <div className="text-sm text-gray-600 mb-1">Admin</div>
+                        <div className="text-3xl font-bold text-blue-600">{stats.adminUsers}</div>
+                    </Card>
+                    {/* <Card>
+                        <div className="text-sm text-gray-600 mb-1">Professionnels</div>
+                        <div className="text-3xl font-bold text-green-600">{stats.proUsers}</div>
+                    </Card> */}
                     <Card>
                         <div className="text-sm text-gray-600 mb-1">Services actifs</div>
                         <div className="text-3xl font-bold text-amber-600">{stats.activeServices}</div>
