@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UseGuards, Get } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Get, Param, Patch } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { RegisterDto, LoginDto } from './dto';
@@ -33,5 +33,31 @@ export class AuthController {
   @ApiResponse({ status: 401, description: 'Non autorisé' })
   async getProfile(@CurrentUser() user: any) {
     return user;
+  }
+
+  @Get('verify-email/:token')
+  @ApiOperation({ summary: "Vérifier l'email d'un utilisateur" })
+  @ApiResponse({ status: 200, description: 'Email vérifié avec succès' })
+  @ApiResponse({ status: 404, description: 'Token invalide' })
+  async verifyEmail(@Param('token') token: string) {
+    return this.authService.verifyEmail(token);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('resend-verification')
+  @ApiOperation({ summary: "Renvoyer l'email de vérification" })
+  @ApiResponse({ status: 200, description: 'Email envoyé' })
+  @ApiResponse({ status: 400, description: 'Email déjà vérifié' })
+  async resendVerification(@CurrentUser() user: any) {
+    return this.authService.resendVerificationEmail(user.id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch('update-email')
+  @ApiOperation({ summary: "Modifier l'email (uniquement si non vérifié)" })
+  @ApiResponse({ status: 200, description: 'Email mis à jour' })
+  @ApiResponse({ status: 400, description: 'Email déjà vérifié ou invalide' })
+  async updateEmail(@CurrentUser() user: any, @Body('email') email: string) {
+    return this.authService.updateEmail(user.id, email);
   }
 }

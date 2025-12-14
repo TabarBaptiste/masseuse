@@ -273,4 +273,60 @@ export class EmailService {
             throw error;
         }
     }
+
+    // ========================================
+    // EMAIL DE VÉRIFICATION
+    // ========================================
+
+    async sendEmailVerification(to: string, data: {
+        firstName: string;
+        verificationToken: string;
+    }) {
+        try {
+            const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+            const verificationUrl = `${frontendUrl}/verify-email?token=${data.verificationToken}`;
+
+            const result = await this.resend.emails.send({
+                from: this.fromEmail,
+                to,
+                subject: 'Confirmez votre adresse email - Aly Dous\'heure',
+                html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #92400e;">Bienvenue chez Aly Dous'heure ! 🌿</h2>
+          <p>Bonjour ${data.firstName},</p>
+          <p>Merci de vous être inscrit(e) ! Pour finaliser votre inscription, veuillez confirmer votre adresse email en cliquant sur le bouton ci-dessous :</p>
+          
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${verificationUrl}" 
+               style="display: inline-block; background-color: #92400e; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold;">
+              Confirmer mon email
+            </a>
+          </div>
+
+          <p style="color: #6b7280; font-size: 14px;">
+            Si le bouton ne fonctionne pas, copiez et collez ce lien dans votre navigateur :<br>
+            <a href="${verificationUrl}" style="color: #92400e;">${verificationUrl}</a>
+          </p>
+
+          <div style="background-color: #fef3c7; padding: 15px; border-radius: 8px; margin: 20px 0;">
+            <p style="margin: 0; color: #92400e;">
+              <strong>💡 Bon à savoir :</strong> Tant que votre email n'est pas confirmé, vous pouvez le modifier depuis votre profil.
+            </p>
+          </div>
+
+          <hr style="margin: 30px 0; border: none; border-top: 1px solid #e5e7eb;">
+          <p style="color: #6b7280; font-size: 12px;">
+            Si vous n'avez pas créé de compte sur Aly Dous'heure, vous pouvez ignorer cet email.
+          </p>
+          <p style="margin-top: 30px;">Cordialement,<br>L'équipe Aly Dous'heure</p>
+        </div>
+      `,
+            });
+
+            return result;
+        } catch (error) {
+            console.error('Erreur lors de l\'envoi de l\'email de vérification:', error);
+            throw error;
+        }
+    }
 }

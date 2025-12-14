@@ -13,7 +13,7 @@ async function removeDist(retries = MAX_RETRIES) {
   try {
     if (fs.existsSync(DIST)) {
       fs.rmSync(DIST, { recursive: true, force: true });
-      console.log('Removed dist folder');
+      console.log('Dossier dist supprimé');
     }
     process.exit(0);
   } catch (err) {
