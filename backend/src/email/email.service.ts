@@ -4,9 +4,11 @@ import { Resend } from 'resend';
 @Injectable()
 export class EmailService {
     private resend: Resend;
+    private fromEmail: string;
 
     constructor() {
         this.resend = new Resend(process.env.RESEND_API_KEY);
+        this.fromEmail = process.env.FROM_EMAIL || 'noreply@alydousheure.fr';
     }
 
     async sendContactEmail(data: {
@@ -16,14 +18,13 @@ export class EmailService {
         message: string;
     }) {
         try {
-            console.log('data :', data);
             const result = await this.resend.emails.send({
-                from: 'onboarding@resend.dev', // À remplacer par votre domaine vérifié
+                from: this.fromEmail,
                 to: process.env.CONTACT_EMAIL || 'tabarbaptiste@gmail.com',
-                subject: `Nouveau message de contact de ${data.name}`,
+                subject: `Message de de ${data.name}`,
                 html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-            <h2 style="color: #92400e;">Nouveau message de contact</h2>
+            <h2 style="color: #92400e;">Nouveau message</h2>
             <div style="background-color: #fef3c7; padding: 20px; border-radius: 8px; margin: 20px 0;">
               <p><strong>Nom:</strong> ${data.name}</p>
               <p><strong>Email:</strong> <a href="mailto:${data.email}">${data.email}</a></p>
@@ -51,7 +52,7 @@ export class EmailService {
     async sendBookingConfirmation(to: string, bookingDetails: any) {
         try {
             const result = await this.resend.emails.send({
-                from: 'onboarding@resend.dev', // À remplacer par votre domaine vérifié
+                from: this.fromEmail,
                 to,
                 subject: 'Confirmation de votre réservation - Aly Dous\'heure',
                 html: `
@@ -81,7 +82,7 @@ export class EmailService {
     async sendBookingReminder(to: string, bookingDetails: any) {
         try {
             const result = await this.resend.emails.send({
-                from: 'onboarding@resend.dev', // À remplacer par votre domaine vérifié
+                from: this.fromEmail,
                 to,
                 subject: 'Rappel de votre rendez-vous - Aly Dous\'heure',
                 html: `
@@ -124,7 +125,7 @@ export class EmailService {
     }) {
         try {
             const result = await this.resend.emails.send({
-                from: 'onboarding@resend.dev',
+                from: this.fromEmail,
                 to: process.env.CONTACT_EMAIL || 'tabarbaptiste@gmail.com',
                 subject: `🎉 Nouvelle réservation - ${bookingDetails.serviceName}`,
                 html: `
@@ -180,7 +181,7 @@ export class EmailService {
     }) {
         try {
             const result = await this.resend.emails.send({
-                from: 'onboarding@resend.dev',
+                from: this.fromEmail,
                 to: process.env.CONTACT_EMAIL || 'tabarbaptiste@gmail.com',
                 subject: `❌ Annulation de réservation - ${bookingDetails.serviceName}`,
                 html: `
@@ -235,7 +236,7 @@ export class EmailService {
     }) {
         try {
             const result = await this.resend.emails.send({
-                from: 'onboarding@resend.dev',
+                from: this.fromEmail,
                 to,
                 subject: 'Votre réservation est confirmée - Aly Dous\'heure',
                 html: `

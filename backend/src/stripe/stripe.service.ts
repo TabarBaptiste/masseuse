@@ -152,9 +152,9 @@ export class StripeService {
       },
     });
 
-    this.logger.log(
-      `Session Checkout créée pour ${user.email} - Service: ${service.name} - Session: ${session.id}`,
-    );
+    // this.logger.log(
+    //   `Session Checkout créée pour ${user.email} - Service: ${service.name} - Session: ${session.id}`,
+    // );
 
     // 7. Retourner l'URL de redirection
     return { url: session.url! };
@@ -300,9 +300,9 @@ export class StripeService {
       },
     });
 
-    this.logger.log(
-      `Session Checkout créée pour la réservation ${bookingId}: ${session.id}`,
-    );
+    // this.logger.log(
+    //   `Session Checkout créée pour la réservation ${bookingId}: ${session.id}`,
+    // );
 
     // 8. Retourner l'URL de redirection
     return { url: session.url! };
