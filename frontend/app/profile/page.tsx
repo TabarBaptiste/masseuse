@@ -6,11 +6,12 @@ import { useAuthStore } from '@/store/auth';
 import { Card } from '@/components/ui/Card';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { BookingsLoading } from '@/components/ui/Loading/BookingsLoading';
+import { EmailVerificationBanner } from '@/components/ui/EmailVerificationBanner';
 import { Booking, BookingStatus } from '@/types';
 import api from '@/lib/api';
 import Link from 'next/link';
 import { LeaveReviewModal } from '@/components/ui/LeaveReviewModal';
-import { Star, User, Calendar, Edit, X, MessageSquare, RotateCcw, Mail, Phone, Shield, ArrowRight } from 'lucide-react';
+import { Star, User, Calendar, Edit, X, MessageSquare, RotateCcw, Mail, Phone, Shield, ArrowRight, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 
 export default function ProfilePage() {
@@ -168,6 +169,9 @@ function ProfileContent() {
           Mon Profil
         </h1>
 
+        {/* Email Verification Banner */}
+        <EmailVerificationBanner email={user.email} emailVerified={user.emailVerified} />
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Card>
             <div className="flex items-center gap-3 mb-4">
@@ -182,7 +186,19 @@ function ProfileContent() {
               </div>
               <div>
                 <p className="text-sm text-gray-600"><Mail className="w-4 h-4 inline-block mr-2" />Email</p>
-                <p className="font-medium">{user.email}</p>
+                <div className="flex items-center gap-2">
+                  <p className="font-medium">{user.email}</p>
+                  {user.emailVerified ? (
+                    <span className="inline-flex items-center gap-1 text-xs text-green-700 bg-green-100 px-2 py-0.5 rounded-full">
+                      <CheckCircle className="w-3 h-3" />
+                      Vérifié
+                    </span>
+                  ) : (
+                    <span className="text-xs text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full">
+                      Non vérifié
+                    </span>
+                  )}
+                </div>
               </div>
               {user.phone && (
                 <div>
