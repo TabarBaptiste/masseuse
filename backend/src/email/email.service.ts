@@ -20,7 +20,7 @@ export class EmailService {
         try {
             const result = await this.resend.emails.send({
                 from: this.fromEmail,
-                to: process.env.CONTACT_EMAIL || 'tabarbaptiste@gmail.com',
+                to: process.env.CONTACT_EMAIL || '',
                 subject: `Message de de ${data.name}`,
                 html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -126,7 +126,7 @@ export class EmailService {
         try {
             const result = await this.resend.emails.send({
                 from: this.fromEmail,
-                to: process.env.CONTACT_EMAIL || 'tabarbaptiste@gmail.com',
+                to: process.env.CONTACT_EMAIL || '',
                 subject: `🎉 Nouvelle réservation - ${bookingDetails.serviceName}`,
                 html: `
                 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -182,7 +182,7 @@ export class EmailService {
         try {
             const result = await this.resend.emails.send({
                 from: this.fromEmail,
-                to: process.env.CONTACT_EMAIL || 'tabarbaptiste@gmail.com',
+                to: process.env.CONTACT_EMAIL || '',
                 subject: `❌ Annulation de réservation - ${bookingDetails.serviceName}`,
                 html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
