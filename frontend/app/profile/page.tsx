@@ -189,10 +189,7 @@ function ProfileContent() {
                 <div className="flex items-center gap-2">
                   <p className="font-medium">{user.email}</p>
                   {user.emailVerified ? (
-                    <span className="inline-flex items-center gap-1 text-xs text-green-700 bg-green-100 px-2 py-0.5 rounded-full">
-                      <CheckCircle className="w-3 h-3" />
-                      Vérifié
-                    </span>
+                    ''
                   ) : (
                     <span className="text-xs text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full">
                       Non vérifié
