@@ -14,6 +14,7 @@ interface AuthState {
   register: (data: RegisterData) => Promise<void>;
   logout: () => void;
   loadUser: () => void;
+  reloadUser: () => Promise<void>;
   setUser: (user: User) => void;
 }
 
@@ -83,5 +84,19 @@ export const useAuthStore = create<AuthState>((set) => ({
   setUser: (user: User) => {
     localStorage.setItem('user', JSON.stringify(user));
     set({ user });
+  },
+
+  reloadUser: async () => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
+    try {
+      const response = await api.get<User>('/auth/me');
+      const user = response.data;
+      localStorage.setItem('user', JSON.stringify(user));
+      set({ user });
+    } catch (error) {
+      console.error('Erreur lors du rechargement de l\'utilisateur:', error);
+    }
   },
 }));

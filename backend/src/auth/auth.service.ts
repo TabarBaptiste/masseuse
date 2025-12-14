@@ -53,7 +53,9 @@ export class AuthService {
         email: true,
         firstName: true,
         lastName: true,
+        phone: true,
         role: true,
+        isActive: true,
         emailVerified: true,
         createdAt: true,
       },
@@ -175,6 +177,7 @@ export class AuthService {
         lastName: true,
         phone: true,
         role: true,
+        isActive: true,
         emailVerified: true,
       },
     });
@@ -230,7 +233,10 @@ export class AuthService {
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
+        phone: user.phone,
         role: user.role,
+        isActive: user.isActive,
+        emailVerified: user.emailVerified,
       },
       access_token: token,
     };

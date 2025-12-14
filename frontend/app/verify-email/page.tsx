@@ -1,20 +1,20 @@
 'use client';
 
 import React, { useEffect, useState, Suspense } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
-import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { Card } from '@/components/ui/Card';
-import { Button } from '@/components/ui/Button';
 import { CheckCircle, XCircle, Loader2 } from 'lucide-react';
 import api from '@/lib/api';
+import { useAuthStore } from '@/store/auth';
 
 function VerifyEmailContent() {
     const searchParams = useSearchParams();
-    const router = useRouter();
     const token = searchParams.get('token');
+    const { reloadUser } = useAuthStore();
 
     const [status, setStatus] = useState<'loading' | 'success' | 'already-verified' | 'error'>('loading');
     const [message, setMessage] = useState('');
+    const [countdown, setCountdown] = useState(5);
 
     useEffect(() => {
         const verifyEmail = async () => {
@@ -33,6 +33,8 @@ function VerifyEmailContent() {
                     setStatus('success');
                     setMessage('Votre email a été vérifié avec succès !');
                 }
+                // Recharger les données utilisateur pour mettre à jour le statut emailVerified
+                await reloadUser();
             } catch (error: unknown) {
                 setStatus('error');
                 const axiosError = error as { response?: { data?: { message?: string } } };
@@ -41,7 +43,25 @@ function VerifyEmailContent() {
         };
 
         verifyEmail();
-    }, [token]);
+    }, [token, reloadUser]);
+
+    // Compte à rebours et fermeture automatique après succès
+    useEffect(() => {
+        if (status === 'success' || status === 'already-verified') {
+            const timer = setInterval(() => {
+                setCountdown((prev) => {
+                    if (prev <= 1) {
+                        clearInterval(timer);
+                        window.close();
+                        return 0;
+                    }
+                    return prev - 1;
+                });
+            }, 1000);
+
+            return () => clearInterval(timer);
+        }
+    }, [status]);
 
     return (
         <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -66,20 +86,12 @@ function VerifyEmailContent() {
                                 <h2 className="text-2xl font-bold text-gray-900 mb-2">
                                     Email vérifié !
                                 </h2>
-                                <p className="text-gray-600 mb-6">
+                                <p className="text-gray-600 mb-4">
                                     {message}
                                 </p>
-                                <div className="space-y-3">
-                                    <Button onClick={() => router.push('/profile')} className="w-full">
-                                        Accéder à mon profil
-                                    </Button>
-                                    <Link
-                                        href="/services"
-                                        className="block text-amber-700 hover:text-amber-800 font-medium"
-                                    >
-                                        Découvrir nos services
-                                    </Link>
-                                </div>
+                                <p className="text-sm text-gray-500">
+                                    Cet onglet se fermera automatiquement dans {countdown} seconde{countdown > 1 ? 's' : ''}...
+                                </p>
                             </>
                         )}
 
@@ -89,14 +101,12 @@ function VerifyEmailContent() {
                                 <h2 className="text-2xl font-bold text-gray-900 mb-2">
                                     Déjà vérifié
                                 </h2>
-                                <p className="text-gray-600 mb-6">
+                                <p className="text-gray-600 mb-4">
                                     {message}
                                 </p>
-                                <div className="space-y-3">
-                                    <Button onClick={() => router.push('/profile')} className="w-full">
-                                        Accéder à mon profil
-                                    </Button>
-                                </div>
+                                <p className="text-sm text-gray-500">
+                                    Cet onglet se fermera automatiquement dans {countdown} seconde{countdown > 1 ? 's' : ''}...
+                                </p>
                             </>
                         )}
 
@@ -106,17 +116,12 @@ function VerifyEmailContent() {
                                 <h2 className="text-2xl font-bold text-gray-900 mb-2">
                                     Erreur de vérification
                                 </h2>
-                                <p className="text-gray-600 mb-6">
+                                <p className="text-gray-600 mb-4">
                                     {message}
                                 </p>
-                                <div className="space-y-3">
-                                    <Button onClick={() => router.push('/profile')} className="w-full">
-                                        Accéder à mon profil
-                                    </Button>
-                                    <p className="text-sm text-gray-500">
-                                        Vous pourrez renvoyer un email de vérification depuis votre profil.
-                                    </p>
-                                </div>
+                                <p className="text-sm text-gray-500">
+                                    Vous pouvez fermer cet onglet. Si besoin, vous pourrez renvoyer un email de vérification depuis votre profil.
+                                </p>
                             </>
                         )}
                     </div>
