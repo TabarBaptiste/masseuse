@@ -72,7 +72,6 @@ export default function Contact() {
 
         try {
             await api.post('/contact', formData);
-            console.log('formData :', formData);
             setSubmitStatus('success');
             setFormData({ name: '', email: '', phone: '', message: '' });
         } catch (error) {
