@@ -1,15 +1,15 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import api from '@/lib/api';
 import { Service, UserRole } from '@/types';
-import { Loading } from '@/components/ui/Loading';
 import { useAuthStore } from '@/store/auth';
 import { useServicesStore } from '@/store/services';
-import { Plus, Edit, Trash2, Clock, ArrowRight } from 'lucide-react';
+import { ServicesLoading } from '@/components/ui/Loading/ServicesLoading';
 import { MapEmbed } from '@/components/ui/MapEmbed';
+import { Plus, Clock, Edit, Trash2, ArrowRight } from 'lucide-react';
 
 // Fonction pour extraire les mots-clés entre *mot*
 const extractKeywords = (description: string): string[] => {
@@ -49,22 +49,30 @@ export default function ServicesPage() {
     setServices,
     setLoading,
     setError,
-    updateLastFetched
+    updateLastFetched,
+    invalidateCache
   } = useServicesStore();
 
   const canManageServices = isAuthenticated && (user?.role === UserRole.ADMIN || user?.role === UserRole.PRO);
 
+  // État local pour savoir si on a déjà tenté de charger
+  const [hasAttemptedFetch, setHasAttemptedFetch] = useState(false);
+
   useEffect(() => {
+    // Invalider le cache au montage pour s'assurer d'avoir les données les plus récentes
+    invalidateCache();
     fetchServices();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchServices = async () => {
     if (isCacheValid()) {
+      setHasAttemptedFetch(true);
       return;
     }
 
     setLoading(true);
+    setHasAttemptedFetch(true);
     try {
       const response = await api.get<Service[]>('/services');
       if (Array.isArray(response.data)) {
@@ -87,8 +95,9 @@ export default function ServicesPage() {
 
     try {
       await api.delete(`/services/${id}`);
-      const updatedServices = services.filter((s: Service) => s.id !== id);
-      setServices(updatedServices);
+      // Invalider le cache et forcer un rechargement
+      invalidateCache();
+      await fetchServices();
     } catch (error) {
       console.error('Erreur lors de la suppression:', error);
       alert('Erreur lors de la suppression du service');
@@ -99,10 +108,6 @@ export default function ServicesPage() {
     e.stopPropagation();
     router.push(`/services/manage?id=${service.id}`);
   };
-
-  if (isLoading) {
-    return <Loading />;
-  }
 
   if (error) {
     return (
@@ -143,7 +148,9 @@ export default function ServicesPage() {
       {/* Services Grid */}
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {Array.isArray(services) && services.length === 0 ? (
+          {isLoading || !hasAttemptedFetch ? (
+            <ServicesLoading />
+          ) : Array.isArray(services) && services.length === 0 ? (
             <p className="text-center text-gray-600 py-20">
               Aucun service disponible pour le moment.
             </p>

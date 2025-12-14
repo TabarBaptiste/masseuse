@@ -28,7 +28,7 @@ async function main() {
   console.log('✅ Admin user created:', admin.email);
 
   // Create PRO User
-  const proPassword = await bcrypt.hash('Pro123!', 10);
+  const proPassword = await bcrypt.hash('Proo123!', 10);
   const pro = await prisma.user.upsert({
     where: { email: 'pro@masseuse.com' },
     update: {},

@@ -71,12 +71,7 @@ export default function Contact() {
         setSubmitStatus('idle');
 
         try {
-            // TODO: Implémenter l'envoi du formulaire vers le backend
-            // await api.post('/contact', formData);
-
-            // Simulation d'envoi
-            await new Promise(resolve => setTimeout(resolve, 1000));
-
+            await api.post('/contact', formData);
             setSubmitStatus('success');
             setFormData({ name: '', email: '', phone: '', message: '' });
         } catch (error) {

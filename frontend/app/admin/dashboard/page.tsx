@@ -5,7 +5,7 @@ import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { UserRole, User, Service, SiteSettings } from '@/types';
 import { Card } from '@/components/ui/Card';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
-import { Loading } from '@/components/ui/Loading';
+import { AdminDashboardLoading } from '@/components/ui/AdminDashboardLoading';
 import api from '@/lib/api';
 import Link from 'next/link';
 import {
@@ -70,19 +70,7 @@ function DashboardContent() {
     };
 
     if (loading) {
-        return (
-            <div className="min-h-screen bg-gray-50 py-8">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <Breadcrumb
-                        items={[{ label: 'Administration' }]}
-                        className="mb-8"
-                    />
-                    <div className="flex justify-center items-center h-64">
-                        <Loading />
-                    </div>
-                </div>
-            </div>
-        );
+        return <AdminDashboardLoading />;
     }
 
     return (

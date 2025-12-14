@@ -15,6 +15,7 @@ interface ServicesState {
     setError: (error: string | null) => void;
     updateLastFetched: () => void;
     isCacheValid: () => boolean;
+    invalidateCache: () => void;
     reset: () => void;
 }
 
@@ -43,12 +44,7 @@ export const useServicesStore = create<ServicesState>()(
                 return Date.now() - lastFetched < cacheDuration;
             },
 
-            reset: () => set({
-                services: [],
-                isLoading: false,
-                error: null,
-                lastFetched: null
-            }),
+            invalidateCache: () => set({ lastFetched: null }),
         }),
         {
             name: 'services-store',
