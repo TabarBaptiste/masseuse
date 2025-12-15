@@ -129,9 +129,9 @@ function DashboardContent() {
                             <div className="p-2 bg-blue-100 rounded-lg">
                                 <PenLine className="w-6 h-6 text-blue-600" />
                             </div>
-                            <h2 className="text-xl font-semibold text-gray-900">
+                            <h3 className="text-xl font-semibold text-gray-900">
                                 Gestion
-                            </h2>
+                            </h3>
                         </div>
                         <div className="space-y-3">
                             <Link href="/pro/reservations" className="block">
@@ -161,9 +161,9 @@ function DashboardContent() {
                             <div className="p-2 bg-indigo-100 rounded-lg">
                                 <Settings className="w-6 h-6 text-indigo-600" />
                             </div>
-                            <h2 className="text-xl font-semibold text-gray-900">
-                                Horraires
-                            </h2>
+                            <h3 className="text-xl font-semibold text-gray-900">
+                                Horaires
+                            </h3>
                         </div>
                         <div className="space-y-3">
                             <Link href="/pro/availability" className="block">
@@ -193,9 +193,9 @@ function DashboardContent() {
                             <div className="p-2 bg-cyan-100 rounded-lg">
                                 <BarChart3 className="w-6 h-6 text-cyan-600" />
                             </div>
-                            <h2 className="text-xl font-semibold text-gray-900">
+                            <h3 className="text-xl font-semibold text-gray-900">
                                 Statistiques et paramètres
-                            </h2>
+                            </h3>
                         </div>
                         <div className="space-y-3">
                             <Link href="/pro/stats" className="block">
@@ -221,9 +221,9 @@ function DashboardContent() {
                             <div className="p-2 bg-gray-100 rounded-lg">
                                 <Shield className="w-6 h-6 text-gray-600" />
                             </div>
-                            <h2 className="text-xl font-semibold text-gray-900">
+                            <h3 className="text-xl font-semibold text-gray-900">
                                 Actions système
-                            </h2>
+                            </h3>
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                             <button className="flex items-center justify-center gap-2 px-4 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-lg text-sm font-medium transition-colors">

@@ -27,14 +27,12 @@ const StarRating = ({ rating }: { rating: number }) => {
   return (
     <div className="flex items-center gap-0.5">
       {[1, 2, 3, 4, 5].map((star) => (
-        <Star
-          key={star}
-          className={`w-4 h-4 ${star <= rating
-            ? 'text-amber-400 fill-amber-400'
-            : star <= rating + 0.5
-              ? 'text-amber-400 fill-amber-200'
-              : 'text-stone-300'
-            }`}
+        <Star key={star} className={`w-4 h-4 ${star <= rating
+          ? 'text-amber-400 fill-amber-400'
+          : star <= rating + 0.5
+            ? 'text-amber-400 fill-amber-200'
+            : 'text-stone-300'
+          }`}
         />
       ))}
     </div>
@@ -161,10 +159,7 @@ function ProfileContent() {
   return (
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <Breadcrumb
-          items={[{ label: 'Mon Profil' }]}
-          className="mb-8"
-        />
+        <Breadcrumb items={[{ label: 'Mon Profil' }]} className="mb-8" />
         <h1 className="text-3xl font-bold text-gray-900 mb-8">
           Mon Profil
         </h1>
@@ -176,7 +171,7 @@ function ProfileContent() {
           <Card>
             <div className="flex items-center gap-3 mb-4">
               <User className="w-5 h-5 text-amber-600" />
-              <h2 className="text-xl font-semibold">Informations personnelles</h2>
+              <h3 className="text-xl font-semibold">Informations personnelles</h3>
             </div>
             <div className="space-y-3">
               <div>
@@ -199,22 +194,23 @@ function ProfileContent() {
               </div>
               {user.phone && (
                 <div>
-                  <p className="text-sm text-gray-600"><Phone className="w-4 h-4 inline-block mr-2" />Téléphone</p>
+                  <p className="text-sm text-gray-600">
+                    <Phone className="w-4 h-4 inline-block mr-2" />
+                    Téléphone</p>
                   <p className="font-medium">{user.phone}</p>
                 </div>
               )}
               {user.role === 'ADMIN' || user.role === 'PRO' ? (
                 <div>
-                  <p className="text-sm text-gray-600"><Shield className="w-4 h-4 inline-block mr-2" />Rôle</p>
+                  <p className="text-sm text-gray-600">
+                    <Shield className="w-4 h-4 inline-block mr-2" />
+                    Rôle</p>
                   <p className="font-medium">{user.role}</p>
                 </div>
               ) : null}
             </div>
             <div className="mt-6">
-              <Link
-                href="/profile/edit"
-                className="inline-flex items-center gap-2 px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-amber-800 hover:bg-amber-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 transition-colors"
-              >
+              <Link href="/profile/edit" className="inline-flex items-center gap-2 px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-amber-800 hover:bg-amber-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 transition-colors">
                 <Edit className="w-4 h-4" />
                 Modifier mes informations
               </Link>
@@ -224,7 +220,7 @@ function ProfileContent() {
           <Card>
             <div className="flex items-center gap-3 mb-4">
               <Calendar className="w-5 h-5 text-amber-600" />
-              <h2 className="text-xl font-semibold">Mes réservations{loading ? '' : bookings.length > 0 ? ` (${bookings.length})` : ''}</h2>
+              <h3 className="text-xl font-semibold">Mes réservations{loading ? '' : bookings.length > 0 ? ` (${bookings.length})` : ''}</h3>
             </div>
             {loading ? (
               <BookingsLoading />
@@ -251,17 +247,18 @@ function ProfileContent() {
                       </span>
                     </div>
                     <div className="space-y-1 text-sm text-gray-600">
-                      <p><strong>Date:</strong> {formatDate(booking.date)}</p>
-                      <p><strong>Heure:</strong> {booking.startTime} - {booking.endTime}</p>
-                      <p><strong>Durée:</strong> {booking.service?.duration} minutes</p>
-                      <p><strong>Prix:</strong> {booking.priceAtBooking}€</p>
+                      <p>
+                        <strong>Date:</strong> {formatDate(booking.date)}</p>
+                      <p>
+                        <strong>Heure:</strong> {booking.startTime} - {booking.endTime}</p>
+                      <p>
+                        <strong>Durée:</strong> {booking.service?.duration} minutes</p>
+                      <p>
+                        <strong>Prix:</strong> {booking.priceAtBooking}€</p>
                     </div>
                     {canCancelBooking(booking) && (
                       <div className="mt-4 pt-4 border-t border-gray-200">
-                        <button
-                          onClick={() => handleCancelBooking(booking.id)}
-                          className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium transition-colors inline-flex items-center gap-2"
-                        >
+                        <button onClick={() => handleCancelBooking(booking.id)} className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium transition-colors inline-flex items-center gap-2">
                           <X className="w-4 h-4" />
                           Annuler la réservation
                         </button>
@@ -287,10 +284,7 @@ function ProfileContent() {
 
                       ) : (
                         <div className="mt-4 pt-4 border-t border-gray-200">
-                          <button
-                            onClick={() => setReviewModal({ bookingId: booking.id, serviceName: booking.service?.name || 'Service' })}
-                            className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-sm font-medium transition-colors inline-flex items-center gap-2"
-                          >
+                          <button onClick={() => setReviewModal({ bookingId: booking.id, serviceName: booking.service?.name || 'Service' })} className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-sm font-medium transition-colors inline-flex items-center gap-2">
                             <MessageSquare className="w-4 h-4" />
                             Laisser un avis
                           </button>
@@ -307,14 +301,10 @@ function ProfileContent() {
 
       {/* Review Modal */}
       {reviewModal && (
-        <LeaveReviewModal
-          bookingId={reviewModal.bookingId}
-          serviceName={reviewModal.serviceName}
-          onClose={() => setReviewModal(null)}
-          onReviewSubmitted={() => {
-            setReviewModal(null);
-            fetchBookings();
-          }}
+        <LeaveReviewModal bookingId={reviewModal.bookingId} serviceName={reviewModal.serviceName} onClose={() => setReviewModal(null)} onReviewSubmitted={() => {
+          setReviewModal(null);
+          fetchBookings();
+        }}
         />
       )}
     </div>
