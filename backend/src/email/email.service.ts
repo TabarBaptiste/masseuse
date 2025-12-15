@@ -1,12 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { Resend } from 'resend';
+import { SiteSettingsService } from '../site-settings/site-settings.service';
 
 @Injectable()
 export class EmailService {
     private resend: Resend;
     private fromEmail: string;
 
-    constructor() {
+    constructor(
+        private siteSettingsService: SiteSettingsService,
+    ) {
         this.resend = new Resend(process.env.RESEND_API_KEY);
         this.fromEmail = process.env.FROM_EMAIL || 'noreply@alydousheure.fr';
     }
@@ -49,38 +52,40 @@ export class EmailService {
         }
     }
 
-    async sendBookingConfirmation(to: string, bookingDetails: any) {
-        try {
-            const result = await this.resend.emails.send({
-                from: this.fromEmail,
-                to,
-                subject: 'Confirmation de votre réservation - Aly Dous\'heure',
-                html: `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-            <h2 style="color: #92400e;">Confirmation de réservation</h2>
-            <p>Bonjour,</p>
-            <p>Votre réservation a bien été enregistrée.</p>
-            <div style="background-color: #fef3c7; padding: 20px; border-radius: 8px; margin: 20px 0;">
-                <p><strong>Service:</strong> ${bookingDetails.serviceName}</p>
-                <p><strong>Date:</strong> ${bookingDetails.date}</p>
-                <p><strong>Heure:</strong> ${bookingDetails.time}</p>
-                <p><strong>Durée:</strong> ${bookingDetails.duration} minutes</p>
-            </div>
-            <p>Nous avons hâte de vous accueillir!</p>
-            <p style="margin-top: 30px;">Cordialement,<br>L'équipe Aly Dous'heure</p>
-            </div>
-        `,
-            });
+    // async sendBookingConfirmation(to: string, bookingDetails: any) {
+    //     try {
+    //         const result = await this.resend.emails.send({
+    //             from: this.fromEmail,
+    //             to,
+    //             subject: 'Confirmation de votre réservation - Aly Dous\'heure',
+    //             html: `
+    //         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+    //         <h2 style="color: #92400e;">Confirmation de réservation</h2>
+    //         <p>Bonjour,</p>
+    //         <p>Votre réservation a bien été enregistrée.</p>
+    //         <div style="background-color: #fef3c7; padding: 20px; border-radius: 8px; margin: 20px 0;">
+    //             <p><strong>Service:</strong> ${bookingDetails.serviceName}</p>
+    //             <p><strong>Date:</strong> ${bookingDetails.date}</p>
+    //             <p><strong>Heure:</strong> ${bookingDetails.time}</p>
+    //             <p><strong>Durée:</strong> ${bookingDetails.duration} minutes</p>
+    //         </div>
+    //         <p>Nous avons hâte de vous accueillir!</p>
+    //         <p style="margin-top: 30px;">Cordialement,<br>L'équipe Aly Dous'heure</p>
+    //         </div>
+    //     `,
+    //         });
 
-            return result;
-        } catch (error) {
-            console.error('Erreur lors de l\'envoi de l\'email de confirmation:', error);
-            throw error;
-        }
-    }
+    //         return result;
+    //     } catch (error) {
+    //         console.error('Erreur lors de l\'envoi de l\'email de confirmation:', error);
+    //         throw error;
+    //     }
+    // }
 
+    // TODO : Ajouter un rappel "SiteSettings.cancellationDeadlineHours"heure avant le rendez-vous
     async sendBookingReminder(to: string, bookingDetails: any) {
         try {
+            const settings = await this.siteSettingsService.get();
             const result = await this.resend.emails.send({
                 from: this.fromEmail,
                 to,
@@ -96,6 +101,13 @@ export class EmailService {
               <p><strong>Heure:</strong> ${bookingDetails.time}</p>
             </div>
             <p>À très bientôt!</p>
+            ${settings.salonAddress || settings.salonPhone ? `
+            <div style="background-color: #f5f5f4; padding: 20px; border-radius: 8px; margin: 20px 0;">
+              <h3 style="margin-top: 0; color: #44403c;">Informations de contact</h3>
+              ${settings.salonAddress ? `<p><strong>Adresse:</strong> ${settings.salonAddress}</p>` : ''}
+              ${settings.salonPhone ? `<p><strong>Téléphone:</strong> <a href="tel:${settings.salonPhone}">${settings.salonPhone}</a></p>` : ''}
+            </div>
+            ` : ''}
             <p style="margin-top: 30px;">Cordialement,<br>L'équipe Aly Dous'heure</p>
           </div>
         `,
@@ -225,7 +237,6 @@ export class EmailService {
         }
     }
 
-    // Dans email.service.ts - ajouter cette méthode
     async sendBookingConfirmationToClient(to: string, bookingDetails: {
         clientName: string;
         serviceName: string;
@@ -235,6 +246,7 @@ export class EmailService {
         price: number;
     }) {
         try {
+            const settings = await this.siteSettingsService.get();
             const result = await this.resend.emails.send({
                 from: this.fromEmail,
                 to,
@@ -256,11 +268,18 @@ export class EmailService {
 
           <div style="background-color: #dbeafe; padding: 15px; border-left: 4px solid #3b82f6; border-radius: 4px; margin: 20px 0;">
             <p style="margin: 0; color: #1e40af;">
-              <strong>💡 Rappel:</strong> Vous avez payé un acompte de 20€. Le solde de ${bookingDetails.price - 20}€ est à régler sur place.
+              <strong>💡 Rappel:</strong> Vous avez payé un acompte de 20€ lors de votre réservation. Le solde restant de ${bookingDetails.price - 20}€ est à régler sur place.
             </p>
           </div>
 
           <p>Si vous avez des questions, n'hésitez pas à nous contacter.</p>
+          ${settings.salonAddress || settings.salonPhone ? `
+          <div style="background-color: #f5f5f4; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <h3 style="margin-top: 0; color: #44403c;">Informations de contact</h3>
+            ${settings.salonAddress ? `<p><strong>Adresse:</strong> ${settings.salonAddress}</p>` : ''}
+            ${settings.salonPhone ? `<p><strong>Téléphone:</strong> <a href="tel:${settings.salonPhone}">${settings.salonPhone}</a></p>` : ''}
+          </div>
+          ` : ''}
           <p style="margin-top: 30px;">À très bientôt !</p>
           <p style="margin-top: 30px;">Cordialement,<br>L'équipe Aly Dous'heure</p>
         </div>
