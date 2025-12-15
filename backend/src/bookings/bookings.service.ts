@@ -229,9 +229,6 @@ export class BookingsService {
     status?: BookingStatus,
     date?: string,
     name?: string,
-    cursor?: string,
-    limit: number = 20,
-    type?: 'upcoming' | 'past',
   ) {
     const where: any = {};
     if (userId) {
@@ -252,25 +249,7 @@ export class BookingsService {
       };
     }
 
-    // Filtrer par type (upcoming/past) si spécifié
-    if (type) {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      
-      if (type === 'upcoming') {
-        where.date = {
-          ...where.date,
-          gte: today,
-        };
-      } else if (type === 'past') {
-        where.date = {
-          ...where.date,
-          lt: today,
-        };
-      }
-    }
-
-    const bookings = await this.prisma.booking.findMany({
+    return this.prisma.booking.findMany({
       where,
       include: {
         service: true,
@@ -285,25 +264,8 @@ export class BookingsService {
         },
         reviews: true,
       },
-      orderBy: type === 'past' 
-        ? [{ date: 'desc' }, { startTime: 'desc' }] 
-        : [{ date: 'asc' }, { startTime: 'asc' }],
-      take: limit + 1, // +1 pour savoir s'il y a plus de résultats
-      ...(cursor && {
-        cursor: { id: cursor },
-        skip: 1, // Skip the cursor itself
-      }),
+      orderBy: [{ date: 'asc' }, { startTime: 'asc' }],
     });
-
-    const hasNextPage = bookings.length > limit;
-    const results = hasNextPage ? bookings.slice(0, -1) : bookings;
-    const nextCursor = hasNextPage ? results[results.length - 1]?.id : null;
-
-    return {
-      bookings: results,
-      hasNextPage,
-      nextCursor,
-    };
   }
 
   async findOne(id: string, userId?: string, userRole?: string) {

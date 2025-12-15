@@ -81,12 +81,8 @@ export class BookingsController {
     @Query('status') status?: BookingStatus,
     @Query('date') date?: string,
     @Query('name') name?: string,
-    @Query('cursor') cursor?: string,
-    @Query('limit') limit?: string,
-    @Query('type') type?: 'upcoming' | 'past',
   ) {
-    const limitNum = limit ? parseInt(limit, 10) : 20;
-    return this.bookingsService.findAll(userId, status, date, name, cursor, limitNum, type);
+    return this.bookingsService.findAll(userId, status, date, name);
   }
 
   @Get('my-bookings')
