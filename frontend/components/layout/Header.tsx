@@ -15,11 +15,11 @@ export const Header: React.FC = () => {
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
           {/* Logo */}
-          <div className="shrink-0">
+          <h1 className="shrink-0">
             <Link href="/" className="heading-serif text-xl sm:text-2xl font-bold text-amber-800 hover:text-amber-900 transition-colors">
               Aly Dous'heure
             </Link>
-          </div>
+          </h1>
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex lg:items-center lg:space-x-6">

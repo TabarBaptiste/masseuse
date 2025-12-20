@@ -290,9 +290,9 @@ function ReservationContent() {
           <div className="lg:col-span-2 space-y-6">
             {/* Step 1: Select Date */}
             <div>
-              <h2 className="text-xl font-semibold mb-4">
+              <h3 className="text-xl font-semibold mb-4">
                 1. Sélectionnez une date
-              </h2>
+              </h3>
               <Calendar
                 selectedDate={selectedDate}
                 onSelectDate={setSelectedDate}
@@ -305,9 +305,9 @@ function ReservationContent() {
             {/* Step 2: Select Time Slot */}
             {selectedDate && (
               <div id="time-slots-section">
-                <h2 className="text-xl font-semibold mb-4">
+                <h3 className="text-xl font-semibold mb-4">
                   2. Choisissez un créneau horaire
-                </h2>
+                </h3>
                 <Card>
                   <p className="text-sm text-gray-600 mb-4">
                     Créneaux pour le{' '}
@@ -326,9 +326,9 @@ function ReservationContent() {
             {/* Optional Notes */}
             {selectedSlot && (
               <div id="notes-section">
-                <h2 className="text-xl font-semibold mb-4">
+                <h3 className="text-xl font-semibold mb-4">
                   3. Notes (optionnel)
-                </h2>
+                </h3>
                 <Card>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">

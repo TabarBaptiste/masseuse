@@ -123,9 +123,9 @@ function SettingsContent() {
                 <form onSubmit={handleSubmit} className="space-y-6">
                     {/* Informations du salon */}
                     <Card>
-                        <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                        <h3 className="text-xl font-semibold text-gray-900 mb-4">
                             Informations du salon
-                        </h2>
+                        </h3>
                         <div className="space-y-4">
                             <div>
                                 <label htmlFor="salonName" className="block text-sm font-medium text-gray-700 mb-2">
@@ -200,9 +200,9 @@ function SettingsContent() {
 
                     {/* Informations légales */}
                     <Card>
-                        <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                        <h3 className="text-xl font-semibold text-gray-900 mb-4">
                             Informations légales
-                        </h2>
+                        </h3>
                         <div className="space-y-4">
                             <div>
                                 <label htmlFor="legalForm" className="block text-sm font-medium text-gray-700 mb-2">
@@ -250,9 +250,9 @@ function SettingsContent() {
 
                     {/* Images */}
                     <Card>
-                        <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                        <h3 className="text-xl font-semibold text-gray-900 mb-4">
                             Images
-                        </h2>
+                        </h3>
                         <div className="space-y-4">
                             <div>
                                 <label htmlFor="logoUrl" className="block text-sm font-medium text-gray-700 mb-2">
@@ -286,9 +286,9 @@ function SettingsContent() {
 
                     {/* Horaires */}
                     <Card>
-                        <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                        <h3 className="text-xl font-semibold text-gray-900 mb-4">
                             Horaires par défaut
-                        </h2>
+                        </h3>
                         {/* <div className="grid grid-cols-2 gap-4"> */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
@@ -323,9 +323,9 @@ function SettingsContent() {
 
                     {/* Paramètres de réservation */}
                     <Card>
-                        <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                        <h3 className="text-xl font-semibold text-gray-900 mb-4">
                             Paramètres de réservation
-                        </h2>
+                        </h3>
                         <div className="space-y-4">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
@@ -387,9 +387,9 @@ function SettingsContent() {
 
                     {/* Notifications */}
                     <Card>
-                        <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                        <h3 className="text-xl font-semibold text-gray-900 mb-4">
                             Notifications
-                        </h2>
+                        </h3>
                         <div className="space-y-4">
                             <div className="flex items-center">
                                 <input
@@ -426,9 +426,9 @@ function SettingsContent() {
 
                     {/* Réseaux sociaux */}
                     <Card>
-                        <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                        <h3 className="text-xl font-semibold text-gray-900 mb-4">
                             Réseaux sociaux
-                        </h2>
+                        </h3>
                         <div className="space-y-4">
                             <div>
                                 <label htmlFor="facebookUrl" className="block text-sm font-medium text-gray-700 mb-2">
