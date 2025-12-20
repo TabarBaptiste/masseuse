@@ -9,8 +9,7 @@ import { Button } from '@/components/ui/Button';
 import { Loading } from '@/components/ui/Loading';
 import { FormField } from '@/components/ui/FormField';
 import api from '@/lib/api';
-import Link from 'next/link';
-import { ArrowLeft, Plus, Edit, Trash2, Calendar } from 'lucide-react';
+import { Plus, Edit, Trash2, Calendar } from 'lucide-react';
 
 interface BlockedSlot {
     id: string;
@@ -145,13 +144,13 @@ function BlockedSlotsContent() {
                 />
 
                 <div className="mb-8">
-                    <Link
+                    {/* <Link
                         href="/admin/dashboard"
                         className="inline-flex items-center space-x-2 text-amber-800 hover:text-amber-900 mb-4"
                     >
                         <ArrowLeft className="w-5 h-5" />
                         <span>Retour au dashboard</span>
-                    </Link>
+                    </Link> */}
                     <div className="flex justify-between items-center">
                         <div>
                             <h1 className="text-3xl font-bold text-gray-900 mb-2">
@@ -167,7 +166,7 @@ function BlockedSlotsContent() {
                                 className="flex items-center space-x-2"
                             >
                                 <Plus className="w-5 h-5" />
-                                <span>Ajouter un blocage</span>
+                                <span>Ajouter</span>
                             </Button>
                         )}
                     </div>

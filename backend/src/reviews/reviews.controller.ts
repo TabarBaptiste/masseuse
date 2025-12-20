@@ -32,6 +32,29 @@ export class ReviewsController {
     return this.reviewsService.findAll(publishedOnly !== 'false');
   }
 
+  @Get('service/:serviceId')
+  findByService(
+    @Param('serviceId') serviceId: string,
+    @Query('publishedOnly') publishedOnly?: string,
+  ) {
+    return this.reviewsService.findByService(
+      serviceId,
+      publishedOnly !== 'false',
+    );
+  }
+
+  @Get('service/:serviceId/user-bookings')
+  @UseGuards(JwtAuthGuard)
+  getUserCompletedBookingsForService(
+    @CurrentUser() user: any,
+    @Param('serviceId') serviceId: string,
+  ) {
+    return this.reviewsService.getUserCompletedBookingsForService(
+      user.id,
+      serviceId,
+    );
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.reviewsService.findOne(id);
@@ -44,11 +67,34 @@ export class ReviewsController {
     return this.reviewsService.update(id, updateReviewDto);
   }
 
+  @Patch(':id/user-update')
+  @UseGuards(JwtAuthGuard)
+  updateByUser(
+    @CurrentUser() user: any,
+    @Param('id') id: string,
+    @Body() updateReviewDto: { comment?: string },
+  ) {
+    return this.reviewsService.updateByUser(user.id, id, updateReviewDto);
+  }
+
+  @Delete(':id/user-delete')
+  @UseGuards(JwtAuthGuard)
+  removeByUser(@CurrentUser() user: any, @Param('id') id: string) {
+    return this.reviewsService.removeByUser(user.id, id);
+  }
+
   @Post(':id/approve')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.PRO, UserRole.ADMIN)
   approve(@Param('id') id: string) {
     return this.reviewsService.approve(id);
+  }
+
+  @Post(':id/unpublish')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.PRO, UserRole.ADMIN)
+  unpublish(@Param('id') id: string) {
+    return this.reviewsService.unpublish(id);
   }
 
   @Delete(':id')

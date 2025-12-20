@@ -3,7 +3,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { format } from 'date-fns';
+import { format, addDays } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { useForm } from 'react-hook-form';
 import api from '@/lib/api';
@@ -17,6 +17,8 @@ import { Loading } from '@/components/ui/Loading';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { useWorkingDaysStore } from '@/store/working-days';
 import { useServicesStore } from '@/store/services';
+import { MapEmbed } from '@/components/ui/MapEmbed';
+import { TriangleAlert } from 'lucide-react';
 
 interface BookingFormData {
   notes?: string;
@@ -39,6 +41,7 @@ function ReservationContent() {
   const [isLoadingSlots, setIsLoadingSlots] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const [siteSettings, setSiteSettings] = useState<{ bookingAdvanceMinDays: number; bookingAdvanceMaxDays: number; cancellationDeadlineHours: number } | null>(null);
 
   const { register, handleSubmit } = useForm<BookingFormData>();
 
@@ -57,6 +60,30 @@ function ReservationContent() {
   // Récupérer le service depuis le store ou l'état local
   const [service, setService] = useState<Service | null>(null);
   const [isLoadingService, setIsLoadingService] = useState(true);
+
+  // Fetch site settings
+  useEffect(() => {
+    const fetchSiteSettings = async () => {
+      try {
+        const response = await api.get('/site-settings');
+        setSiteSettings({
+          bookingAdvanceMinDays: response.data.bookingAdvanceMinDays,
+          bookingAdvanceMaxDays: response.data.bookingAdvanceMaxDays,
+          cancellationDeadlineHours: response.data.cancellationDeadlineHours
+        });
+      } catch (err) {
+        console.error('Error fetching site settings:', err);
+        // Valeurs par défaut en cas d'erreur
+        setSiteSettings({
+          bookingAdvanceMinDays: 0,
+          bookingAdvanceMaxDays: 60,
+          cancellationDeadlineHours: 24
+        });
+      }
+    };
+
+    fetchSiteSettings();
+  }, []);
 
   // Fetch working days avec cache
   useEffect(() => {
@@ -134,6 +161,62 @@ function ReservationContent() {
     fetchAvailableSlots();
   }, [selectedDate, service]);
 
+  // Fonction de scroll smooth avec easing personnalisé
+  const smoothScrollToElement = (elementId: string) => {
+    const element = document.getElementById(elementId);
+    if (!element) return;
+
+    const elementRect = element.getBoundingClientRect();
+    const absoluteElementTop = elementRect.top + window.pageYOffset;
+    const middle = absoluteElementTop - (window.innerHeight / 2) + (elementRect.height / 2);
+
+    // Fonction d'easing ease-out (rapide au début, lent à la fin)
+    const easeOutCubic = (t: number): number => {
+      return 1 - Math.pow(1 - t, 3);
+    };
+
+    const startPosition = window.pageYOffset;
+    const distance = middle - startPosition;
+    const duration = 800; // Durée totale en ms
+    let startTime: number | null = null;
+
+    const animation = (currentTime: number) => {
+      if (startTime === null) startTime = currentTime;
+      const timeElapsed = currentTime - startTime;
+      const progress = Math.min(timeElapsed / duration, 1);
+
+      // Appliquer l'easing
+      const easedProgress = easeOutCubic(progress);
+      const currentPosition = startPosition + (distance * easedProgress);
+
+      window.scrollTo(0, currentPosition);
+
+      if (progress < 1) {
+        requestAnimationFrame(animation);
+      }
+    };
+
+    requestAnimationFrame(animation);
+  };
+
+  // Scroll vers les créneaux quand une date est sélectionnée (uniquement sur mobile)
+  useEffect(() => {
+    if (selectedDate && window.innerWidth < 1024) {
+      setTimeout(() => {
+        smoothScrollToElement('time-slots-section');
+      }, 200);
+    }
+  }, [selectedDate]);
+
+  // Scroll vers le récapitulatif quand un créneau est sélectionné (uniquement sur mobile)
+  useEffect(() => {
+    if (selectedSlot && window.innerWidth < 1024) {
+      setTimeout(() => {
+        smoothScrollToElement('summary-section');
+      }, 200);
+    }
+  }, [selectedSlot]);
+
   const onSubmit = async (data: BookingFormData) => {
     if (!selectedDate || !selectedSlot || !service) {
       setError('Veuillez sélectionner une date et un créneau horaire');
@@ -151,10 +234,15 @@ function ReservationContent() {
         notes: data.notes,
       };
 
-      await api.post('/bookings', bookingData);
+      const response = await api.post('/bookings', bookingData);
 
-      // Redirect to profile/bookings page
-      router.push('/profile?tab=bookings');
+      // Rediriger vers Stripe Checkout pour le paiement de l'acompte
+      if (response.data.checkoutUrl) {
+        window.location.href = response.data.checkoutUrl;
+      } else {
+        // Fallback si pas d'URL de checkout (ne devrait pas arriver)
+        router.push('/profile?tab=bookings');
+      }
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } };
       setError(
@@ -184,7 +272,7 @@ function ReservationContent() {
 
   return (
     <div className="min-h-screen bg-gray-50 py-12">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <Breadcrumb
           items={[
             { label: 'Services', href: '/services' },
@@ -202,25 +290,27 @@ function ReservationContent() {
           <div className="lg:col-span-2 space-y-6">
             {/* Step 1: Select Date */}
             <div>
-              <h2 className="text-xl font-semibold mb-4">
+              <h3 className="text-xl font-semibold mb-4">
                 1. Sélectionnez une date
-              </h2>
+              </h3>
               <Calendar
                 selectedDate={selectedDate}
                 onSelectDate={setSelectedDate}
                 workingDays={workingDays}
+                minDate={siteSettings ? addDays(new Date(), siteSettings.bookingAdvanceMinDays - 1) : new Date()}
+                maxDate={siteSettings ? addDays(new Date(), siteSettings.bookingAdvanceMaxDays) : addDays(new Date(), 60)}
               />
             </div>
 
             {/* Step 2: Select Time Slot */}
             {selectedDate && (
-              <div>
-                <h2 className="text-xl font-semibold mb-4">
+              <div id="time-slots-section">
+                <h3 className="text-xl font-semibold mb-4">
                   2. Choisissez un créneau horaire
-                </h2>
+                </h3>
                 <Card>
                   <p className="text-sm text-gray-600 mb-4">
-                    Créneaux disponibles pour le{' '}
+                    Créneaux pour le{' '}
                     {format(selectedDate, 'EEEE d MMMM yyyy', { locale: fr })}
                   </p>
                   <TimeSlotPicker
@@ -235,10 +325,10 @@ function ReservationContent() {
 
             {/* Optional Notes */}
             {selectedSlot && (
-              <div>
-                <h2 className="text-xl font-semibold mb-4">
+              <div id="notes-section">
+                <h3 className="text-xl font-semibold mb-4">
                   3. Notes (optionnel)
-                </h2>
+                </h3>
                 <Card>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -246,7 +336,7 @@ function ReservationContent() {
                     </label>
                     <textarea
                       {...register('notes')}
-                      rows={4}
+                      rows={2}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                       placeholder="Préférences, informations spéciales..."
                     />
@@ -254,26 +344,12 @@ function ReservationContent() {
                 </Card>
               </div>
             )}
-
-            {/* Step 3: Confirm */}
-            {/* {selectedSlot && (
-              <div>
-                <h2 className="text-xl font-semibold mb-4">
-                  3. Confirmez votre réservation
-                </h2>
-                <Card>
-                  <p className="text-sm text-gray-600">
-                    Vérifiez les informations ci-dessous et confirmez votre réservation.
-                  </p>
-                </Card>
-              </div>
-            )} */}
           </div>
 
           {/* Booking Summary */}
           <div className="lg:col-span-1">
             <Card className="sticky top-6">
-              <h3 className="text-lg font-semibold mb-4">Récapitulatif</h3>
+              <h3 className="text-lg font-semibold mb-4" id="summary-section">Récapitulatif</h3>
               <div className="space-y-3">
                 <div>
                   <p className="text-sm text-gray-600">Service</p>
@@ -284,23 +360,27 @@ function ReservationContent() {
                   <p className="font-medium">{service.duration} minutes</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600">Prix</p>
+                  <p className="text-sm text-gray-600">Prix total</p>
                   <p className="font-medium text-xl text-blue-600">
                     {service.price}€
                   </p>
+                  <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-blue-800 font-medium">À payer maintenant :</span>
+                      <span className="text-blue-800 font-bold">20€</span>
+                    </div>
+                    <div className="flex justify-between items-center text-sm mt-1">
+                      <span className="text-gray-600">À payer sur place :</span>
+                      <span className="text-gray-600 font-medium">{service.price - 20}€</span>
+                    </div>
+                  </div>
                 </div>
                 {selectedDate && (
                   <div>
                     <p className="text-sm text-gray-600">Date</p>
                     <p className="font-medium">
-                      {format(selectedDate, 'EEEE d MMMM yyyy', { locale: fr })}
+                      {format(selectedDate, 'EEEE d MMMM yyyy', { locale: fr })} <br />à {selectedSlot && (selectedSlot)}
                     </p>
-                  </div>
-                )}
-                {selectedSlot && (
-                  <div>
-                    <p className="text-sm text-gray-600">Heure</p>
-                    <p className="font-medium">{selectedSlot}</p>
                   </div>
                 )}
               </div>
@@ -326,6 +406,30 @@ function ReservationContent() {
                   </form>
                 </div>
               )}
+
+              {/* Map Section */}
+              <div className="mt-6 pt-6 border-t border-gray-200">
+                {siteSettings && (
+                  <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                    <div className="flex items-start space-x-2">
+                      <div className="shrink-0">
+                        <TriangleAlert className="w-5 h-5 text-amber-600" />
+                      </div>
+                      <div className="text-sm">
+                        <p className="text-amber-800 font-medium">Conditions d'annulation</p>
+                        <p className="text-amber-700 mt-1">
+                          L'acompte de 20€ est remboursable uniquement si vous annulez au moins {siteSettings.cancellationDeadlineHours}h avant le rendez-vous.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                <h4 className="text-lg font-semibold mb-4">Emplacement du salon</h4>
+                <MapEmbed width={400} height={250} />
+                <p className="text-sm text-gray-600 mt-2">
+                  21, Rue des goyaviers, Zac Moulin à vent, Le Robert 97231, Martinique
+                </p>
+              </div>
             </Card>
           </div>
         </div>

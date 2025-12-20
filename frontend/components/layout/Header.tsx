@@ -15,11 +15,11 @@ export const Header: React.FC = () => {
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
           {/* Logo */}
-          <div className="shrink-0">
+          <h1 className="shrink-0">
             <Link href="/" className="heading-serif text-xl sm:text-2xl font-bold text-amber-800 hover:text-amber-900 transition-colors">
               Aly Dous'heure
             </Link>
-          </div>
+          </h1>
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex lg:items-center lg:space-x-6">
@@ -49,7 +49,7 @@ export const Header: React.FC = () => {
                   {user?.firstName}
                 </span> */}
                 {user?.role === UserRole.PRO && (
-                  <Link href="/pro/dashboard" className="flex items-center space-x-2 text-stone-700 hover:text-amber-800 text-sm font-medium transition-colors">
+                  <Link href="/pro/reservations" className="flex items-center space-x-2 text-stone-700 hover:text-amber-800 text-sm font-medium transition-colors">
                     <Settings className="w-4 h-4" /><span>Dashboard PRO</span>
                   </Link>
                 )}
@@ -68,12 +68,12 @@ export const Header: React.FC = () => {
               </div>
             ) : (
               <div className="flex items-center space-x-3 ml-4 pl-4 border-l border-stone-200">
-                <Link href="/login" className="flex items-center space-x-2 text-stone-700 hover:text-amber-800 px-3 py-2 text-sm font-medium transition-colors">
+                <Link href="/login" className="flex items-center space-x-2 bg-stone-200 hover:bg-stone-300 rounded-lg text-stone-700 px-3 py-2 text-sm font-medium transition-colors">
                   <LogIn className="w-4 h-4" />
                   <span>Connexion</span>
                 </Link>
-                <Link href="/login" className="bg-amber-800 hover:bg-amber-900 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all shadow-sm hover:shadow-md">
-                  Réserver
+                <Link href="/register" className="bg-amber-700 hover:bg-amber-800 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all shadow-sm hover:shadow-md">
+                  S'inscrire
                 </Link>
               </div>
             )}
@@ -141,7 +141,7 @@ export const Header: React.FC = () => {
 
                   {user?.role === UserRole.PRO && (
                     <Link
-                      href="/pro/dashboard"
+                      href="/pro/reservations"
                       className="flex items-center space-x-3 px-3 py-2 rounded-lg text-base font-medium text-stone-700 hover:text-amber-800 hover:bg-stone-50 transition-colors"
                       onClick={() => setMobileMenuOpen(false)}
                     >
@@ -166,16 +166,17 @@ export const Header: React.FC = () => {
                       logout();
                       setMobileMenuOpen(false);
                     }}
-                    className="w-full text-left px-3 py-2 rounded-lg text-base font-medium text-stone-700 hover:text-amber-800 hover:bg-stone-50 transition-colors"
+                    className="flex items-center space-x-3 px-3 py-2 rounded-lg text-base font-medium text-stone-700 hover:text-amber-800 hover:bg-stone-50 transition-colors"
                   >
-                    Déconnexion
+                    <LogOut className="w-5 h-5" />
+                    <span>Déconnexion</span>
                   </button>
                 </>
               ) : (
-                <div className="space-y-1 border-t border-stone-200 mt-2 pt-2">
+                <div className="space-y-2 border-t border-stone-200 mt-2 pt-2">
                   <Link
                     href="/login"
-                    className="flex items-center space-x-3 py-2 rounded-lg text-base font-medium text-stone-700 hover:text-amber-800 hover:bg-stone-50 transition-colors"
+                    className="flex items-center justify-center space-x-3 bg-stone-200 hover:bg-stone-300 rounded-lg text-stone-700 px-3 py-2 text-base font-medium transition-colors"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     <LogIn className="w-5 h-5" />

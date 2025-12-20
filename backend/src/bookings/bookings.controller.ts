@@ -7,6 +7,7 @@ import {
   Param,
   UseGuards,
   Query,
+  BadRequestException,
 } from '@nestjs/common';
 import { BookingsService } from './bookings.service';
 import { CreateBookingDto, UpdateBookingDto } from './dto';
@@ -15,15 +16,53 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { UserRole, BookingStatus } from '@prisma/client';
+import { StripeService } from '../stripe/stripe.service';
 
 @Controller('bookings')
 @UseGuards(JwtAuthGuard)
 export class BookingsController {
-  constructor(private readonly bookingsService: BookingsService) {}
+  constructor(
+    private readonly bookingsService: BookingsService,
+    private readonly stripeService: StripeService,
+  ) {}
 
   @Post()
-  create(@CurrentUser() user: any, @Body() createBookingDto: CreateBookingDto) {
-    return this.bookingsService.create(user.id, createBookingDto);
+  async create(
+    @CurrentUser() user: any,
+    @Body() createBookingDto: CreateBookingDto,
+  ) {
+    // 1. Vérifier la disponibilité du créneau avant de créer la session de paiement
+    const isAvailable = await this.bookingsService.checkSlotAvailability(
+      createBookingDto.serviceId,
+      createBookingDto.date,
+      createBookingDto.startTime,
+    );
+
+    if (!isAvailable) {
+      throw new BadRequestException("Ce créneau n'est plus disponible");
+    }
+
+    // TODO : DOIT ÊTRE SUPPRIMÉ APRÈS TESTS
+    // ! DOIT ÊTRE SUPPRIMÉ APRÈS TESTS
+    // Créer la réservation avec statut PENDING_PAYMENT
+    // await this.bookingsService.create(
+    //   user.id,
+    //   createBookingDto,
+    // );
+    // TODO : DOIT ÊTRE SUPPRIMÉ APRÈS TESTS
+    // ! DOIT ÊTRE SUPPRIMÉ APRÈS TESTS
+  
+    // 2. Créer la session Stripe Checkout avec les données de réservation
+    const { url } = await this.stripeService.createCheckoutSessionForBooking(
+      user.id,
+      createBookingDto,
+    );
+
+    // 3. Retourner l'URL de paiement (pas de réservation créée encore)
+    return {
+      checkoutUrl: url,
+      message: 'Redirection vers le paiement en cours...',
+    };
   }
 
   @Get('available-slots')

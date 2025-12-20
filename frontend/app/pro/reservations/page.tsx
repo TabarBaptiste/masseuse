@@ -5,7 +5,7 @@ import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { UserRole, Booking, BookingStatus } from '@/types';
 import { Card } from '@/components/ui/Card';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
-import { Phone, Mail, X, User } from 'lucide-react';
+import { Phone, Mail, X, User, Filter } from 'lucide-react';
 import { useAuthStore } from '@/store/auth';
 import api from '@/lib/api';
 
@@ -247,15 +247,18 @@ function DashboardContent() {
         <div className="min-h-screen bg-gray-50 py-8">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <Breadcrumb
-                    items={[{ label: 'Dashboard Professionnel' }]}
+                    items={[
+                        { label: 'Administration', href: '/admin/dashboard' },
+                        { label: 'Réservations' }]
+                    }
                     className="mb-8"
                 />
                 <div className="mb-8">
                     <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                        Dashboard Professionnel
+                        Réservations
                     </h1>
                     <p className="text-gray-600">
-                        Gérez vos réservations et votre planning
+                        Gérez vos réservations
                     </p>
                     <button
                         onClick={() => setShowStats(!showStats)}
@@ -266,7 +269,7 @@ function DashboardContent() {
                 </div>
 
                 {/* Stats Cards */}
-                <div className={`${showStats ? 'block' : 'hidden'} lg:grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-6 gap-4 mb-8`}>
+                <div className={`${showStats ? 'block' : 'hidden'} grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-6 gap-4 mb-8`}>
                     <Card>
                         <div className="text-sm text-gray-600 mb-1">Aujourd'hui</div>
                         <div className="text-3xl font-bold text-amber-800">{stats.today}</div>
@@ -299,68 +302,97 @@ function DashboardContent() {
                         <h2 className="text-xl font-semibold text-gray-900 mb-4">
                             Toutes les réservations
                         </h2>
-                        <div className="flex flex-col lg:flex-row gap-4">
-                            <div className="flex flex-wrap gap-2">
-                                <button
-                                    onClick={() => setFilter('ALL')}
-                                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${filter === 'ALL'
-                                        ? 'bg-amber-800 text-white'
-                                        : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300'
-                                        }`}
-                                >
-                                    Toutes
-                                </button>
-                                <button
-                                    onClick={() => setFilter(BookingStatus.PENDING)}
-                                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${filter === BookingStatus.PENDING
-                                        ? 'bg-yellow-600 text-white'
-                                        : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300'
-                                        }`}
-                                >
-                                    En attente
-                                </button>
-                                <button
-                                    onClick={() => setFilter(BookingStatus.CONFIRMED)}
-                                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${filter === BookingStatus.CONFIRMED
-                                        ? 'bg-green-600 text-white'
-                                        : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300'
-                                        }`}
-                                >
-                                    Confirmées
-                                </button>
-                                <button
-                                    onClick={() => setFilter(BookingStatus.COMPLETED)}
-                                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${filter === BookingStatus.COMPLETED
-                                        ? 'bg-blue-600 text-white'
-                                        : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300'
-                                        }`}
-                                >
-                                    Terminées
-                                </button>
+                    </div>
+
+                    {/* Filters */}
+                    <Card className="mb-6">
+                        <div className="flex items-center gap-3 mb-4">
+                            <Filter className="w-5 h-5 text-gray-600" />
+                            <h3 className="text-lg font-semibold text-gray-900">Filtres</h3>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            {/* Filter by status */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Statut
+                                </label>
+                                <div className="flex flex-wrap gap-2">
+                                    <button
+                                        onClick={() => setFilter('ALL')}
+                                        className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${filter === 'ALL'
+                                            ? 'bg-amber-800 text-white'
+                                            : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300'
+                                            }`}
+                                    >
+                                        Toutes
+                                    </button>
+                                    <button
+                                        onClick={() => setFilter(BookingStatus.PENDING)}
+                                        className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${filter === BookingStatus.PENDING
+                                            ? 'bg-yellow-600 text-white'
+                                            : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300'
+                                            }`}
+                                    >
+                                        En attente
+                                    </button>
+                                    <button
+                                        onClick={() => setFilter(BookingStatus.CONFIRMED)}
+                                        className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${filter === BookingStatus.CONFIRMED
+                                            ? 'bg-green-600 text-white'
+                                            : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300'
+                                            }`}
+                                    >
+                                        Confirmées
+                                    </button>
+                                    <button
+                                        onClick={() => setFilter(BookingStatus.COMPLETED)}
+                                        className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${filter === BookingStatus.COMPLETED
+                                            ? 'bg-blue-600 text-white'
+                                            : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300'
+                                            }`}
+                                    >
+                                        Terminées
+                                    </button>
+                                </div>
                             </div>
-                            <div className="flex flex-col sm:flex-row gap-4">
+
+                            {/* Filter by date */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Date
+                                </label>
                                 <input
                                     type="date"
                                     value={dateFilter}
                                     onChange={(e) => setDateFilter(e.target.value)}
-                                    className="px-4 py-2 border border-gray-300 rounded-lg text-sm"
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                 />
-                                <input
-                                    type="text"
-                                    value={nameFilter}
-                                    onChange={(e) => setNameFilter(e.target.value)}
-                                    className="px-4 py-2 border border-gray-300 rounded-lg text-sm"
-                                    placeholder="Rechercher par nom/prénom"
-                                />
-                                <button
-                                    onClick={() => { setDateFilter(''); setNameFilter(''); }}
-                                    className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg text-sm font-medium transition-colors"
-                                >
-                                    <X className="inline-block mr-1 w-4 h-4" /> Effacer filtres
-                                </button>
+                            </div>
+
+                            {/* Search by name */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Rechercher par nom
+                                </label>
+                                <div className="flex gap-2">
+                                    <input
+                                        type="text"
+                                        value={nameFilter}
+                                        onChange={(e) => setNameFilter(e.target.value)}
+                                        className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        placeholder="Nom, prénom..."
+                                    />
+                                    <button
+                                        onClick={() => { setDateFilter(''); setNameFilter(''); }}
+                                        className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg text-sm font-medium transition-colors"
+                                        title="Effacer les filtres"
+                                    >
+                                        <X className="w-4 h-4" />
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    </Card>
 
                     {loading ? (
                         <div className="space-y-4">

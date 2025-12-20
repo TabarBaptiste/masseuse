@@ -52,7 +52,7 @@ function EditUserContent() {
             await fetchCompletedBookings();
         } catch (error) {
             console.error('Erreur lors du chargement de l\'utilisateur:', error);
-            router.push('/admin/users');
+            router.push('/pro/users');
         } finally {
             setIsLoading(false);
         }
@@ -60,7 +60,7 @@ function EditUserContent() {
 
     useEffect(() => {
         if (!canManageUsers) {
-            router.push('/admin/users');
+            router.push('/pro/users');
             return;
         }
 
@@ -85,7 +85,7 @@ function EditUserContent() {
             };
 
             await api.patch(`/users/${editingUser.id}`, data);
-            router.push('/admin/users');
+            router.push('/pro/users');
         } catch (error) {
             console.error('Erreur lors de la modification:', error);
             alert('Erreur lors de la modification de l\'utilisateur');
@@ -116,7 +116,7 @@ function EditUserContent() {
                 <Breadcrumb
                     items={[
                         { label: 'Administration', href: '/admin/dashboard' },
-                        { label: 'Utilisateurs', href: '/admin/users' },
+                        { label: 'Utilisateurs', href: '/pro/users' },
                         { label: 'Modifier l\'utilisateur' }
                     ]}
                     className="mb-8"
@@ -194,7 +194,7 @@ function EditUserContent() {
 
                         <div className="flex gap-3 pt-4">
                             <Link
-                                href="/admin/users"
+                                href="/pro/users"
                                 className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-medium transition-colors text-center"
                             >
                                 Annuler

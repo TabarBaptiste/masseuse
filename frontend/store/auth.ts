@@ -12,8 +12,9 @@ interface AuthState {
   isInitialized: boolean;
   login: (data: LoginData) => Promise<void>;
   register: (data: RegisterData) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
   loadUser: () => void;
+  reloadUser: () => Promise<void>;
   setUser: (user: User) => void;
 }
 
@@ -30,6 +31,8 @@ export const useAuthStore = create<AuthState>((set) => ({
       const response = await api.post<AuthResponse>('/auth/login', data);
       const { user, access_token } = response.data;
       
+      // Le token est maintenant stocké dans un cookie httpOnly côté serveur
+      // On garde le localStorage pour la rétrocompatibilité temporaire
       localStorage.setItem('token', access_token);
       localStorage.setItem('user', JSON.stringify(user));
       
@@ -46,6 +49,8 @@ export const useAuthStore = create<AuthState>((set) => ({
       const response = await api.post<AuthResponse>('/auth/register', data);
       const { user, access_token } = response.data;
       
+      // Le token est maintenant stocké dans un cookie httpOnly côté serveur
+      // On garde le localStorage pour la rétrocompatibilité temporaire
       localStorage.setItem('token', access_token);
       localStorage.setItem('user', JSON.stringify(user));
       
@@ -56,10 +61,18 @@ export const useAuthStore = create<AuthState>((set) => ({
     }
   },
 
-  logout: () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    set({ user: null, token: null, isAuthenticated: false });
+  logout: async () => {
+    try {
+      // Appeler l'endpoint de déconnexion pour supprimer le cookie httpOnly
+      await api.post('/auth/logout');
+    } catch (error) {
+      console.error('Erreur lors de la déconnexion:', error);
+    } finally {
+      // Nettoyer le localStorage (rétrocompatibilité)
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      set({ user: null, token: null, isAuthenticated: false });
+    }
   },
 
   loadUser: () => {
@@ -83,5 +96,19 @@ export const useAuthStore = create<AuthState>((set) => ({
   setUser: (user: User) => {
     localStorage.setItem('user', JSON.stringify(user));
     set({ user });
+  },
+
+  reloadUser: async () => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
+    try {
+      const response = await api.get<User>('/auth/me');
+      const user = response.data;
+      localStorage.setItem('user', JSON.stringify(user));
+      set({ user });
+    } catch (error) {
+      console.error('Erreur lors du rechargement de l\'utilisateur:', error);
+    }
   },
 }));

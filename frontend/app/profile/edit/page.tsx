@@ -10,6 +10,7 @@ import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { FormField } from '@/components/ui/FormField';
 import { PhoneInput } from '@/components/ui/PhoneInput';
 import { Button } from '@/components/ui/Button';
+import { AlertTriangle } from 'lucide-react';
 import api from '@/lib/api';
 
 export default function EditProfilePage() {
@@ -26,6 +27,7 @@ function EditProfileContent() {
     const [saving, setSaving] = useState(false);
     const [phonePrefix, setPhonePrefix] = useState('+596');
     const [phoneNumber, setPhoneNumber] = useState('');
+    const [email, setEmail] = useState('');
 
     useEffect(() => {
         // Force scroll to top on page load
@@ -39,6 +41,11 @@ function EditProfileContent() {
                 setPhoneNumber(parts.slice(1).join(' '));
             }
         }
+
+        // Initialiser l'email
+        if (user?.email) {
+            setEmail(user.email);
+        }
     }, [user]);
 
     const handleSubmit = async (formData: FormData) => {
@@ -47,6 +54,7 @@ function EditProfileContent() {
         setSaving(true);
 
         try {
+            // Mise à jour des informations de base
             const data = {
                 firstName: formData.get('firstName') as string,
                 lastName: formData.get('lastName') as string,
@@ -54,7 +62,16 @@ function EditProfileContent() {
             };
 
             const response = await api.patch(`/users/${user.id}`, data);
-            setUser(response.data); // Update the user in the store
+            
+            // Si l'email a changé et n'est pas vérifié, le mettre à jour
+            if (!user.emailVerified && email !== user.email) {
+                const emailResponse = await api.patch('/auth/update-email', { email });
+                setUser(emailResponse.data);
+                alert('Votre email a été mis à jour. Un nouvel email de vérification a été envoyé.');
+            } else {
+                setUser(response.data);
+            }
+            
             router.push('/profile');
         } catch (error) {
             console.error('Erreur lors de la modification:', error);
@@ -111,15 +128,35 @@ function EditProfileContent() {
                             onNumberChange={setPhoneNumber}
                         />
 
-                        <div className="bg-gray-50 rounded-lg p-4">
-                            <h3 className="text-sm font-medium text-gray-900 mb-2">Informations non modifiables</h3>
-                            <div className="space-y-2 text-sm">
-                                <div>
-                                    <span className="font-medium text-gray-700">Email:</span>
-                                    <span className="ml-2 text-gray-900">{user.email}</span>
+                        {/* Email - modifiable uniquement si non vérifié */}
+                        {!user.emailVerified ? (
+                            <div>
+                                <FormField
+                                    label="Email"
+                                    name="email"
+                                    type="email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    required
+                                />
+                                <div className="mt-2 flex items-start gap-2 text-sm text-amber-700 bg-amber-50 p-3 rounded-lg">
+                                    <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
+                                    <p>
+                                        Votre email n'est pas encore vérifié. Vous pouvez le modifier maintenant. Un nouvel email de vérification sera envoyé.
+                                    </p>
                                 </div>
                             </div>
-                        </div>
+                        ) : (
+                            <div className="bg-gray-50 rounded-lg p-4">
+                                <h3 className="text-sm font-medium text-gray-900 mb-2">Informations non modifiables</h3>
+                                <div className="space-y-2 text-sm">
+                                    <div>
+                                        <span className="font-medium text-gray-700">Email:</span>
+                                        <span className="ml-2 text-gray-900">{user.email}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
 
                         <div className="flex gap-3 pt-4">
                             <Link
@@ -133,7 +170,7 @@ function EditProfileContent() {
                                 disabled={saving}
                                 className="flex-1"
                             >
-                                {saving ? 'Enregistrement...' : 'Enregistrer les modifications'}
+                                {saving ? 'Enregistrement...' : 'Enregistrer'}
                             </Button>
                         </div>
                     </form>

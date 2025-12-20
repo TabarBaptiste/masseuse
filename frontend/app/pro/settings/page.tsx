@@ -8,7 +8,7 @@ import { Loading } from '@/components/ui/Loading';
 import { Breadcrumb } from '@/components/ui/Breadcrumb';
 import { Button } from '@/components/ui/Button';
 import api from '@/lib/api';
-import { ArrowLeft, Save } from 'lucide-react';
+import { Save } from 'lucide-react';
 import Link from 'next/link';
 
 export default function ProSettingsPage() {
@@ -54,6 +54,9 @@ function SettingsContent() {
             salonAddress: formData.get('salonAddress') as string,
             salonPhone: formData.get('salonPhone') as string,
             salonEmail: formData.get('salonEmail') as string,
+            legalForm: formData.get('legalForm') as string,
+            siret: formData.get('siret') as string,
+            vatNumber: formData.get('vatNumber') as string,
             logoUrl: formData.get('logoUrl') as string,
             heroImageUrl: formData.get('heroImageUrl') as string,
             defaultOpenTime: formData.get('defaultOpenTime') as string,
@@ -103,13 +106,6 @@ function SettingsContent() {
                     className="mb-8"
                 />
                 <div className="mb-8">
-                    <Link
-                        href="/admin/dashboard"
-                        className="inline-flex items-center space-x-2 text-amber-800 hover:text-amber-900 mb-4"
-                    >
-                        <ArrowLeft className="w-5 h-5" />
-                        <span>Retour au dashboard</span>
-                    </Link>
                     <h1 className="text-3xl font-bold text-gray-900 mb-2">
                         Configuration du site
                     </h1>
@@ -127,9 +123,9 @@ function SettingsContent() {
                 <form onSubmit={handleSubmit} className="space-y-6">
                     {/* Informations du salon */}
                     <Card>
-                        <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                        <h3 className="text-xl font-semibold text-gray-900 mb-4">
                             Informations du salon
-                        </h2>
+                        </h3>
                         <div className="space-y-4">
                             <div>
                                 <label htmlFor="salonName" className="block text-sm font-medium text-gray-700 mb-2">
@@ -202,11 +198,61 @@ function SettingsContent() {
                         </div>
                     </Card>
 
+                    {/* Informations légales */}
+                    <Card>
+                        <h3 className="text-xl font-semibold text-gray-900 mb-4">
+                            Informations légales
+                        </h3>
+                        <div className="space-y-4">
+                            <div>
+                                <label htmlFor="legalForm" className="block text-sm font-medium text-gray-700 mb-2">
+                                    Forme juridique
+                                </label>
+                                <input
+                                    type="text"
+                                    id="legalForm"
+                                    name="legalForm"
+                                    defaultValue={settings.legalForm || ''}
+                                    placeholder="Ex: EI, SARL, SAS, etc."
+                                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                                />
+                            </div>
+
+                            <div>
+                                <label htmlFor="siret" className="block text-sm font-medium text-gray-700 mb-2">
+                                    Numéro SIRET
+                                </label>
+                                <input
+                                    type="text"
+                                    id="siret"
+                                    name="siret"
+                                    defaultValue={settings.siret || ''}
+                                    placeholder="123 456 789 01234"
+                                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                                />
+                            </div>
+
+                            <div>
+                                <label htmlFor="vatNumber" className="block text-sm font-medium text-gray-700 mb-2">
+                                    Numéro TVA intracommunautaire
+                                </label>
+                                <input
+                                    type="text"
+                                    id="vatNumber"
+                                    name="vatNumber"
+                                    defaultValue={settings.vatNumber || ''}
+                                    placeholder="FR12345678901"
+                                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                                />
+                            </div>
+                        </div>
+                    </Card>
+
                     {/* Images */}
                     <Card>
-                        <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                        <h3 className="text-xl font-semibold text-gray-900 mb-4">
                             Images
-                        </h2>
+                        </h3>
                         <div className="space-y-4">
                             <div>
                                 <label htmlFor="logoUrl" className="block text-sm font-medium text-gray-700 mb-2">
@@ -240,9 +286,9 @@ function SettingsContent() {
 
                     {/* Horaires */}
                     <Card>
-                        <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                        <h3 className="text-xl font-semibold text-gray-900 mb-4">
                             Horaires par défaut
-                        </h2>
+                        </h3>
                         {/* <div className="grid grid-cols-2 gap-4"> */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
@@ -277,9 +323,9 @@ function SettingsContent() {
 
                     {/* Paramètres de réservation */}
                     <Card>
-                        <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                        <h3 className="text-xl font-semibold text-gray-900 mb-4">
                             Paramètres de réservation
-                        </h2>
+                        </h3>
                         <div className="space-y-4">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
@@ -341,9 +387,9 @@ function SettingsContent() {
 
                     {/* Notifications */}
                     <Card>
-                        <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                        <h3 className="text-xl font-semibold text-gray-900 mb-4">
                             Notifications
-                        </h2>
+                        </h3>
                         <div className="space-y-4">
                             <div className="flex items-center">
                                 <input
@@ -380,9 +426,9 @@ function SettingsContent() {
 
                     {/* Réseaux sociaux */}
                     <Card>
-                        <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                        <h3 className="text-xl font-semibold text-gray-900 mb-4">
                             Réseaux sociaux
-                        </h2>
+                        </h3>
                         <div className="space-y-4">
                             <div>
                                 <label htmlFor="facebookUrl" className="block text-sm font-medium text-gray-700 mb-2">

@@ -7,13 +7,17 @@ export const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  // Important : envoyer les cookies avec chaque requête
+  withCredentials: true,
 });
 
-// Add auth token to requests
+// Add auth token to requests (fallback pour la rétrocompatibilité)
 api.interceptors.request.use((config) => {
   if (typeof window !== 'undefined') {
+    // Le token est maintenant géré via cookie httpOnly
+    // On garde le localStorage comme fallback temporaire
     const token = localStorage.getItem('token');
-    if (token) {
+    if (token && !config.headers.Authorization) {
       config.headers.Authorization = `Bearer ${token}`;
     }
   }
@@ -25,10 +29,17 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Clear token and redirect to login
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
+      // Don't redirect if we're already on the login page or if it's a login/register error
       if (typeof window !== 'undefined') {
+        const currentPath = window.location.pathname;
+        if (currentPath === '/login' || currentPath === '/register') {
+          // Don't redirect, just reject the error
+          return Promise.reject(error);
+        }
+        
+        // Clear token and redirect to login for other pages
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
         window.location.href = '/login';
       }
     }

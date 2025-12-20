@@ -6,12 +6,14 @@ interface CloudinaryUploadProps {
   value?: string;
   onChange: (url: string) => void;
   disabled?: boolean;
+  onUploadingChange?: (uploading: boolean) => void;
 }
 
 export const CloudinaryUpload: React.FC<CloudinaryUploadProps> = ({
   value,
   onChange,
-  disabled = false
+  disabled = false,
+  onUploadingChange
 }) => {
   const [uploading, setUploading] = useState(false);
   const [preview, setPreview] = useState<string | null>(value || null);
@@ -30,6 +32,7 @@ export const CloudinaryUpload: React.FC<CloudinaryUploadProps> = ({
 
     try {
       setUploading(true);
+      onUploadingChange?.(true);
       const response = await fetch(
         `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
         {
@@ -51,6 +54,7 @@ export const CloudinaryUpload: React.FC<CloudinaryUploadProps> = ({
       alert('Erreur lors de l\'upload de l\'image');
     } finally {
       setUploading(false);
+      onUploadingChange?.(false);
     }
   };
 

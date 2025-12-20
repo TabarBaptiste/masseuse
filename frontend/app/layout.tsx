@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Playfair_Display } from 'next/font/google';
+import { Inter, Dancing_Script } from 'next/font/google';
 import "./globals.css";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
@@ -11,10 +11,11 @@ const inter = Inter({
   display: 'swap',
 });
 
-const playfair = Playfair_Display({
+const dancingScript = Dancing_Script({
   subsets: ['latin'],
-  variable: '--font-playfair',
+  variable: '--font-dancing-script',
   display: 'swap',
+  weight: '400',
 });
 
 export const metadata: Metadata = {
@@ -28,7 +29,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fr" className={`${inter.variable} ${playfair.variable}`}>
+    <html lang="fr" className={`${inter.variable} ${dancingScript.variable}`}>
       <body className="antialiased">
         <AuthProvider>
           <div className="flex flex-col min-h-screen">

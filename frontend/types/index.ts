@@ -82,10 +82,12 @@ export interface Booking {
   cancelledAt?: string;
   cancelReason?: string;
   reminderSentAt?: string;
+  // Relations
   createdAt: string;
   updatedAt: string;
   service?: Service;
   user?: User;
+  reviews?: Review[];
 }
 
 export interface Review {
@@ -95,7 +97,6 @@ export interface Review {
   rating: number;
   comment?: string;
   isApproved: boolean;
-  isPublished: boolean;
   createdAt: string;
   updatedAt: string;
   user?: User;
@@ -109,6 +110,9 @@ export interface SiteSettings {
   salonAddress?: string;
   salonPhone?: string;
   salonEmail?: string;
+  legalForm?: string;
+  siret?: string;
+  vatNumber?: string;
   logoUrl?: string;
   heroImageUrl?: string;
   defaultOpenTime: string;

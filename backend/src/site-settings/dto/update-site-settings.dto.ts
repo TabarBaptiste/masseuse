@@ -30,6 +30,18 @@ export class UpdateSiteSettingsDto {
 
   @IsString()
   @IsOptional()
+  legalForm?: string;
+
+  @IsString()
+  @IsOptional()
+  siret?: string;
+
+  @IsString()
+  @IsOptional()
+  vatNumber?: string;
+
+  @IsString()
+  @IsOptional()
   logoUrl?: string;
 
   @IsString()
