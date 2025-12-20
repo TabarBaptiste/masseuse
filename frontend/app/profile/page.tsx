@@ -11,7 +11,7 @@ import { Booking, BookingStatus } from '@/types';
 import api from '@/lib/api';
 import Link from 'next/link';
 import { LeaveReviewModal } from '@/components/ui/LeaveReviewModal';
-import { Star, User, Calendar, Edit, X, MessageSquare, RotateCcw, Mail, Phone, Shield, ArrowRight, CheckCircle } from 'lucide-react';
+import { Star, User, Calendar, Edit, X, MessageSquare, RotateCcw, Mail, Phone, Shield, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 
 export default function ProfilePage() {

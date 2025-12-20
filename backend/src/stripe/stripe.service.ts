@@ -64,10 +64,18 @@ export class StripeService {
   }
 
   /**
-   * Crée un compte Stripe Connect Standard pour la masseuse (ADMIN)
-   * @param userId - ID de l'utilisateur ADMIN
-   * @returns L'ID du compte Stripe créé
+   * Gère les erreurs Stripe et les convertit en messages génériques
+   * @param error - L'erreur Stripe
+   * @throws BadRequestException avec un message générique
    */
+  private handleStripeError(error: any): never {
+    this.logger.error('Erreur Stripe:', error);
+
+    // Ne jamais exposer les détails techniques des erreurs Stripe
+    throw new BadRequestException(
+      'Une erreur de paiement est survenue. Veuillez contacter l\'administrateur ou réessayer plus tard.'
+    );
+  }
   async createStripeConnectAccount(userId: string): Promise<{ accountId: string }> {
     // Vérifier que l'utilisateur est bien ADMIN
     const user = await this.prisma.user.findUnique({
@@ -271,64 +279,69 @@ export class StripeService {
     const stripeAccountId = await this.requireStripeConnectAccount();
 
     // 7. Créer la session Stripe Checkout sur le compte Connect
-    const session = await this.stripe.checkout.sessions.create(
-      {
-        // Mode paiement unique (pas d'abonnement)
-        mode: 'payment',
+    let session;
+    try {
+      session = await this.stripe.checkout.sessions.create(
+        {
+          // Mode paiement unique (pas d'abonnement)
+          mode: 'payment',
 
-        // URLs de redirection après paiement
-        success_url: `${frontendUrl}/reservation/success?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${frontendUrl}/reservation/cancel?service_id=${bookingData.serviceId}`,
+          // URLs de redirection après paiement
+          success_url: `${frontendUrl}/reservation/success?session_id={CHECKOUT_SESSION_ID}`,
+          cancel_url: `${frontendUrl}/reservation/cancel?service_id=${bookingData.serviceId}`,
 
-        // Email du client pré-rempli
-        customer_email: user.email,
+          // Email du client pré-rempli
+          customer_email: user.email,
 
-        // Métadonnées pour créer la réservation dans le webhook
-        metadata: {
-          userId: user.id,
-          serviceId: service.id,
-          date: bookingData.date,
-          startTime: bookingData.startTime,
-          endTime: endTime,
-          notes: bookingData.notes || '',
-          depositAmount: depositAmount.toString(),
-        },
+          // Métadonnées pour créer la réservation dans le webhook
+          metadata: {
+            userId: user.id,
+            serviceId: service.id,
+            date: bookingData.date,
+            startTime: bookingData.startTime,
+            endTime: endTime,
+            notes: bookingData.notes || '',
+            depositAmount: depositAmount.toString(),
+          },
 
-        // Produit : l'acompte pour la réservation
-        line_items: [
-          {
-            price_data: {
-              currency: 'eur',
-              unit_amount: Math.round(depositAmount * 100), // Stripe utilise les centimes
-              product_data: {
-                name: `Acompte - ${service.name}`,
-                description: `Réservation du ${formattedDate} à ${bookingData.startTime}`,
-                // Image du service si disponible
-                ...(service.imageUrl && {
-                  images: [service.imageUrl],
-                }),
+          // Produit : l'acompte pour la réservation
+          line_items: [
+            {
+              price_data: {
+                currency: 'eur',
+                unit_amount: Math.round(depositAmount * 100), // Stripe utilise les centimes
+                product_data: {
+                  name: `Acompte - ${service.name}`,
+                  description: `Réservation du ${formattedDate} à ${bookingData.startTime}`,
+                  // Image du service si disponible
+                  ...(service.imageUrl && {
+                    images: [service.imageUrl],
+                  }),
+                },
               },
+              quantity: 1,
             },
-            quantity: 1,
-          },
-        ],
+          ],
 
-        // Options de paiement
-        payment_method_types: ['card'],
+          // Options de paiement
+          payment_method_types: ['card'],
 
-        // Expiration de la session (30 minutes)
-        expires_at: Math.floor(Date.now() / 1000) + 30 * 60,
+          // Expiration de la session (30 minutes)
+          expires_at: Math.floor(Date.now() / 1000) + 30 * 60,
 
-        // Message personnalisé
-        custom_text: {
-          submit: {
-            message: `Acompte non remboursable en cas d'annulation tardive (moins de ${settings?.cancellationDeadlineHours || 24}h avant le RDV).`,
+          // Message personnalisé
+          custom_text: {
+            submit: {
+              message: `Acompte non remboursable en cas d'annulation tardive (moins de ${settings?.cancellationDeadlineHours || 24}h avant le RDV).`,
+            },
           },
         },
-      },
-      // Utiliser le compte Stripe Connect de la masseuse
-      { stripeAccount: stripeAccountId },
-    );
+        // Utiliser le compte Stripe Connect de la masseuse
+        { stripeAccount: stripeAccountId },
+      );
+    } catch (error) {
+      this.handleStripeError(error);
+    }
 
     // this.logger.log(
     //   `Session Checkout créée pour ${user.email} - Service: ${service.name} - Session: ${session.id}`,

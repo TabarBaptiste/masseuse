@@ -245,9 +245,15 @@ function ReservationContent() {
       }
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } };
+      const backendMessage = error.response?.data?.message || '';
+
+      // Vérifier si le message contient des informations sensibles (clés API, comptes Stripe, etc.)
+      const containsSensitiveInfo = /sk_live|sk_test|pk_live|pk_test|acct_|whsec_/i.test(backendMessage);
+
       setError(
-        error.response?.data?.message ||
-        'Erreur lors de la réservation. Veuillez réessayer.'
+        containsSensitiveInfo
+          ? 'Une erreur de paiement est survenue. Veuillez contacter l\'administrateur ou réessayer plus tard.'
+          : backendMessage || 'Erreur lors de la réservation. Veuillez réessayer.'
       );
     } finally {
       setIsSubmitting(false);
