@@ -4,6 +4,7 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../../prisma/prisma.service';
 import { UserRole } from '@prisma/client';
+import { Request } from 'express';
 
 export interface JwtPayload {
   sub: string;
@@ -11,18 +12,39 @@ export interface JwtPayload {
   role: UserRole;
 }
 
+/**
+ * Extrait le JWT soit du cookie httpOnly, soit du header Authorization
+ * Priorité : Cookie > Header (pour la rétrocompatibilité)
+ */
+const extractJwtFromCookieOrHeader = (req: Request): string | null => {
+  // 1. Essayer d'extraire depuis le cookie httpOnly
+  if (req.cookies && req.cookies.access_token) {
+    return req.cookies.access_token;
+  }
+  
+  // 2. Fallback sur le header Authorization (Bearer token)
+  const authHeader = req.headers.authorization;
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    return authHeader.substring(7);
+  }
+  
+  return null;
+};
+
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
     private configService: ConfigService,
     private prisma: PrismaService,
   ) {
+    const jwtSecret = configService.get<string>('JWT_SECRET');
+    if (!jwtSecret) {
+      throw new Error('JWT_SECRET environment variable is not defined. Application cannot start.');
+    }
     super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      jwtFromRequest: extractJwtFromCookieOrHeader,
       ignoreExpiration: false,
-      secretOrKey:
-        configService.get<string>('JWT_SECRET') ||
-        'your-super-secret-jwt-key-change-in-production',
+      secretOrKey: jwtSecret,
     });
   }
 
@@ -34,8 +56,10 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         email: true,
         firstName: true,
         lastName: true,
+        phone: true,
         role: true,
         isActive: true,
+        emailVerified: true,
       },
     });
 

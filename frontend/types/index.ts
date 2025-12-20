@@ -82,6 +82,7 @@ export interface Booking {
   cancelledAt?: string;
   cancelReason?: string;
   reminderSentAt?: string;
+  // Relations
   createdAt: string;
   updatedAt: string;
   service?: Service;
@@ -109,6 +110,9 @@ export interface SiteSettings {
   salonAddress?: string;
   salonPhone?: string;
   salonEmail?: string;
+  legalForm?: string;
+  siret?: string;
+  vatNumber?: string;
   logoUrl?: string;
   heroImageUrl?: string;
   defaultOpenTime: string;

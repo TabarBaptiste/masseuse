@@ -19,7 +19,8 @@ enum UserRole {
 }
 
 enum BookingStatus {
-  PENDING // En attente de confirmation
+  PENDING_PAYMENT // En attente de paiement de l'acompte
+  PENDING // En attente de confirmation (acompte payé)
   CONFIRMED // Confirmée
   COMPLETED // Effectuée
   CANCELLED // Annulée par le client
@@ -49,8 +50,12 @@ model User {
   phone     String?
   role      UserRole @default(USER)
 
-  emailVerified Boolean @default(false)
-  isActive      Boolean @default(true)
+  emailVerified          Boolean  @default(false)
+  emailVerificationToken String?  @unique
+  isActive               Boolean  @default(true)
+
+  // Stripe Connect (uniquement pour ADMIN)
+  stripeAccountId String? @unique // ID du compte Stripe Connect Standard
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -154,6 +159,15 @@ model Booking {
   // Prix au moment de la réservation (au cas où le prix change)
   priceAtBooking Decimal @db.Decimal(10, 2)
 
+  // ========================================
+  // PAIEMENT STRIPE
+  // ========================================
+  stripeSessionId       String?  @unique // ID de la session Checkout Stripe
+  stripePaymentIntentId String?  @unique // ID du PaymentIntent Stripe
+  depositAmount         Decimal? @db.Decimal(10, 2) // Montant de l'acompte payé
+  depositPaidAt         DateTime? // Date/heure du paiement de l'acompte
+  isDepositPaid         Boolean  @default(false) // Indicateur de paiement effectué
+
   // Annulation
   cancelledAt  DateTime?
   cancelReason String?   @db.Text
@@ -171,6 +185,7 @@ model Booking {
   @@index([serviceId])
   @@index([date, startTime])
   @@index([status])
+  @@index([stripeSessionId])
 }
 
 // ========================================
@@ -216,6 +231,11 @@ model SiteSettings {
   salonPhone       String?
   salonEmail       String?
 
+  // Informations légales
+  legalForm        String? // Forme juridique (EI, SARL, etc.)
+  siret            String? // Numéro SIRET
+  vatNumber        String? // Numéro TVA intracommunautaire
+
   // Images
   logoUrl      String?
   heroImageUrl String?
@@ -228,6 +248,10 @@ model SiteSettings {
   bookingAdvanceMinDays     Int @default(0) // Nb jours min avant réservation
   bookingAdvanceMaxDays     Int @default(60) // Nb jours max avant réservation
   cancellationDeadlineHours Int @default(24) // Délai annulation (en heures)
+
+  // Paramètres de paiement
+  depositAmount             Decimal @default(20) @db.Decimal(10, 2) // Montant de l'acompte en euros
+  depositRequired           Boolean @default(true) // Acompte obligatoire
 
   // Notifications
   emailNotificationsEnabled Boolean @default(true)

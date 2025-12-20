@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/Button';
 import { ShieldCheck, Heart, Sparkles } from 'lucide-react';
 import { MapEmbed } from '@/components/ui/MapEmbed';
 import { FloatingFlowers } from '@/components/ui/FloatingFlowers';
+import Contact from '@/components/contact/Contact';
 
 export default function Home() {
   return (
@@ -35,20 +36,21 @@ export default function Home() {
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center pt-6 animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
               <Link href="/services" className="w-full sm:w-auto">
                 <Button
+                  variant="discover"
                   size="lg"
-                  className="w-full sm:w-auto bg-amber-800 hover:bg-amber-900 text-white px-6 sm:px-10 py-3 sm:py-4 text-base sm:text-lg rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                  className="w-full sm:w-auto px-6 sm:px-10 py-3 sm:py-4 text-base sm:text-lg"
                 >
                   Découvrir mes soins
                 </Button>
               </Link>
-              <Link href="/register" className="w-full sm:w-auto">
+              {/* <Link href="/register" className="w-full sm:w-auto">
                 <Button
                   size="lg"
                   className="w-full sm:w-auto bg-stone-800 hover:bg-stone-900 text-white border-2 border-stone-800 px-6 sm:px-10 py-3 sm:py-4 text-base sm:text-lg rounded-full shadow-md hover:shadow-lg transition-all duration-300"
                 >
                   Réserver maintenant
                 </Button>
-              </Link>
+              </Link> */}
             </div>
           </div>
         </div>
@@ -139,7 +141,7 @@ export default function Home() {
             <Link href="/services">
               <Button
                 size="lg"
-                className="bg-amber-600 hover:bg-amber-700 text-white px-12 py-6 text-lg rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
+                className="w-full sm:w-auto px-6 sm:px-10 py-3 sm:py-4 text-base sm:text-lg"
               >
                 Voir tous mes soins
               </Button>
@@ -167,7 +169,7 @@ export default function Home() {
             <Link href="/services" className="w-full sm:w-auto max-w-sm">
               <Button
                 size="lg"
-                className="w-full bg-amber-800 hover:bg-amber-900 text-white px-8 sm:px-12 py-4 sm:py-5 text-base sm:text-lg rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
+                className="w-full sm:w-auto px-6 sm:px-10 py-3 sm:py-4 text-base sm:text-lg"
               >
                 Réserver en ligne
               </Button>
@@ -194,6 +196,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Contact Section */}
+      <Contact />
 
       <style jsx>{`
         @keyframes fade-in {

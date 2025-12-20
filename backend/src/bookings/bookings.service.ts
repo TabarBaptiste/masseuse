@@ -7,10 +7,16 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateBookingDto, UpdateBookingDto } from './dto';
 import { BookingStatus, DayOfWeek } from '@prisma/client';
+import { EmailService } from '../email/email.service';
+import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
 
 @Injectable()
 export class BookingsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private emailService: EmailService,
+  ) { }
 
   async create(userId: string, createBookingDto: CreateBookingDto) {
     // Get service
@@ -71,13 +77,14 @@ export class BookingsService {
     }
 
     // Create booking
-    return this.prisma.booking.create({
+    const booking = await this.prisma.booking.create({
       data: {
         userId,
         serviceId: createBookingDto.serviceId,
         date: new Date(createBookingDto.date),
         startTime: createBookingDto.startTime,
         endTime,
+        // status: BookingStatus.PENDING_PAYMENT,
         notes: createBookingDto.notes,
         priceAtBooking: service.price,
       },
@@ -94,6 +101,26 @@ export class BookingsService {
         },
       },
     });
+
+    // Envoyer email de notification à l'administrateur
+    try {
+      await this.emailService.notifyAdminNewBooking({
+        clientName: `${booking.user.firstName} ${booking.user.lastName}`,
+        clientEmail: booking.user.email,
+        clientPhone: booking.user.phone || undefined,
+        serviceName: booking.service.name,
+        date: format(new Date(booking.date), 'EEEE d MMMM yyyy', { locale: fr }),
+        time: booking.startTime,
+        duration: booking.service.duration,
+        price: Number(booking.priceAtBooking),
+        notes: booking.notes || undefined,
+      });
+    } catch (error) {
+      console.error('Erreur lors de l\'envoi de l\'email de notification:', error);
+      // On ne fait pas échouer la réservation si l'email échoue
+    }
+
+    return booking;
   }
 
   async getAvailableSlots(serviceId: string, date: string) {
@@ -270,6 +297,7 @@ export class BookingsService {
     return booking;
   }
 
+  // Dans bookings.service.ts - modifier la méthode update()
   async update(
     id: string,
     updateBookingDto: UpdateBookingDto,
@@ -278,34 +306,8 @@ export class BookingsService {
   ) {
     const booking = await this.findOne(id, userId, userRole);
 
-    // Users can only update their own bookings and limited fields
-    if (userRole === 'USER' && booking.userId !== userId) {
-      throw new ForbiddenException('You can only update your own bookings');
-    }
-
-    // Users can only update notes
-    if (userRole === 'USER') {
-      const { notes } = updateBookingDto;
-      return this.prisma.booking.update({
-        where: { id },
-        data: { notes },
-        include: {
-          service: true,
-          user: {
-            select: {
-              id: true,
-              email: true,
-              firstName: true,
-              lastName: true,
-              phone: true,
-            },
-          },
-        },
-      });
-    }
-
     // PRO and ADMIN can update all fields
-    return this.prisma.booking.update({
+    const updatedBooking = await this.prisma.booking.update({
       where: { id },
       data: updateBookingDto,
       include: {
@@ -321,6 +323,28 @@ export class BookingsService {
         },
       },
     });
+
+    // Envoyer email de confirmation au client si le statut passe à CONFIRMED
+    if (updateBookingDto.status === BookingStatus.CONFIRMED && booking.status !== BookingStatus.CONFIRMED) {
+      try {
+        await this.emailService.sendBookingConfirmationToClient(
+          updatedBooking.user.email,
+          {
+            clientName: `${updatedBooking.user.firstName} ${updatedBooking.user.lastName}`,
+            serviceName: updatedBooking.service.name,
+            date: format(new Date(updatedBooking.date), 'EEEE d MMMM yyyy', { locale: fr }),
+            time: updatedBooking.startTime,
+            duration: updatedBooking.service.duration,
+            price: Number(updatedBooking.priceAtBooking),
+          }
+        );
+      } catch (error) {
+        console.error('Erreur lors de l\'envoi de l\'email de confirmation au client:', error);
+        // On ne fait pas échouer la mise à jour si l'email échoue
+      }
+    }
+
+    return updatedBooking;
   }
 
   async cancel(id: string, userId: string, userRole: string, reason?: string) {
@@ -352,7 +376,7 @@ export class BookingsService {
       }
     }
 
-    return this.prisma.booking.update({
+    const cancelledBooking = await this.prisma.booking.update({
       where: { id },
       data: {
         status: BookingStatus.CANCELLED,
@@ -372,6 +396,52 @@ export class BookingsService {
         },
       },
     });
+
+    // Envoyer email de notification à l'administrateur
+    try {
+      await this.emailService.notifyAdminBookingCancelled({
+        clientName: `${cancelledBooking.user.firstName} ${cancelledBooking.user.lastName}`,
+        clientEmail: cancelledBooking.user.email,
+        serviceName: cancelledBooking.service.name,
+        date: format(new Date(cancelledBooking.date), 'EEEE d MMMM yyyy', { locale: fr }),
+        time: cancelledBooking.startTime,
+        cancelReason: reason,
+      });
+    } catch (error) {
+      console.error('Erreur lors de l\'envoi de l\'email d\'annulation:', error);
+      // On ne fait pas échouer l'annulation si l'email échoue
+    }
+
+    return cancelledBooking;
+  }
+
+  /**
+   * Vérifie la disponibilité d'un créneau pour un service donné
+   * Méthode publique utilisée avant de créer une session de paiement
+   */
+  async checkSlotAvailability(
+    serviceId: string,
+    date: string,
+    startTime: string,
+  ): Promise<boolean> {
+    // Récupérer le service pour connaître la durée
+    const service = await this.prisma.service.findUnique({
+      where: { id: serviceId },
+    });
+
+    if (!service) {
+      throw new NotFoundException('Service not found');
+    }
+
+    // Calculer l'heure de fin
+    const [startHour, startMinute] = startTime.split(':').map(Number);
+    const endMinutes = startHour * 60 + startMinute + service.duration;
+    const endHour = Math.floor(endMinutes / 60);
+    const endMinute = endMinutes % 60;
+    const endTime = `${String(endHour).padStart(2, '0')}:${String(endMinute).padStart(2, '0')}`;
+
+    // Vérifier la disponibilité
+    return this.isSlotAvailable(date, startTime, endTime);
   }
 
   private async isSlotAvailable(

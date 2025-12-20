@@ -28,7 +28,7 @@ async function main() {
   console.log('✅ Admin user created:', admin.email);
 
   // Create PRO User
-  const proPassword = await bcrypt.hash('Pro123!', 10);
+  const proPassword = await bcrypt.hash('Proo123!', 10);
   const pro = await prisma.user.upsert({
     where: { email: 'pro@masseuse.com' },
     update: {},
@@ -151,7 +151,7 @@ async function main() {
         'Découvrez mes massages relaxants et toniques dans mon salon au Robert. Tarifs de 25€ à 80€, sur rendez-vous uniquement.',
       salonAddress: 'Le Robert, Martinique',
       salonPhone: '+596 596 XX XX XX', // Placeholder for Martinique number
-      salonEmail: 'contact@alydousheure.com',
+      salonEmail: 'contact@alydousheure.fr',
       defaultOpenTime: '09:00',
       defaultCloseTime: '18:00',
       bookingAdvanceMinDays: 1,

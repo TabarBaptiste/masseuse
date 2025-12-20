@@ -2,7 +2,7 @@ import React from 'react';
 import clsx from 'clsx';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'outline' | 'danger';
+  variant?: 'primary' | 'secondary' | 'outline' | 'danger' | 'discover';
   size?: 'sm' | 'md' | 'lg';
   children: React.ReactNode;
 }
@@ -21,6 +21,7 @@ export const Button: React.FC<ButtonProps> = ({
     secondary: 'bg-gray-600 text-white hover:bg-gray-700 focus:ring-gray-500',
     outline: 'border-2 border-blue-600 text-blue-600 hover:bg-blue-50 focus:ring-blue-500',
     danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500',
+    discover: 'bg-amber-800 text-white hover:bg-amber-900 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105',
   };
   
   const sizes = {
@@ -29,9 +30,11 @@ export const Button: React.FC<ButtonProps> = ({
     lg: 'px-6 py-3 text-lg',
   };
 
+  const variantStyles = variant ? variants[variant] : '';
+
   return (
     <button
-      className={clsx(baseStyles, variants[variant], sizes[size], className)}
+      className={clsx(baseStyles, variantStyles, sizes[size], className)}
       {...props}
     >
       {children}
