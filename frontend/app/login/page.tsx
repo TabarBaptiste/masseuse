@@ -34,8 +34,9 @@ export default function LoginPage() {
     try {
       await login(data);
       
-      // Redirect to stored URL or default to profile
-      const redirectUrl = localStorage.getItem('redirectAfterLogin') || '/profile';
+      // Redirect to stored URL if it's a reservation, otherwise to services
+      const storedRedirect = localStorage.getItem('redirectAfterLogin');
+      const redirectUrl = storedRedirect && storedRedirect.startsWith('/reservation/') ? storedRedirect : '/services';
       localStorage.removeItem('redirectAfterLogin'); // Clean up
       router.push(redirectUrl);
     } catch (err: unknown) {
