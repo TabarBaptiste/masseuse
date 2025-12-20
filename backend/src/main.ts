@@ -1,6 +1,8 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import helmet from 'helmet';
+import cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
 
 // Load environment variables
@@ -12,15 +14,36 @@ async function bootstrap() {
     rawBody: true,
   });
 
+  // Enable cookie parsing for httpOnly cookies
+  app.use(cookieParser());
+
+  // Enable security headers with Helmet
+  app.use(helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        imgSrc: ["'self'", 'data:', 'https:'],
+        scriptSrc: ["'self'"],
+      },
+    },
+    crossOriginEmbedderPolicy: false, // Nécessaire pour les images externes
+  }));
+
   // Enable CORS for frontend
   const allowedOrigins = process.env.FRONTEND_URL
     ? process.env.FRONTEND_URL.split(',')
-    : ['http://localhost:3000', 'https://alydousheure.fr', 'http://192.168.80.1:3000'];
+    : ['http://localhost:3000'];
 
   app.enableCors({
     origin: (origin: string, callback) => {
-      // Allow requests with no origin (like mobile apps or curl requests)
-      if (!origin) return callback(null, true);
+      // Allow requests with no origin (like mobile apps or curl requests) only in development
+      if (!origin) {
+        if (process.env.NODE_ENV === 'production') {
+          return callback(new Error('Not allowed by CORS'));
+        }
+        return callback(null, true);
+      }
 
       if (allowedOrigins.includes(origin)) {
         return callback(null, true);
@@ -29,6 +52,8 @@ async function bootstrap() {
       }
     },
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'stripe-signature'],
   });
 
   // Enable global validation
@@ -43,25 +68,24 @@ async function bootstrap() {
   // Set global prefix
   app.setGlobalPrefix('api');
 
-  // Configure Swagger
-  const config = new DocumentBuilder()
-    .setTitle('Masseuse API')
-    .setDescription('API pour l\'application de réservation de massages')
-    .setVersion('1.0')
-    // .addTag('auth', 'Authentification')
-    // .addTag('users', 'Utilisateurs')
-    // .addTag('services', 'Services')
-    // .addTag('bookings', 'Réservations')
-    // .addTag('availability', 'Disponibilités')
-    // .addTag('reviews', 'Avis')
-    // .addTag('blocked-slots', 'Créneaux bloqués')
-    // .addTag('site-settings', 'Paramètres du site')
-    .build();
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api/docs', app, document);
+  // Configure Swagger - Only in development
+  if (process.env.NODE_ENV !== 'production') {
+    const config = new DocumentBuilder()
+      .setTitle('Masseuse API')
+      .setDescription('API pour l\'application de réservation de massages')
+      .setVersion('1.0')
+      .addBearerAuth()
+      .build();
+    const document = SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup('api/docs', app, document);
+  }
 
   await app.listen(process.env.PORT ?? 3001);
-  console.log(`Application is running on: ${await app.getUrl()}`);
-  console.log(`Swagger UI available at: ${await app.getUrl()}/api/docs\n`);
+  const appUrl = await app.getUrl();
+  console.log(`Application is running on: ${appUrl}`);
+  
+  if (process.env.NODE_ENV !== 'production') {
+    console.log(`Swagger UI available at: ${appUrl}/api/docs`);
+  }
 }
 void bootstrap();

@@ -32,7 +32,7 @@ export class AuthService {
     }
 
     // Hash password
-    const hashedPassword = await bcrypt.hash(registerDto.password, 10);
+    const hashedPassword = await bcrypt.hash(registerDto.password, 12);
 
     // Generate email verification token
     const emailVerificationToken = randomBytes(32).toString('hex');

@@ -45,10 +45,10 @@ export class BookingsController {
     // TODO : DOIT ÊTRE SUPPRIMÉ APRÈS TESTS
     // ! DOIT ÊTRE SUPPRIMÉ APRÈS TESTS
     // Créer la réservation avec statut PENDING_PAYMENT
-    await this.bookingsService.create(
-      user.id,
-      createBookingDto,
-    );
+    // await this.bookingsService.create(
+    //   user.id,
+    //   createBookingDto,
+    // );
     // TODO : DOIT ÊTRE SUPPRIMÉ APRÈS TESTS
     // ! DOIT ÊTRE SUPPRIMÉ APRÈS TESTS
   

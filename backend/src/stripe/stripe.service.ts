@@ -386,6 +386,8 @@ export class StripeService {
   /**
    * Crée une réservation après paiement réussi
    * Utilisé dans le nouveau flow où la réservation est créée seulement après paiement
+   * 
+   * IDEMPOTENCE : Vérifie si une réservation existe déjà avec ce stripeSessionId
    *
    * @param session - Session Checkout Stripe
    */
@@ -403,6 +405,20 @@ export class StripeService {
     } = session.metadata!;
 
     try {
+      // IDEMPOTENCE : Vérifier si une réservation existe déjà avec cette session
+      const existingBooking = await this.prisma.booking.findFirst({
+        where: {
+          stripeSessionId: session.id,
+        },
+      });
+
+      if (existingBooking) {
+        this.logger.warn(
+          `Webhook doublon détecté - Réservation ${existingBooking.id} existe déjà pour la session ${session.id}`,
+        );
+        return;
+      }
+
       // Récupérer le prix du service
       const service = await this.prisma.service.findUnique({
         where: { id: serviceId },
@@ -495,5 +511,136 @@ export class StripeService {
     // Vérifier auprès de Stripe
     const session = await this.stripe.checkout.sessions.retrieve(sessionId);
     return session.payment_status === 'paid';
+  }
+
+  /**
+   * Vérifie si une réservation peut être remboursée selon le délai configuré
+   * 
+   * @param bookingId - ID de la réservation
+   * @returns { canRefund: boolean, reason?: string, hoursUntilBooking?: number }
+   */
+  async canRefundBooking(bookingId: string): Promise<{
+    canRefund: boolean;
+    reason?: string;
+    hoursUntilBooking?: number;
+  }> {
+    const booking = await this.prisma.booking.findUnique({
+      where: { id: bookingId },
+    });
+
+    if (!booking) {
+      return { canRefund: false, reason: 'Réservation introuvable' };
+    }
+
+    if (!booking.isDepositPaid || !booking.stripePaymentIntentId) {
+      return { canRefund: false, reason: 'Aucun paiement à rembourser' };
+    }
+
+    if (booking.status === BookingStatus.CANCELLED) {
+      return { canRefund: false, reason: 'Réservation déjà annulée' };
+    }
+
+    // Récupérer les paramètres du site pour le délai d'annulation
+    const settings = await this.prisma.siteSettings.findFirst();
+    const cancellationDeadlineHours = settings?.cancellationDeadlineHours || 24;
+
+    // Calculer le temps restant avant le rendez-vous
+    const bookingDateTime = new Date(booking.date);
+    const [hours, minutes] = booking.startTime.split(':').map(Number);
+    bookingDateTime.setHours(hours, minutes, 0, 0);
+
+    const now = new Date();
+    const hoursUntilBooking = (bookingDateTime.getTime() - now.getTime()) / (1000 * 60 * 60);
+
+    if (hoursUntilBooking < cancellationDeadlineHours) {
+      return {
+        canRefund: false,
+        reason: `Annulation impossible moins de ${cancellationDeadlineHours}h avant le rendez-vous. L'acompte ne sera pas remboursé.`,
+        hoursUntilBooking: Math.max(0, hoursUntilBooking),
+      };
+    }
+
+    return { canRefund: true, hoursUntilBooking };
+  }
+
+  /**
+   * Effectue un remboursement Stripe pour une réservation
+   * 
+   * @param bookingId - ID de la réservation à rembourser
+   * @param reason - Raison du remboursement (optionnel)
+   * @returns Les détails du remboursement
+   */
+  async refundBooking(
+    bookingId: string,
+    reason?: string,
+  ): Promise<{
+    success: boolean;
+    refundId?: string;
+    amount?: number;
+    error?: string;
+  }> {
+    // Vérifier si le remboursement est possible
+    const canRefundResult = await this.canRefundBooking(bookingId);
+    
+    if (!canRefundResult.canRefund) {
+      return {
+        success: false,
+        error: canRefundResult.reason,
+      };
+    }
+
+    const booking = await this.prisma.booking.findUnique({
+      where: { id: bookingId },
+    });
+
+    if (!booking || !booking.stripePaymentIntentId) {
+      return {
+        success: false,
+        error: 'Paiement Stripe introuvable',
+      };
+    }
+
+    try {
+      // Créer le remboursement via Stripe
+      const refund = await this.stripe.refunds.create({
+        payment_intent: booking.stripePaymentIntentId,
+        reason: 'requested_by_customer',
+        metadata: {
+          bookingId: booking.id,
+          reason: reason || 'Annulation client',
+        },
+      });
+
+      // Mettre à jour la réservation
+      await this.prisma.booking.update({
+        where: { id: bookingId },
+        data: {
+          status: BookingStatus.CANCELLED,
+          cancelledAt: new Date(),
+          cancelReason: reason || 'Annulation avec remboursement',
+          // On pourrait ajouter un champ stripeRefundId si nécessaire
+        },
+      });
+
+      this.logger.log(
+        `Remboursement effectué pour la réservation ${bookingId}: ${refund.id} - ${refund.amount / 100}€`,
+      );
+
+      return {
+        success: true,
+        refundId: refund.id,
+        amount: refund.amount / 100, // Convertir en euros
+      };
+    } catch (error) {
+      this.logger.error(
+        `Erreur lors du remboursement de la réservation ${bookingId}:`,
+        error,
+      );
+
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Erreur lors du remboursement',
+      };
+    }
   }
 }
