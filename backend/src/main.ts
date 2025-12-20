@@ -15,7 +15,7 @@ async function bootstrap() {
   // Enable CORS for frontend
   const allowedOrigins = process.env.FRONTEND_URL
     ? process.env.FRONTEND_URL.split(',')
-    : ['http://localhost:3000', 'https://alydousheure.netlify.app'];
+    : ['http://localhost:3000', 'https://alydousheure.fr', 'http://192.168.80.1:3000'];
 
   app.enableCors({
     origin: (origin: string, callback) => {

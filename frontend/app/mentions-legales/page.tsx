@@ -23,7 +23,7 @@ export default function MentionsLegales() {
                     salonDescription: "Votre havre de paix et de relaxation.",
                     salonAddress: "Le Robert, Martinique",
                     salonPhone: "+596 596 XX XX XX",
-                    salonEmail: "contact@alydousheure.com",
+                    salonEmail: "contact@alydousheure.fr",
                     logoUrl: "",
                     heroImageUrl: "",
                     defaultOpenTime: "09:00",
@@ -82,7 +82,7 @@ export default function MentionsLegales() {
                             <p><strong>Forme juridique :</strong> [À définir - EI, SARL, etc.]</p>
                             <p><strong>Adresse :</strong> {settings.salonAddress || 'Le Robert, Martinique'}</p>
                             <p><strong>Téléphone :</strong> {settings.salonPhone || '+596 596 XX XX XX'}</p>
-                            <p><strong>Email :</strong> {settings.salonEmail || 'contact@alydousheure.com'}</p>
+                            <p><strong>Email :</strong> {settings.salonEmail || 'contact@alydousheure.fr'}</p>
                             <p><strong>SIRET :</strong> [Numéro SIRET à renseigner]</p>
                             <p><strong>Numéro TVA intracommunautaire :</strong> [Si applicable]</p>
                             <p><strong>Directeur de la publication :</strong> [Nom du responsable]</p>
@@ -132,7 +132,7 @@ export default function MentionsLegales() {
                                 vous disposez d'un droit d'accès, de rectification, de suppression et d'opposition aux données personnelles vous concernant.
                             </p>
                             <p>
-                                Pour exercer ces droits, vous pouvez nous contacter à l'adresse email : {settings.salonEmail || 'contact@alydousheure.com'}
+                                Pour exercer ces droits, vous pouvez nous contacter à l'adresse email : {settings.salonEmail || 'contact@alydousheure.fr'}
                             </p>
                             <p>
                                 Les données collectées via ce site sont utilisées uniquement pour le traitement de vos demandes de réservation et de contact.
@@ -259,7 +259,7 @@ export default function MentionsLegales() {
                             <p>
                                 Pour toute question concernant ces mentions légales, vous pouvez nous contacter :
                             </p>
-                            <p><strong>Email :</strong> {settings.salonEmail || 'contact@alydousheure.com'}</p>
+                            <p><strong>Email :</strong> {settings.salonEmail || 'contact@alydousheure.fr'}</p>
                             <p><strong>Téléphone :</strong> {settings.salonPhone || '+596 596 XX XX XX'}</p>
                             <p><strong>Adresse :</strong> {settings.salonAddress || 'Le Robert, Martinique'}</p>
                         </div>
