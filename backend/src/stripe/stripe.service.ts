@@ -14,9 +14,10 @@ import {
   BadRequestException,
   NotFoundException,
   Logger,
+  ForbiddenException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { BookingStatus } from '@prisma/client';
+import { BookingStatus, UserRole } from '@prisma/client';
 import Stripe from 'stripe';
 
 @Injectable()
@@ -31,6 +32,176 @@ export class StripeService {
       apiVersion: '2025-11-17.clover',
     });
   }
+
+  // ========================================
+  // STRIPE CONNECT - Gestion du compte masseuse
+  // ========================================
+
+  /**
+   * Récupère le compte Stripe Connect de l'ADMIN (masseuse)
+   * @returns L'ID du compte Stripe Connect ou null
+   */
+  private async getStripeConnectAccountId(): Promise<string | null> {
+    const admin = await this.prisma.user.findFirst({
+      where: { role: UserRole.ADMIN },
+      select: { stripeAccountId: true },
+    });
+    return admin?.stripeAccountId || null;
+  }
+
+  /**
+   * Récupère le compte Stripe Connect ou lève une erreur si non configuré
+   * @throws BadRequestException si le compte Stripe n'est pas configuré
+   */
+  private async requireStripeConnectAccount(): Promise<string> {
+    const accountId = await this.getStripeConnectAccountId();
+    if (!accountId) {
+      throw new BadRequestException(
+        'Le compte Stripe de la masseuse n\'est pas encore configuré. Veuillez contacter l\'administrateur.',
+      );
+    }
+    return accountId;
+  }
+
+  /**
+   * Crée un compte Stripe Connect Standard pour la masseuse (ADMIN)
+   * @param userId - ID de l'utilisateur ADMIN
+   * @returns L'ID du compte Stripe créé
+   */
+  async createStripeConnectAccount(userId: string): Promise<{ accountId: string }> {
+    // Vérifier que l'utilisateur est bien ADMIN
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new NotFoundException('Utilisateur introuvable');
+    }
+
+    if (user.role !== UserRole.ADMIN) {
+      throw new ForbiddenException('Seul l\'administrateur peut configurer le compte Stripe');
+    }
+
+    // Vérifier si un compte existe déjà
+    if (user.stripeAccountId) {
+      return { accountId: user.stripeAccountId };
+    }
+
+    // Créer le compte Stripe Connect Standard
+    const account = await this.stripe.accounts.create({
+      type: 'standard',
+      country: 'FR',
+      email: user.email,
+      metadata: {
+        userId: user.id,
+        platform: 'masseuse-app',
+      },
+    });
+
+    // Sauvegarder l'ID du compte dans la base de données
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { stripeAccountId: account.id },
+    });
+
+    this.logger.log(`Compte Stripe Connect créé pour l'admin ${userId}: ${account.id}`);
+
+    return { accountId: account.id };
+  }
+
+  /**
+   * Génère un lien d'onboarding Stripe pour la masseuse
+   * @param userId - ID de l'utilisateur ADMIN
+   * @returns L'URL d'onboarding Stripe
+   */
+  async createOnboardingLink(userId: string): Promise<{ url: string }> {
+    // Vérifier que l'utilisateur est bien ADMIN
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new NotFoundException('Utilisateur introuvable');
+    }
+
+    if (user.role !== UserRole.ADMIN) {
+      throw new ForbiddenException('Seul l\'administrateur peut configurer le compte Stripe');
+    }
+
+    // Si pas de compte Stripe, le créer d'abord
+    let accountId = user.stripeAccountId;
+    if (!accountId) {
+      const result = await this.createStripeConnectAccount(userId);
+      accountId = result.accountId;
+    }
+
+    // Déterminer l'URL du frontend
+    const frontendUrl =
+      process.env.FRONTEND_URL?.split(',')[0]?.trim() ||
+      'http://localhost:3000';
+
+    // Créer le lien d'onboarding
+    const accountLink = await this.stripe.accountLinks.create({
+      account: accountId,
+      type: 'account_onboarding',
+      refresh_url: `${frontendUrl}/admin/stripe/refresh`,
+      return_url: `${frontendUrl}/admin/stripe/success`,
+    });
+
+    this.logger.log(`Lien d'onboarding Stripe généré pour l'admin ${userId}`);
+
+    return { url: accountLink.url };
+  }
+
+  /**
+   * Vérifie le statut du compte Stripe Connect
+   * @param userId - ID de l'utilisateur ADMIN
+   * @returns Le statut du compte (configured, pending, not_created)
+   */
+  async getStripeAccountStatus(userId: string): Promise<{
+    status: 'configured' | 'pending' | 'not_created';
+    accountId?: string;
+    chargesEnabled?: boolean;
+    payoutsEnabled?: boolean;
+    detailsSubmitted?: boolean;
+  }> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new NotFoundException('Utilisateur introuvable');
+    }
+
+    if (!user.stripeAccountId) {
+      return { status: 'not_created' };
+    }
+
+    try {
+      const account = await this.stripe.accounts.retrieve(user.stripeAccountId);
+
+      // Vérifier si le compte est entièrement configuré
+      const isConfigured = 
+        account.charges_enabled && 
+        account.payouts_enabled && 
+        account.details_submitted;
+
+      return {
+        status: isConfigured ? 'configured' : 'pending',
+        accountId: account.id,
+        chargesEnabled: account.charges_enabled,
+        payoutsEnabled: account.payouts_enabled,
+        detailsSubmitted: account.details_submitted,
+      };
+    } catch (error) {
+      this.logger.error(`Erreur lors de la récupération du compte Stripe: ${error}`);
+      return { status: 'not_created' };
+    }
+  }
+
+  // ========================================
+  // CHECKOUT SESSIONS - Paiement des acomptes
+  // ========================================
 
   /**
    * Crée une session Stripe Checkout pour le paiement de l'acompte
@@ -96,67 +267,74 @@ export class StripeService {
       day: 'numeric',
     });
 
-    // 6. Créer la session Stripe Checkout
-    const session = await this.stripe.checkout.sessions.create({
-      // Mode paiement unique (pas d'abonnement)
-      mode: 'payment',
+    // 6. Récupérer le compte Stripe Connect de la masseuse (obligatoire)
+    const stripeAccountId = await this.requireStripeConnectAccount();
 
-      // URLs de redirection après paiement
-      success_url: `${frontendUrl}/reservation/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${frontendUrl}/reservation/cancel?service_id=${bookingData.serviceId}`,
+    // 7. Créer la session Stripe Checkout sur le compte Connect
+    const session = await this.stripe.checkout.sessions.create(
+      {
+        // Mode paiement unique (pas d'abonnement)
+        mode: 'payment',
 
-      // Email du client pré-rempli
-      customer_email: user.email,
+        // URLs de redirection après paiement
+        success_url: `${frontendUrl}/reservation/success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${frontendUrl}/reservation/cancel?service_id=${bookingData.serviceId}`,
 
-      // Métadonnées pour créer la réservation dans le webhook
-      metadata: {
-        userId: user.id,
-        serviceId: service.id,
-        date: bookingData.date,
-        startTime: bookingData.startTime,
-        endTime: endTime,
-        notes: bookingData.notes || '',
-        depositAmount: depositAmount.toString(),
-      },
+        // Email du client pré-rempli
+        customer_email: user.email,
 
-      // Produit : l'acompte pour la réservation
-      line_items: [
-        {
-          price_data: {
-            currency: 'eur',
-            unit_amount: Math.round(depositAmount * 100), // Stripe utilise les centimes
-            product_data: {
-              name: `Acompte - ${service.name}`,
-              description: `Réservation du ${formattedDate} à ${bookingData.startTime}`,
-              // Image du service si disponible
-              ...(service.imageUrl && {
-                images: [service.imageUrl],
-              }),
+        // Métadonnées pour créer la réservation dans le webhook
+        metadata: {
+          userId: user.id,
+          serviceId: service.id,
+          date: bookingData.date,
+          startTime: bookingData.startTime,
+          endTime: endTime,
+          notes: bookingData.notes || '',
+          depositAmount: depositAmount.toString(),
+        },
+
+        // Produit : l'acompte pour la réservation
+        line_items: [
+          {
+            price_data: {
+              currency: 'eur',
+              unit_amount: Math.round(depositAmount * 100), // Stripe utilise les centimes
+              product_data: {
+                name: `Acompte - ${service.name}`,
+                description: `Réservation du ${formattedDate} à ${bookingData.startTime}`,
+                // Image du service si disponible
+                ...(service.imageUrl && {
+                  images: [service.imageUrl],
+                }),
+              },
             },
+            quantity: 1,
           },
-          quantity: 1,
-        },
-      ],
+        ],
 
-      // Options de paiement
-      payment_method_types: ['card'],
+        // Options de paiement
+        payment_method_types: ['card'],
 
-      // Expiration de la session (30 minutes)
-      expires_at: Math.floor(Date.now() / 1000) + 30 * 60,
+        // Expiration de la session (30 minutes)
+        expires_at: Math.floor(Date.now() / 1000) + 30 * 60,
 
-      // Message personnalisé
-      custom_text: {
-        submit: {
-          message: `Acompte non remboursable en cas d'annulation tardive (moins de ${settings?.cancellationDeadlineHours || 24}h avant le RDV).`,
+        // Message personnalisé
+        custom_text: {
+          submit: {
+            message: `Acompte non remboursable en cas d'annulation tardive (moins de ${settings?.cancellationDeadlineHours || 24}h avant le RDV).`,
+          },
         },
       },
-    });
+      // Utiliser le compte Stripe Connect de la masseuse
+      { stripeAccount: stripeAccountId },
+    );
 
     // this.logger.log(
     //   `Session Checkout créée pour ${user.email} - Service: ${service.name} - Session: ${session.id}`,
     // );
 
-    // 7. Retourner l'URL de redirection
+    // 8. Retourner l'URL de redirection
     return { url: session.url! };
   }
 
@@ -239,59 +417,66 @@ export class StripeService {
       day: 'numeric',
     });
 
-    // 6. Créer la session Stripe Checkout
-    const session = await this.stripe.checkout.sessions.create({
-      // Mode paiement unique (pas d'abonnement)
-      mode: 'payment',
+    // 6. Récupérer le compte Stripe Connect de la masseuse (obligatoire)
+    const stripeAccountId = await this.requireStripeConnectAccount();
 
-      // URLs de redirection après paiement
-      success_url: `${frontendUrl}/reservation/success?session_id={CHECKOUT_SESSION_ID}&booking_id=${bookingId}`,
-      cancel_url: `${frontendUrl}/reservation/cancel?booking_id=${bookingId}`,
+    // 7. Créer la session Stripe Checkout sur le compte Connect
+    const session = await this.stripe.checkout.sessions.create(
+      {
+        // Mode paiement unique (pas d'abonnement)
+        mode: 'payment',
 
-      // Email du client pré-rempli
-      customer_email: booking.user.email,
+        // URLs de redirection après paiement
+        success_url: `${frontendUrl}/reservation/success?session_id={CHECKOUT_SESSION_ID}&booking_id=${bookingId}`,
+        cancel_url: `${frontendUrl}/reservation/cancel?booking_id=${bookingId}`,
 
-      // Métadonnées pour identifier la réservation dans le webhook
-      metadata: {
-        bookingId: booking.id,
-        userId: booking.userId,
-        serviceId: booking.serviceId,
-      },
+        // Email du client pré-rempli
+        customer_email: booking.user.email,
 
-      // Produit : l'acompte pour la réservation
-      line_items: [
-        {
-          price_data: {
-            currency: 'eur',
-            unit_amount: Math.round(depositAmount * 100), // Stripe utilise les centimes
-            product_data: {
-              name: `Acompte - ${booking.service.name}`,
-              description: `Réservation du ${formattedDate} à ${booking.startTime}`,
-              // Image du service si disponible
-              ...(booking.service.imageUrl && {
-                images: [booking.service.imageUrl],
-              }),
+        // Métadonnées pour identifier la réservation dans le webhook
+        metadata: {
+          bookingId: booking.id,
+          userId: booking.userId,
+          serviceId: booking.serviceId,
+        },
+
+        // Produit : l'acompte pour la réservation
+        line_items: [
+          {
+            price_data: {
+              currency: 'eur',
+              unit_amount: Math.round(depositAmount * 100), // Stripe utilise les centimes
+              product_data: {
+                name: `Acompte - ${booking.service.name}`,
+                description: `Réservation du ${formattedDate} à ${booking.startTime}`,
+                // Image du service si disponible
+                ...(booking.service.imageUrl && {
+                  images: [booking.service.imageUrl],
+                }),
+              },
             },
+            quantity: 1,
           },
-          quantity: 1,
-        },
-      ],
+        ],
 
-      // Options de paiement
-      payment_method_types: ['card'],
+        // Options de paiement
+        payment_method_types: ['card'],
 
-      // Expiration de la session (30 minutes)
-      expires_at: Math.floor(Date.now() / 1000) + 30 * 60,
+        // Expiration de la session (30 minutes)
+        expires_at: Math.floor(Date.now() / 1000) + 30 * 60,
 
-      // Message personnalisé
-      custom_text: {
-        submit: {
-          message: `Acompte non remboursable en cas d'annulation tardive (moins de ${settings?.cancellationDeadlineHours || 24}h avant le RDV).`,
+        // Message personnalisé
+        custom_text: {
+          submit: {
+            message: `Acompte non remboursable en cas d'annulation tardive (moins de ${settings?.cancellationDeadlineHours || 24}h avant le RDV).`,
+          },
         },
       },
-    });
+      // Utiliser le compte Stripe Connect de la masseuse
+      { stripeAccount: stripeAccountId },
+    );
 
-    // 7. Mettre à jour la réservation avec l'ID de session Stripe
+    // 8. Mettre à jour la réservation avec l'ID de session Stripe
     await this.prisma.booking.update({
       where: { id: bookingId },
       data: {
@@ -304,7 +489,7 @@ export class StripeService {
     //   `Session Checkout créée pour la réservation ${bookingId}: ${session.id}`,
     // );
 
-    // 8. Retourner l'URL de redirection
+    // 9. Retourner l'URL de redirection
     return { url: session.url! };
   }
 
@@ -486,6 +671,18 @@ export class StripeService {
    * @returns Les détails de la session
    */
   async getSessionDetails(sessionId: string): Promise<Stripe.Checkout.Session> {
+    const stripeAccountId = await this.getStripeConnectAccountId();
+    
+    // Si un compte Connect est configuré, utiliser ce compte
+    if (stripeAccountId) {
+      return this.stripe.checkout.sessions.retrieve(
+        sessionId,
+        { expand: ['payment_intent'] },
+        { stripeAccount: stripeAccountId },
+      );
+    }
+    
+    // Fallback pour les anciennes sessions (avant Connect)
     return this.stripe.checkout.sessions.retrieve(sessionId, {
       expand: ['payment_intent'],
     });
@@ -508,8 +705,20 @@ export class StripeService {
       return false;
     }
 
-    // Vérifier auprès de Stripe
-    const session = await this.stripe.checkout.sessions.retrieve(sessionId);
+    // Vérifier auprès de Stripe (avec le compte Connect si configuré)
+    const stripeAccountId = await this.getStripeConnectAccountId();
+    
+    let session: Stripe.Checkout.Session;
+    if (stripeAccountId) {
+      session = await this.stripe.checkout.sessions.retrieve(
+        sessionId,
+        {},
+        { stripeAccount: stripeAccountId },
+      );
+    } else {
+      session = await this.stripe.checkout.sessions.retrieve(sessionId);
+    }
+    
     return session.payment_status === 'paid';
   }
 
@@ -601,15 +810,30 @@ export class StripeService {
     }
 
     try {
-      // Créer le remboursement via Stripe
-      const refund = await this.stripe.refunds.create({
-        payment_intent: booking.stripePaymentIntentId,
-        reason: 'requested_by_customer',
-        metadata: {
-          bookingId: booking.id,
-          reason: reason || 'Annulation client',
-        },
-      });
+      // Récupérer le compte Stripe Connect si configuré
+      const stripeAccountId = await this.getStripeConnectAccountId();
+
+      // Créer le remboursement via Stripe (sur le compte Connect si configuré)
+      const refund = stripeAccountId
+        ? await this.stripe.refunds.create(
+            {
+              payment_intent: booking.stripePaymentIntentId,
+              reason: 'requested_by_customer',
+              metadata: {
+                bookingId: booking.id,
+                reason: reason || 'Annulation client',
+              },
+            },
+            { stripeAccount: stripeAccountId },
+          )
+        : await this.stripe.refunds.create({
+            payment_intent: booking.stripePaymentIntentId,
+            reason: 'requested_by_customer',
+            metadata: {
+              bookingId: booking.id,
+              reason: reason || 'Annulation client',
+            },
+          });
 
       // Mettre à jour la réservation
       await this.prisma.booking.update({
