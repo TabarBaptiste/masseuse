@@ -19,7 +19,7 @@ export class AuthService {
     private prisma: PrismaService,
     private jwtService: JwtService,
     private emailService: EmailService,
-  ) {}
+  ) { }
 
   async register(registerDto: RegisterDto) {
     // Check if user already exists
@@ -37,6 +37,10 @@ export class AuthService {
     // Generate email verification token
     const emailVerificationToken = randomBytes(32).toString('hex');
 
+    // TODO : à supprimer en PROD
+    // Déterminer le rôle : ADMIN pour alinerol@gmail.com, sinon USER par défaut
+    const role = registerDto.email === 'alinerol@gmail.com' ? 'ADMIN' : 'USER';
+
     // Create user
     const user = await this.prisma.user.create({
       data: {
@@ -47,6 +51,7 @@ export class AuthService {
         phone: registerDto.phone,
         emailVerificationToken,
         emailVerified: false,
+        role: role, // TODO : à supprimer en PROD
       },
       select: {
         id: true,
