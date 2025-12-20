@@ -183,11 +183,11 @@ export const Header: React.FC = () => {
                     <span>Connexion</span>
                   </Link>
                   <Link
-                    href="/login"
+                    href="/register"
                     className="block px-3 py-2 rounded-lg text-base font-medium bg-amber-800 text-white hover:bg-amber-900 transition-colors text-center"
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                    Réserver
+                    S'inscrire
                   </Link>
                 </div>
               )}
