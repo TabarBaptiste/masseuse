@@ -19,8 +19,22 @@ import {
     Activity,
     MessageSquare,
     PenLine,
-    CircleOff
+    CircleOff,
+    CreditCard,
+    CheckCircle,
+    AlertCircle,
+    ExternalLink,
+    Loader2
 } from 'lucide-react';
+
+// Types pour Stripe Connect
+interface StripeConnectStatus {
+    status: 'configured' | 'pending' | 'not_created';
+    accountId?: string;
+    chargesEnabled?: boolean;
+    payoutsEnabled?: boolean;
+    detailsSubmitted?: boolean;
+}
 
 export default function AdminDashboardPage() {
     return (
@@ -35,10 +49,27 @@ function DashboardContent() {
     const [services, setServices] = useState<Service[]>([]);
     const [_settings, setSettings] = useState<SiteSettings | null>(null);
     const [loading, setLoading] = useState(true);
+    
+    // Stripe Connect state
+    const [stripeStatus, setStripeStatus] = useState<StripeConnectStatus | null>(null);
+    const [stripeLoading, setStripeLoading] = useState(false);
+    const [stripeError, setStripeError] = useState<string | null>(null);
 
     useEffect(() => {
         window.scrollTo(0, 0);
     }, []);
+
+    // Fonction pour récupérer le statut Stripe
+    const fetchStripeStatus = async () => {
+        try {
+            const response = await api.get('/stripe/connect/status');
+            setStripeStatus(response.data);
+            setStripeError(null);
+        } catch (error) {
+            console.error('Erreur lors de la récupération du statut Stripe:', error);
+            setStripeError('Impossible de récupérer le statut Stripe');
+        }
+    };
 
     useEffect(() => {
         const fetchData = async () => {
@@ -51,6 +82,9 @@ function DashboardContent() {
                 setUsers(usersRes.data);
                 setServices(servicesRes.data);
                 setSettings(settingsRes.data);
+                
+                // Récupérer aussi le statut Stripe
+                await fetchStripeStatus();
             } catch (error) {
                 console.error('Erreur lors de la récupération des données:', error);
             } finally {
@@ -60,6 +94,22 @@ function DashboardContent() {
 
         fetchData();
     }, []);
+
+    // Fonction pour lancer l'onboarding Stripe
+    const handleStripeOnboarding = async () => {
+        setStripeLoading(true);
+        setStripeError(null);
+        
+        try {
+            const response = await api.post('/stripe/connect/onboarding-link');
+            // Rediriger vers Stripe
+            window.location.href = response.data.url;
+        } catch (error: any) {
+            console.error('Erreur lors de la création du lien d\'onboarding:', error);
+            setStripeError(error.response?.data?.message || 'Erreur lors de la configuration Stripe');
+            setStripeLoading(false);
+        }
+    };
 
     const stats = {
         // totalUsers: users.length,
@@ -118,6 +168,142 @@ function DashboardContent() {
                     <Card>
                         <div className="text-sm text-gray-600 mb-1">Total services</div>
                         <div className="text-3xl font-bold text-gray-900">{stats.totalServices}</div>
+                    </Card>
+                </div>
+
+                {/* Stripe Connect Section */}
+                <div className="mb-8">
+                    <Card className="border-2 border-indigo-100">
+                        <div className="flex items-center gap-3 mb-4">
+                            <div className="p-2 bg-indigo-100 rounded-lg">
+                                <CreditCard className="w-6 h-6 text-indigo-600" />
+                            </div>
+                            <div>
+                                <h3 className="text-xl font-semibold text-gray-900">
+                                    Configuration Stripe Connect
+                                </h3>
+                                <p className="text-sm text-gray-500">
+                                    Configurez votre compte Stripe pour recevoir les paiements
+                                </p>
+                            </div>
+                        </div>
+
+                        {stripeError && (
+                            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-red-700">
+                                <AlertCircle className="w-5 h-5 flex-shrink-0" />
+                                <span className="text-sm">{stripeError}</span>
+                            </div>
+                        )}
+
+                        {/* Statut du compte */}
+                        <div className="mb-4 p-4 bg-gray-50 rounded-lg">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                    {stripeStatus?.status === 'configured' ? (
+                                        <>
+                                            <CheckCircle className="w-6 h-6 text-green-500" />
+                                            <div>
+                                                <p className="font-medium text-green-700">Compte configuré</p>
+                                                <p className="text-sm text-gray-500">
+                                                    Votre compte Stripe est prêt à recevoir des paiements
+                                                </p>
+                                            </div>
+                                        </>
+                                    ) : stripeStatus?.status === 'pending' ? (
+                                        <>
+                                            <AlertCircle className="w-6 h-6 text-amber-500" />
+                                            <div>
+                                                <p className="font-medium text-amber-700">Configuration en cours</p>
+                                                <p className="text-sm text-gray-500">
+                                                    Complétez votre profil Stripe pour activer les paiements
+                                                </p>
+                                                {stripeStatus.accountId && (
+                                                    <p className="text-xs text-gray-400 mt-1">
+                                                        ID: {stripeStatus.accountId}
+                                                    </p>
+                                                )}
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <AlertCircle className="w-6 h-6 text-gray-400" />
+                                            <div>
+                                                <p className="font-medium text-gray-700">Compte non configuré</p>
+                                                <p className="text-sm text-gray-500">
+                                                    Configurez votre compte Stripe pour accepter les paiements
+                                                </p>
+                                            </div>
+                                        </>
+                                    )}
+                                </div>
+
+                                {/* Indicateurs de statut */}
+                                {stripeStatus?.status === 'pending' && (
+                                    <div className="text-right text-sm">
+                                        <div className="flex items-center gap-2">
+                                            <span className={stripeStatus.chargesEnabled ? 'text-green-600' : 'text-gray-400'}>
+                                                {stripeStatus.chargesEnabled ? '✓' : '○'} Paiements
+                                            </span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <span className={stripeStatus.payoutsEnabled ? 'text-green-600' : 'text-gray-400'}>
+                                                {stripeStatus.payoutsEnabled ? '✓' : '○'} Virements
+                                            </span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <span className={stripeStatus.detailsSubmitted ? 'text-green-600' : 'text-gray-400'}>
+                                                {stripeStatus.detailsSubmitted ? '✓' : '○'} Infos complètes
+                                            </span>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Boutons d'action */}
+                        <div className="flex flex-wrap gap-3">
+                            {stripeStatus?.status !== 'configured' && (
+                                <button
+                                    onClick={handleStripeOnboarding}
+                                    disabled={stripeLoading}
+                                    className="flex items-center justify-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white rounded-lg font-medium transition-colors"
+                                >
+                                    {stripeLoading ? (
+                                        <>
+                                            <Loader2 className="w-5 h-5 animate-spin" />
+                                            Redirection...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <ExternalLink className="w-5 h-5" />
+                                            {stripeStatus?.status === 'pending' 
+                                                ? 'Continuer la configuration' 
+                                                : 'Configurer Stripe Connect'}
+                                        </>
+                                    )}
+                                </button>
+                            )}
+
+                            {stripeStatus?.status === 'configured' && (
+                                <a
+                                    href="https://dashboard.stripe.com"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex items-center justify-center gap-2 px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-medium transition-colors"
+                                >
+                                    <ExternalLink className="w-5 h-5" />
+                                    Accéder au dashboard Stripe
+                                </a>
+                            )}
+
+                            <button
+                                onClick={fetchStripeStatus}
+                                className="flex items-center justify-center gap-2 px-4 py-3 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-lg font-medium transition-colors"
+                            >
+                                <Activity className="w-4 h-4" />
+                                Actualiser le statut
+                            </button>
+                        </div>
                     </Card>
                 </div>
 

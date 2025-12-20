@@ -54,6 +54,9 @@ model User {
   emailVerificationToken String?  @unique
   isActive               Boolean  @default(true)
 
+  // Stripe Connect (uniquement pour ADMIN)
+  stripeAccountId String? @unique // ID du compte Stripe Connect Standard
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

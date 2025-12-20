@@ -5,17 +5,67 @@
  * - POST /stripe/create-checkout-session - Crée une session de paiement
  * - POST /stripe/webhook - Reçoit les événements Stripe
  * - GET /stripe/verify-payment - Vérifie un paiement
+ * - POST /stripe/connect/create-account - Crée un compte Stripe Connect
+ * - POST /stripe/connect/onboarding-link - Génère un lien d'onboarding
+ * - GET /stripe/connect/status - Vérifie le statut du compte Stripe
  */
 
 import * as common from '@nestjs/common';
 import type { Request } from 'express';
 import { StripeService } from './stripe.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { UserRole } from '@prisma/client';
 
 @common.Controller('stripe')
 export class StripeController {
   constructor(private readonly stripeService: StripeService) {}
+
+  // ========================================
+  // STRIPE CONNECT - Configuration du compte masseuse
+  // ========================================
+
+  /**
+   * Crée un compte Stripe Connect Standard pour la masseuse
+   * Réservé à l'ADMIN uniquement
+   */
+  @common.Post('connect/create-account')
+  @common.UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  async createConnectAccount(@CurrentUser() user: any) {
+    return this.stripeService.createStripeConnectAccount(user.id);
+  }
+
+  /**
+   * Génère un lien d'onboarding Stripe pour la masseuse
+   * Ce lien permet de configurer le compte (IBAN, infos légales, etc.)
+   * Réservé à l'ADMIN uniquement
+   */
+  @common.Post('connect/onboarding-link')
+  @common.UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  async createOnboardingLink(@CurrentUser() user: any) {
+    return this.stripeService.createOnboardingLink(user.id);
+  }
+
+  /**
+   * Vérifie le statut du compte Stripe Connect
+   * Réservé à l'ADMIN uniquement
+   * 
+   * @returns { status: 'configured' | 'pending' | 'not_created', ... }
+   */
+  @common.Get('connect/status')
+  @common.UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  async getConnectStatus(@CurrentUser() user: any) {
+    return this.stripeService.getStripeAccountStatus(user.id);
+  }
+
+  // ========================================
+  // CHECKOUT SESSIONS - Paiement des acomptes
+  // ========================================
 
   /**
    * Crée une session Stripe Checkout pour payer l'acompte
