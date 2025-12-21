@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card } from '@/components/ui/Card';
 import { Loading } from '@/components/ui/Loading';
+import { Check, X } from 'lucide-react';
 
 interface ResetPasswordFormData {
   password: string;
@@ -32,6 +33,65 @@ function ResetPasswordContent() {
   } = useForm<ResetPasswordFormData>();
 
   const password = watch('password');
+  const confirmPassword = watch('confirmPassword');
+
+  // Password validation functions
+  const hasMinLength = (pwd: string) => pwd && pwd.length >= 8;
+  const hasSpecialChar = (pwd: string) => pwd && /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(pwd);
+  const hasNumber = (pwd: string) => pwd && /\d/.test(pwd);
+  const passwordsMatch = (pwd: string, confirmPwd: string) => pwd === confirmPwd && pwd.length > 0;
+
+  // Password strength component
+  const PasswordStrengthIndicator = ({ password }: { password: string }) => {
+    const criteria = [
+      { label: 'Au moins 8 caractères', valid: hasMinLength(password) },
+      { label: 'Au moins 1 caractère spécial (!@#$%^&*)', valid: hasSpecialChar(password) },
+      { label: 'Au moins 1 chiffre', valid: hasNumber(password) },
+    ];
+
+    return (
+      <div className="mt-2 space-y-1">
+        {criteria.map((criterion, index) => (
+          <div key={index} className="flex items-center text-sm">
+            {criterion.valid ? (
+              <Check className="w-4 h-4 text-green-500 mr-2" />
+            ) : (
+              <X className="w-4 h-4 text-gray-400 mr-2" />
+            )}
+            <span className={criterion.valid ? 'text-green-700' : 'text-gray-500'}>
+              {criterion.label}
+            </span>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+  // Password confirmation component
+  const PasswordConfirmationIndicator = ({
+    password,
+    confirmPassword
+  }: {
+    password: string;
+    confirmPassword: string
+  }) => {
+    const isValid = passwordsMatch(password, confirmPassword);
+
+    return (
+      <div className="mt-2">
+        <div className="flex items-center text-sm">
+          {isValid ? (
+            <Check className="w-4 h-4 text-green-500 mr-2" />
+          ) : (
+            <X className="w-4 h-4 text-gray-400 mr-2" />
+          )}
+          <span className={isValid ? 'text-green-700' : 'text-gray-500'}>
+            {isValid ? 'Les mots de passe correspondent' : 'Les mots de passe ne correspondent pas'}
+          </span>
+        </div>
+      </div>
+    );
+  };
 
   const onSubmit = async (data: ResetPasswordFormData) => {
     if (!token) {
@@ -128,13 +188,19 @@ function ResetPasswordContent() {
                     value: 8,
                     message: 'Le mot de passe doit contenir au moins 8 caractères',
                   },
-                  pattern: {
-                    value: /(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
-                    message: 'Le mot de passe doit contenir au moins une majuscule, une minuscule et un chiffre',
+                  validate: {
+                    hasSpecialChar: (value) =>
+                      /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(value) ||
+                      'Au moins 1 caractère spécial requis (!@#$%^&*...)',
+                    hasNumber: (value) =>
+                      /\d/.test(value) ||
+                      'Au moins 1 chiffre requis',
                   },
                 })}
                 error={errors.password?.message}
               />
+
+              {password && <PasswordStrengthIndicator password={password} />}
 
               <Input
                 label="Confirmer le mot de passe"
@@ -147,15 +213,9 @@ function ResetPasswordContent() {
                 error={errors.confirmPassword?.message}
               />
 
-              <div className="text-xs text-gray-500">
-                Le mot de passe doit contenir au moins :
-                <ul className="list-disc list-inside mt-1">
-                  <li>8 caractères</li>
-                  <li>Une lettre majuscule</li>
-                  <li>Une lettre minuscule</li>
-                  <li>Un chiffre</li>
-                </ul>
-              </div>
+              {confirmPassword && password && hasMinLength(password) && hasSpecialChar(password) && hasNumber(password) && (
+                <PasswordConfirmationIndicator password={password} confirmPassword={confirmPassword} />
+              )}
 
               <Button
                 type="submit"

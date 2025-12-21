@@ -15,8 +15,11 @@ export class ResetPasswordDto {
     })
     @IsString()
     @MinLength(8, { message: 'Le mot de passe doit contenir au moins 8 caractères' })
-    @Matches(/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, {
-        message: 'Le mot de passe doit contenir au moins une majuscule, une minuscule et un chiffre',
+    @Matches(/(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])/, {
+        message: 'Le mot de passe doit contenir au moins 1 caractère spécial (!@#$%^&*...)',
+    })
+    @Matches(/(?=.*\d)/, {
+        message: 'Le mot de passe doit contenir au moins 1 chiffre',
     })
     @IsNotEmpty({ message: 'Mot de passe requis' })
     password: string;
