@@ -28,9 +28,9 @@ function StripeRefreshContent() {
         try {
             const response = await api.post('/stripe/connect/onboarding-link');
             window.location.href = response.data.url;
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error('Erreur lors de la génération du lien:', err);
-            setError(err.response?.data?.message || 'Impossible de générer un nouveau lien');
+            setError((err as any).response?.data?.message || 'Impossible de générer un nouveau lien');
             setLoading(false);
         }
     };

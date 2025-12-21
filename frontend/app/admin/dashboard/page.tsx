@@ -104,9 +104,9 @@ function DashboardContent() {
             const response = await api.post('/stripe/connect/onboarding-link');
             // Rediriger vers Stripe
             window.location.href = response.data.url;
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error('Erreur lors de la création du lien d\'onboarding:', error);
-            setStripeError(error.response?.data?.message || 'Erreur lors de la configuration Stripe');
+            setStripeError((error as any).response?.data?.message || 'Erreur lors de la configuration Stripe');
             setStripeLoading(false);
         }
     };
