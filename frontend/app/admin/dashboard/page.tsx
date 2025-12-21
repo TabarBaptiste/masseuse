@@ -106,7 +106,8 @@ function DashboardContent() {
             window.location.href = response.data.url;
         } catch (error: unknown) {
             console.error('Erreur lors de la création du lien d\'onboarding:', error);
-            setStripeError((error as any).response?.data?.message || 'Erreur lors de la configuration Stripe');
+            const err = error as { response?: { data?: { message?: string } } };
+            setStripeError(err.response?.data?.message || 'Erreur lors de la configuration Stripe');
             setStripeLoading(false);
         }
     };

@@ -30,7 +30,8 @@ function StripeRefreshContent() {
             window.location.href = response.data.url;
         } catch (err: unknown) {
             console.error('Erreur lors de la génération du lien:', err);
-            setError((err as any).response?.data?.message || 'Impossible de générer un nouveau lien');
+            const error = err as { response?: { data?: { message?: string } } };
+            setError(error.response?.data?.message || 'Impossible de générer un nouveau lien');
             setLoading(false);
         }
     };
