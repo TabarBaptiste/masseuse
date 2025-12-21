@@ -9,7 +9,7 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../prisma/prisma.service';
 import { EmailService } from '../email/email.service';
-import { RegisterDto, LoginDto } from './dto';
+import { RegisterDto, LoginDto, ForgotPasswordDto, ResetPasswordDto } from './dto';
 import { JwtPayload } from './strategies/jwt.strategy';
 import { randomBytes } from 'crypto';
 
@@ -37,10 +37,6 @@ export class AuthService {
     // Generate email verification token
     const emailVerificationToken = randomBytes(32).toString('hex');
 
-    // TODO : à supprimer en PROD
-    // Déterminer le rôle : ADMIN pour alinerol@gmail.com, sinon USER par défaut
-    const role = registerDto.email === 'alinerol@gmail.com' ? 'ADMIN' : 'USER';
-
     // Create user
     const user = await this.prisma.user.create({
       data: {
@@ -51,7 +47,6 @@ export class AuthService {
         phone: registerDto.phone,
         emailVerificationToken,
         emailVerified: false,
-        role: role, // TODO : à supprimer en PROD
       },
       select: {
         id: true,
@@ -249,5 +244,72 @@ export class AuthService {
     //   console.error('💥 JWT generation failed:', error.message);
     //   throw error;
     // }
+  }
+
+  // ========================================
+  // RÉINITIALISATION DU MOT DE PASSE
+  // ========================================
+
+  async forgotPassword(forgotPasswordDto: ForgotPasswordDto) {
+    const user = await this.prisma.user.findUnique({
+      where: { email: forgotPasswordDto.email },
+    });
+
+    // Ne pas révéler si l'email existe ou non (sécurité)
+    if (!user) {
+      return { message: 'Si un compte existe avec cet email, un lien de réinitialisation a été envoyé.' };
+    }
+
+    // Générer un token sécurisé
+    const resetToken = randomBytes(32).toString('hex');
+    const resetExpires = new Date(Date.now() + 60 * 60 * 1000); // 1 heure
+
+    // Sauvegarder le token dans la base
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: {
+        passwordResetToken: resetToken,
+        passwordResetExpires: resetExpires,
+      },
+    });
+
+    // Envoyer l'email
+    await this.emailService.sendPasswordResetEmail(user.email, {
+      firstName: user.firstName,
+      resetToken,
+    });
+
+    return { message: 'Si un compte existe avec cet email, un lien de réinitialisation a été envoyé.' };
+  }
+
+  async resetPassword(resetPasswordDto: ResetPasswordDto) {
+    // Trouver l'utilisateur avec ce token
+    const user = await this.prisma.user.findUnique({
+      where: { passwordResetToken: resetPasswordDto.token },
+    });
+
+    if (!user) {
+      throw new BadRequestException('Token de réinitialisation invalide ou expiré');
+    }
+
+    // Vérifier que le token n'a pas expiré
+    if (!user.passwordResetExpires || user.passwordResetExpires < new Date()) {
+      throw new BadRequestException('Token de réinitialisation expiré');
+    }
+
+    // Hasher le nouveau mot de passe
+    const hashedPassword = await bcrypt.hash(resetPasswordDto.password, 12);
+
+    // Mettre à jour le mot de passe et supprimer le token
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: {
+        password: hashedPassword,
+        passwordResetToken: null,
+        passwordResetExpires: null,
+      },
+    });
+
+    return { message: 'Mot de passe réinitialisé avec succès' };
   }
 }

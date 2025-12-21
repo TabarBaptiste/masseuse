@@ -3,7 +3,7 @@ import type { Response } from 'express';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { Throttle, SkipThrottle } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
-import { RegisterDto, LoginDto } from './dto';
+import { RegisterDto, LoginDto, ForgotPasswordDto, ResetPasswordDto } from './dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { CurrentUser } from './decorators/current-user.decorator';
 
@@ -107,5 +107,22 @@ export class AuthController {
   @ApiResponse({ status: 400, description: 'Email déjà vérifié ou invalide' })
   async updateEmail(@CurrentUser() user: { id: string }, @Body('email') email: string) {
     return this.authService.updateEmail(user.id, email);
+  }
+
+  @Post('forgot-password')
+  @Throttle({ default: { limit: 3, ttl: 60000 } }) // 3 tentatives par minute
+  @ApiOperation({ summary: 'Demande de réinitialisation du mot de passe' })
+  @ApiResponse({ status: 200, description: 'Email envoyé si le compte existe' })
+  async forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
+    return this.authService.forgotPassword(forgotPasswordDto);
+  }
+
+  @Post('reset-password')
+  @Throttle({ default: { limit: 5, ttl: 60000 } }) // 5 tentatives par minute
+  @ApiOperation({ summary: 'Réinitialisation du mot de passe' })
+  @ApiResponse({ status: 200, description: 'Mot de passe réinitialisé' })
+  @ApiResponse({ status: 400, description: 'Token invalide ou expiré' })
+  async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
+    return this.authService.resetPassword(resetPasswordDto);
   }
 }
