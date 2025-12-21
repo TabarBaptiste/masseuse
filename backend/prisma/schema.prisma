@@ -54,6 +54,10 @@ model User {
   emailVerificationToken String?  @unique
   isActive               Boolean  @default(true)
 
+  // Reset password
+  passwordResetToken     String?   @unique
+  passwordResetExpires   DateTime?
+
   // Stripe Connect (uniquement pour ADMIN)
   stripeAccountId String? @unique // ID du compte Stripe Connect Standard
 
