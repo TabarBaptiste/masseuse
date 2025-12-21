@@ -30,10 +30,10 @@ export default function LoginPage() {
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
     setError('');
-    
+
     try {
       await login(data);
-      
+
       // Redirect to stored URL if it's a reservation, otherwise to services
       const storedRedirect = localStorage.getItem('redirectAfterLogin');
       const redirectUrl = storedRedirect && storedRedirect.startsWith('/reservation/') ? storedRedirect : '/services';
@@ -99,6 +99,15 @@ export default function LoginPage() {
             >
               {isLoading ? 'Connexion...' : 'Se connecter'}
             </Button>
+
+            <div className="flex items-center justify-end">
+              <Link
+                href="/forgot-password"
+                className="text-sm text-blue-600 hover:text-blue-500"
+              >
+                Mot de passe oublié ?
+              </Link>
+            </div>
           </form>
         </Card>
       </div>
