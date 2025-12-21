@@ -58,7 +58,7 @@ export class AuthController {
   @Post('logout')
   @ApiOperation({ summary: "Déconnexion de l'utilisateur" })
   @ApiResponse({ status: 200, description: 'Déconnexion réussie' })
-  async logout(@Res({ passthrough: true }) response: Response) {
+  logout(@Res({ passthrough: true }) response: Response) {
     // Supprimer le cookie
     response.clearCookie('access_token', {
       httpOnly: true,
@@ -76,7 +76,7 @@ export class AuthController {
   @ApiOperation({ summary: "Obtenir le profil de l'utilisateur connecté" })
   @ApiResponse({ status: 200, description: 'Profil utilisateur' })
   @ApiResponse({ status: 401, description: 'Non autorisé' })
-  async getProfile(@CurrentUser() user: any) {
+  getProfile(@CurrentUser() user: any) {
     return user;
   }
 
@@ -95,7 +95,7 @@ export class AuthController {
   @ApiOperation({ summary: "Renvoyer l'email de vérification" })
   @ApiResponse({ status: 200, description: 'Email envoyé' })
   @ApiResponse({ status: 400, description: 'Email déjà vérifié' })
-  async resendVerification(@CurrentUser() user: any) {
+  async resendVerification(@CurrentUser() user: { id: string }) {
     return this.authService.resendVerificationEmail(user.id);
   }
 
@@ -105,7 +105,7 @@ export class AuthController {
   @ApiOperation({ summary: "Modifier l'email (uniquement si non vérifié)" })
   @ApiResponse({ status: 200, description: 'Email mis à jour' })
   @ApiResponse({ status: 400, description: 'Email déjà vérifié ou invalide' })
-  async updateEmail(@CurrentUser() user: any, @Body('email') email: string) {
+  async updateEmail(@CurrentUser() user: { id: string }, @Body('email') email: string) {
     return this.authService.updateEmail(user.id, email);
   }
 }

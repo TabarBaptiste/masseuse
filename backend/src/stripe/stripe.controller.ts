@@ -136,7 +136,7 @@ export class StripeController {
 
       case 'checkout.session.expired': {
         const session = event.data.object;
-        await this.stripeService.handleSessionExpired(session);
+        this.stripeService.handleSessionExpired(session);
         break;
       }
 
