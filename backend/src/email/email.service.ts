@@ -397,4 +397,61 @@ export class EmailService {
             throw error;
         }
     }
+
+    // ========================================
+    // EMAIL DE RÉINITIALISATION MOT DE PASSE
+    // ========================================
+
+    async sendPasswordResetEmail(to: string, data: {
+        firstName: string;
+        resetToken: string;
+    }) {
+        try {
+            const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+            const resetUrl = `${frontendUrl}/reset-password?token=${data.resetToken}`;
+            const safeFirstName = escapeHtml(data.firstName);
+
+            const result = await this.resend.emails.send({
+                from: this.fromEmail,
+                to,
+                subject: 'Réinitialisation de votre mot de passe - Aly Dous\'heure',
+                html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #92400e;">Réinitialisation de mot de passe 🔐</h2>
+          <p>Bonjour ${safeFirstName},</p>
+          <p>Vous avez demandé à réinitialiser votre mot de passe. Cliquez sur le bouton ci-dessous pour en choisir un nouveau :</p>
+          
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${resetUrl}" 
+               style="display: inline-block; background-color: #92400e; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold;">
+              Réinitialiser mon mot de passe
+            </a>
+          </div>
+
+          <p style="color: #6b7280; font-size: 14px;">
+            Si le bouton ne fonctionne pas, copiez et collez ce lien dans votre navigateur :<br>
+            <a href="${resetUrl}" style="color: #92400e;">${resetUrl}</a>
+          </p>
+
+          <div style="background-color: #fef3c7; padding: 15px; border-radius: 8px; margin: 20px 0;">
+            <p style="margin: 0; color: #92400e;">
+              <strong>⚠️ Important :</strong> Ce lien est valable pendant 1 heure uniquement.
+            </p>
+          </div>
+
+          <hr style="margin: 30px 0; border: none; border-top: 1px solid #e5e7eb;">
+          <p style="color: #6b7280; font-size: 12px;">
+            Si vous n'avez pas demandé cette réinitialisation, vous pouvez ignorer cet email. Votre mot de passe actuel reste inchangé.
+          </p>
+          <p style="margin-top: 30px;">Cordialement,<br>L'équipe Aly Dous'heure</p>
+        </div>
+      `,
+            });
+
+            return result;
+        } catch (error) {
+            console.error('Erreur lors de l\'envoi de l\'email de réinitialisation:', error);
+            throw error;
+        }
+    }
 }
